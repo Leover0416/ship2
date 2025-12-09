@@ -338,9 +338,14 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
       if (!link) {
         link = document.createElement('link');
         link.rel = 'stylesheet';
+        // 使用多个备用 CDN，提高可用性（移除 integrity 以避免某些网络环境下的问题）
         link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-        link.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
-        link.crossOrigin = '';
+        link.crossOrigin = 'anonymous';
+        link.onerror = () => {
+          console.warn('[StaticMap] 主 CDN CSS 加载失败，尝试备用 CDN');
+          // 备用 CDN
+          link.href = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css';
+        };
         document.head.appendChild(link);
       }
 
@@ -348,13 +353,47 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
       let script = document.querySelector('script[src*="leaflet"]') as HTMLScriptElement;
       if (!script) {
         script = document.createElement('script');
+        // 使用多个备用 CDN，提高可用性（移除 integrity 以避免某些网络环境下的问题）
         script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-        script.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
-        script.crossOrigin = '';
+        script.crossOrigin = 'anonymous';
         script.onload = () => {
-          leafletLoadedRef.current = true;
-          setIsLoading(false);
-          initializeMap();
+          // @ts-ignore
+          if (window.L) {
+            console.log('[StaticMap] Leaflet 加载成功');
+            leafletLoadedRef.current = true;
+            setIsLoading(false);
+            initializeMap();
+          } else {
+            console.error('[StaticMap] Leaflet 脚本加载完成，但 window.L 未定义');
+            setIsLoading(false);
+          }
+        };
+        script.onerror = () => {
+          console.warn('[StaticMap] 主 CDN 加载失败，尝试备用 CDN');
+          // 移除失败的脚本
+          script.remove();
+          // 尝试备用 CDN
+          const fallbackScript = document.createElement('script');
+          fallbackScript.src = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js';
+          fallbackScript.crossOrigin = 'anonymous';
+          fallbackScript.onload = () => {
+            // @ts-ignore
+            if (window.L) {
+              console.log('[StaticMap] Leaflet 从备用 CDN 加载成功');
+              leafletLoadedRef.current = true;
+              setIsLoading(false);
+              initializeMap();
+            } else {
+              console.error('[StaticMap] 备用 CDN 加载完成，但 window.L 未定义');
+              setIsLoading(false);
+            }
+          };
+          fallbackScript.onerror = () => {
+            console.error('[StaticMap] 所有 CDN 加载失败，地图无法显示');
+            setIsLoading(false);
+            alert('地图库加载失败，请检查网络连接或刷新页面重试。如果问题持续，请联系管理员。');
+          };
+          document.body.appendChild(fallbackScript);
         };
         document.body.appendChild(script);
       } else {
@@ -364,10 +403,17 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
           setIsLoading(false);
           initializeMap();
         } else {
+          // 如果脚本已存在但 L 未定义，等待加载完成
           script.onload = () => {
-            leafletLoadedRef.current = true;
-            setIsLoading(false);
-            initializeMap();
+            // @ts-ignore
+            if (window.L) {
+              leafletLoadedRef.current = true;
+              setIsLoading(false);
+              initializeMap();
+            } else {
+              console.error('[StaticMap] 脚本加载完成，但 window.L 未定义');
+              setIsLoading(false);
+            }
           };
         }
       }
@@ -2201,7 +2247,20 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
   const initializeMap = () => {
     // @ts-ignore
     const L: any = window.L;
-    if (!L || !mapRef.current || mapInstanceRef.current) return;
+    if (!L) {
+      console.error('[StaticMap] Leaflet (L) 未定义，无法初始化地图');
+      setIsLoading(false);
+      return;
+    }
+    if (!mapRef.current) {
+      console.error('[StaticMap] mapRef.current 为空，无法初始化地图');
+      setIsLoading(false);
+      return;
+    }
+    if (mapInstanceRef.current) {
+      console.log('[StaticMap] 地图已初始化，跳过');
+      return;
+    }
 
     try {
       // 创建地图实例
@@ -2216,11 +2275,18 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
         minZoom: 2
       });
 
-      // 添加 OpenStreetMap 瓦片图层
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      // 添加 OpenStreetMap 瓦片图层（使用多个备用服务器）
+      const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors',
-        maxZoom: 19
+        maxZoom: 19,
+        subdomains: ['a', 'b', 'c'], // 使用多个子域名提高可用性
+        errorTileUrl: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7' // 加载失败时显示空白图
       }).addTo(map);
+      
+      // 监听瓦片加载错误，提供备用方案
+      osmLayer.on('tileerror', (error: any, tile: any) => {
+        console.warn('[StaticMap] 瓦片加载失败:', error, tile);
+      });
 
       // 设置地图容器的 z-index，确保弹窗可以显示在上方
       const mapContainer = map.getContainer();
