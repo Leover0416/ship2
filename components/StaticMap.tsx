@@ -34,6 +34,7 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
   const anchorageMarkersRef = useRef<Map<string, any>>(new Map()); // 存储锚位标记
   const shipMarkersRef = useRef<Map<string, any>>(new Map()); // 存储船舶标记
   const shipTrajectoryLinesRef = useRef<Map<string, any>>(new Map()); // 存储船舶轨迹线
+  const shipIconCacheRef = useRef<Map<string, { rotation: number; isMoving: boolean }>>(new Map()); // 缓存船舶图标配置，避免频繁更新
   // 存储最新的berth数据映射，供tooltip函数使用
   const berthDataRef = useRef<Map<string, Berth>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
@@ -1652,6 +1653,7 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
         }
       });
       shipMarkersRef.current.clear();
+      shipIconCacheRef.current.clear(); // 清理图标缓存
       
       // 清理所有轨迹线
       const allTrajectoryIds = Array.from(shipTrajectoryLinesRef.current.keys());
@@ -1706,6 +1708,7 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
       });
       shipIdsToRemove.forEach(shipId => {
         shipMarkersRef.current.delete(shipId);
+        shipIconCacheRef.current.delete(shipId); // 清理图标缓存
       });
       
       // 清理所有不在visibleShips中的轨迹线
@@ -1757,6 +1760,7 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
       });
       forceRemoveShipIds.forEach(shipId => {
         shipMarkersRef.current.delete(shipId);
+        shipIconCacheRef.current.delete(shipId); // 清理图标缓存
       });
     }
 
@@ -1867,6 +1871,12 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
       // 判断是否在移动
       const isMoving = ship.status === 'navigating' || ship.status === 'docking';
       
+      // 检查图标是否需要更新（避免频繁更新导致闪烁）
+      const cachedIcon = shipIconCacheRef.current.get(ship.id);
+      const iconNeedsUpdate = !cachedIcon || 
+        cachedIcon.rotation !== rotationDeg || 
+        cachedIcon.isMoving !== isMoving;
+      
       // 创建船舶图标（使用调度地图中的小黄船图标，和PortMap保持一致）
       const shipIcon = L.divIcon({
         className: 'ship-marker',
@@ -1888,9 +1898,14 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
       // 检查是否已存在标记，如果存在则更新位置，否则创建新标记
       let shipMarker = shipMarkersRef.current.get(ship.id);
       if (shipMarker) {
-        // 更新现有标记的位置和图标
+        // 更新现有标记的位置
         shipMarker.setLatLng([position.lat, position.lng]);
-        shipMarker.setIcon(shipIcon);
+        // 只在图标配置真正变化时才更新图标（避免闪烁）
+        if (iconNeedsUpdate) {
+          shipMarker.setIcon(shipIcon);
+          // 更新缓存
+          shipIconCacheRef.current.set(ship.id, { rotation: rotationDeg, isMoving });
+        }
       } else {
         // 创建新标记
         shipMarker = L.marker([position.lat, position.lng], { 
@@ -2946,8 +2961,8 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
         </div>
       )}
 
-      {/* 顶部工具栏（当没有编辑面板时显示） */}
-      {!editingBerthId && (
+      {/* 顶部工具栏（已隐藏：锚位添加、泊位添加、管理按钮） */}
+      {false && !editingBerthId && (
         <div 
           className="absolute top-3 right-3 flex gap-2 bg-slate-800/95 border border-slate-600/80 rounded-lg shadow-2xl backdrop-blur-md p-2"
           style={{ zIndex: 10000 }}
@@ -2994,8 +3009,8 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
         </div>
       )}
 
-      {/* 管理面板 */}
-      {showManagementPanel && (
+      {/* 管理面板（已隐藏） */}
+      {false && showManagementPanel && (
         <div
           className="absolute bg-slate-900/98 text-slate-100 text-sm px-4 py-3 rounded-lg border border-slate-600 shadow-2xl pointer-events-auto"
           style={{
@@ -3532,46 +3547,51 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
                 </button>
               </>
             )}
-            <button
-              onClick={() => {
-                setAddMode('anchorage');
-                setClickToAddMode(false);
-                setEditingBerthId(null);
-              }}
-              className={`flex items-center justify-center gap-1 px-2 py-1.5 rounded text-xs font-semibold transition-colors ${
-                addMode === 'anchorage'
-                  ? 'bg-green-600 hover:bg-green-500 text-white'
-                  : 'bg-green-700 hover:bg-green-600 text-white'
-              }`}
-              title="点击地图添加锚位"
-            >
-              <Plus size={12} /> 锚位
-            </button>
-            <button
-              onClick={() => {
-                setAddMode('berth');
-                setClickToAddMode(false);
-                setEditingBerthId(null);
-              }}
-              className={`flex items-center justify-center gap-1 px-2 py-1.5 rounded text-xs font-semibold transition-colors ${
-                addMode === 'berth'
-                  ? 'bg-orange-600 hover:bg-orange-500 text-white'
-                  : 'bg-orange-700 hover:bg-orange-600 text-white'
-              }`}
-              title="点击地图添加泊位"
-            >
-              <Plus size={12} /> 泊位
-            </button>
-            <button
-              onClick={() => {
-                setShowManagementPanel(true);
-                setEditingBerthId(null);
-              }}
-              className="flex items-center justify-center gap-1 px-2 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded text-xs font-semibold transition-colors"
-              title="打开管理面板"
-            >
-              <Edit2 size={12} /> 管理
-            </button>
+            {/* 已隐藏：锚位添加、泊位添加、管理按钮 */}
+            {false && (
+              <>
+                <button
+                  onClick={() => {
+                    setAddMode('anchorage');
+                    setClickToAddMode(false);
+                    setEditingBerthId(null);
+                  }}
+                  className={`flex items-center justify-center gap-1 px-2 py-1.5 rounded text-xs font-semibold transition-colors ${
+                    addMode === 'anchorage'
+                      ? 'bg-green-600 hover:bg-green-500 text-white'
+                      : 'bg-green-700 hover:bg-green-600 text-white'
+                  }`}
+                  title="点击地图添加锚位"
+                >
+                  <Plus size={12} /> 锚位
+                </button>
+                <button
+                  onClick={() => {
+                    setAddMode('berth');
+                    setClickToAddMode(false);
+                    setEditingBerthId(null);
+                  }}
+                  className={`flex items-center justify-center gap-1 px-2 py-1.5 rounded text-xs font-semibold transition-colors ${
+                    addMode === 'berth'
+                      ? 'bg-orange-600 hover:bg-orange-500 text-white'
+                      : 'bg-orange-700 hover:bg-orange-600 text-white'
+                  }`}
+                  title="点击地图添加泊位"
+                >
+                  <Plus size={12} /> 泊位
+                </button>
+                <button
+                  onClick={() => {
+                    setShowManagementPanel(true);
+                    setEditingBerthId(null);
+                  }}
+                  className="flex items-center justify-center gap-1 px-2 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded text-xs font-semibold transition-colors"
+                  title="打开管理面板"
+                >
+                  <Edit2 size={12} /> 管理
+                </button>
+              </>
+            )}
             <button
               onClick={() => exportWaypoints(berthWaypoints, berthPositions)}
               className="flex items-center justify-center gap-1 px-2 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded text-xs font-semibold transition-colors"

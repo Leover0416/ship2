@@ -775,7 +775,7 @@ ${anchorageAssignmentsList}
               const shipsWithoutBerthInfo = shipsWithoutBerth.map(s => {
                   const anchorage = latestBerthsForMessage.find(b => b.id === s.assignedAnchorageId);
                   const anchorageName = anchorage ? anchorage.name : s.assignedAnchorageId;
-                  return `${s.name} -> ${anchorageName} (只能在分配的锚位先待着)`;
+                  return `${s.name} -> ${anchorageName} (暂时在锚位等待)`;
               }).join('\n');
               
               // 组合消息
@@ -1103,7 +1103,7 @@ ${anchorageAssignmentsList}
           const shipsWithoutBerthInfo = shipsWithoutBerth.map(s => {
               const anchorage = latestBerthsForMessage.find(b => b.id === s.assignedAnchorageId);
               const anchorageName = anchorage ? anchorage.name : s.assignedAnchorageId;
-              return `${s.name} -> ${anchorageName} (只能在分配的锚位先待着)`;
+              return `${s.name} -> ${anchorageName} (暂时在锚位等待)`;
           }).join('\n');
           
           // 组合消息
