@@ -212,29 +212,70 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
     }
   };
 
-  // 从 localStorage 加载数据
+  // 从 public/waypoints/berth-waypoints-latlng.json 或 localStorage 加载数据
   useEffect(() => {
-    try {
-      const storedWaypoints = localStorage.getItem('berth-waypoints-latlng');
-      if (storedWaypoints) {
-        const parsed = JSON.parse(storedWaypoints);
-        setBerthWaypoints(parsed);
+    const loadData = async () => {
+      try {
+        // 优先从 public/waypoints/berth-waypoints-latlng.json 加载
+        const response = await fetch('/waypoints/berth-waypoints-latlng.json');
+        if (response.ok) {
+          const data = await response.json();
+          console.log('[StaticMap] Loaded from public/waypoints/berth-waypoints-latlng.json');
+          
+          // 加载路径点
+          if (data.waypoints) {
+            setBerthWaypoints(data.waypoints);
+            // 同步到 localStorage 以便后续编辑
+            localStorage.setItem('berth-waypoints-latlng', JSON.stringify(data.waypoints));
+          }
+          
+          // 加载位置
+          if (data.positions) {
+            setBerthPositions(data.positions);
+            // 同步到 localStorage 以便后续编辑
+            localStorage.setItem('berth-positions-latlng', JSON.stringify(data.positions));
+          }
+          
+          // 加载自定义名称（如果有）
+          if (data.customNames) {
+            setBerthCustomNames(data.customNames);
+            localStorage.setItem('berth-custom-names-latlng', JSON.stringify(data.customNames));
+          }
+          
+          return; // 成功加载，直接返回
+        }
+      } catch (e) {
+        console.warn('[StaticMap] Failed to load from public/waypoints/berth-waypoints-latlng.json, trying localStorage:', e);
       }
       
-      const storedPositions = localStorage.getItem('berth-positions-latlng');
-      if (storedPositions) {
-        const parsed = JSON.parse(storedPositions);
-        setBerthPositions(parsed);
-      }
+      // 如果 public 文件不存在或加载失败，从 localStorage 加载
+      try {
+        const storedWaypoints = localStorage.getItem('berth-waypoints-latlng');
+        if (storedWaypoints) {
+          const parsed = JSON.parse(storedWaypoints);
+          setBerthWaypoints(parsed);
+          console.log('[StaticMap] Loaded waypoints from localStorage');
+        }
+        
+        const storedPositions = localStorage.getItem('berth-positions-latlng');
+        if (storedPositions) {
+          const parsed = JSON.parse(storedPositions);
+          setBerthPositions(parsed);
+          console.log('[StaticMap] Loaded positions from localStorage');
+        }
 
-      const storedNames = localStorage.getItem('berth-custom-names-latlng');
-      if (storedNames) {
-        const parsed = JSON.parse(storedNames);
-        setBerthCustomNames(parsed);
+        const storedNames = localStorage.getItem('berth-custom-names-latlng');
+        if (storedNames) {
+          const parsed = JSON.parse(storedNames);
+          setBerthCustomNames(parsed);
+          console.log('[StaticMap] Loaded custom names from localStorage');
+        }
+      } catch (e) {
+        console.error('[StaticMap] Failed to load data from localStorage:', e);
       }
-    } catch (e) {
-      console.error('Failed to load data from localStorage:', e);
-    }
+    };
+    
+    loadData();
   }, []);
 
 
