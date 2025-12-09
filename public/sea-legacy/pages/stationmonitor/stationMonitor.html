@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../../assets/css/station/visual.css"/>
+    <link rel="stylesheet" href="../../assets/css/station/swiper.min.css"/>
+    <script type="text/javascript" src="../../assets/libs/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="../../assets/libs/echarts/echarts.min.js"></script>
+    <link rel="stylesheet" href="../../assets/libs/swiper/swiper.min.css"/>
+    <script type="text/javascript" src="../../assets/libs/swiper/swiper.min.js"></script>
+    <script type="text/javascript" src="../../assets/libs/layui/layui.js"></script>
+    <link rel="stylesheet" href="../../assets/libs/layui/css/layui.css"/>
+    <title>基站监控</title>
+</head>
+<body class="ksh">
+<div id="load">
+    <div class="load_img"><!-- 加载动画 -->
+        <img class="jzxz1" src="../../assets/css/station/images/jzxz1.png">
+        <img class="jzxz2" src="../../assets/css/station/images/jzxz2.png">
+    </div>
+</div>
+<div class='swiper-container visual_swiper_staffInfo'>
+    <div id="swiper" class='swiper-wrapper'>
+        <div class="swiper-slide">
+            <div class="visual">
+                <div class="visual_left">
+                    <div class="visual_box">
+                        <div class="visual_title">
+                            <span id="shoreTitle0" >老铁山-400054325</span>
+                            <img src="../../assets/css/station/images/ksh33.png">
+                        </div>
+                        <div class=" sfzcll">
+                            <div class="visual_con">
+                                <div class="visual_conTop">
+                                    <div class="visual_conTop_box visual_conTop1">
+                                        <div id="power0" style="height: 50px">
+                                            <span >电源状态</span>
+                                        </div>
+                                    </div>
+                                    <div class="visual_conTop_box visual_conTop1">
+                                        <div id="antenna0">
+                                            <span>天线状态</span>
+                                        </div>
+                                    </div>
+                                    <div class="visual_conTop_box visual_conTop1">
+                                        <div id="signalStrength0">
+                                            <span>信号强度</span>
+
+                                        </div>
+                                    </div>
+                                    <div class="visual_conTop_box visual_conTop1">
+                                        <div id="noiseRatio0">
+                                            <span>信噪比</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="width: 845px ;height: 180px;margin-top: 70px" id="main1">
+
+                        </div>
+                            <div style="display : inline-block;width: 420px ;height: 160px;margin-top: 5px" id="main2">
+
+                            </div>
+                            <div style="display : inline-block;width: 420px ;height: 160px;margin-top: 5px" id="main3">
+
+                            </div>
+
+                    </div>
+                    <div class="visual_box sfzcll">
+                        <div class="visual_title">
+                            <span id="shoreTitle2">长兴岛-400040103</span>
+                            <img src="../../assets/css/station/images/ksh33.png">
+                        </div>
+                        <div class=" sfzcll">
+                            <div class="visual_con">
+                                <div class="visual_conTop">
+                                    <div class="visual_conTop_box visual_conTop1">
+                                        <div id="power2" style="height: 50px">
+                                            <span >电源状态</span>
+                                        </div>
+                                    </div>
+                                    <div class="visual_conTop_box visual_conTop1">
+                                        <div id="antenna2">
+                                            <span>天线状态</span>
+                                        </div>
+                                    </div>
+                                    <div class="visual_conTop_box visual_conTop1">
+                                        <div id="signalStrength2">
+                                            <span>信号强度</span>
+
+                                        </div>
+                                    </div>
+                                    <div class="visual_conTop_box visual_conTop1">
+                                        <div id="noiseRatio2">
+                                            <span>信噪比</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="width: 845px ;height: 180px;margin-top: 70px" id="main7">
+
+                        </div>
+                        <div style="display : inline-block;width: 420px ;height: 160px;margin-top: 5px" id="main8">
+
+                        </div>
+                        <div style="display : inline-block;width: 420px ;height: 160px;margin-top: 5px" id="main9">
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="visual_right">
+                    <div class="visual_box">
+                        <div class="visual_title">
+                            <span id="shoreTitle1">航天大厦-401014231</span>
+                            <img src="../../assets/css/station/images/ksh33.png">
+                        </div>
+                        <div class=" sfzcll">
+                            <div class="visual_con">
+                                <div class="visual_conTop">
+                                    <div class="visual_conTop_box visual_conTop1">
+                                        <div id="power1" style="height: 50px">
+                                            <span >电源状态</span>
+                                        </div>
+                                    </div>
+                                    <div class="visual_conTop_box visual_conTop1">
+                                        <div id="antenna1">
+                                            <span>天线状态</span>
+                                        </div>
+                                    </div>
+                                    <div class="visual_conTop_box visual_conTop1">
+                                        <div id="signalStrength1">
+                                            <span>信号强度</span>
+
+                                        </div>
+                                    </div>
+                                    <div class="visual_conTop_box visual_conTop1">
+                                        <div id="noiseRatio1">
+                                            <span>信噪比</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="width: 845px ;height: 180px;margin-top: 70px" id="main4">
+
+                        </div>
+                        <div style="display : inline-block;width: 420px ;height: 160px;margin-top: 5px" id="main5">
+
+                        </div>
+                        <div style="display : inline-block;width: 420px ;height: 160px;margin-top: 5px" id="main6">
+
+                        </div>
+                    </div>
+                    <div class="visual_box visualSfzsfl">
+                        <div class="visual_title">
+                            <span id="shoreTitle3">黄白咀-400009154</span>
+                            <img src="../../assets/css/station/images/ksh33.png">
+                        </div>
+                        <div class=" sfzcll">
+                            <div class="visual_con">
+                                <div class="visual_conTop">
+                                    <div class="visual_conTop_box visual_conTop1">
+                                        <div id="power3" style="height: 50px">
+                                            <span >电源状态</span>
+                                        </div>
+                                    </div>
+                                    <div class="visual_conTop_box visual_conTop1">
+                                        <div id="antenna3">
+                                            <span>天线状态</span>
+                                        </div>
+                                    </div>
+                                    <div class="visual_conTop_box visual_conTop1">
+                                        <div id="signalStrength3">
+                                            <span>信号强度</span>
+
+                                        </div>
+                                    </div>
+                                    <div class="visual_conTop_box visual_conTop1">
+                                        <div id="noiseRatio3">
+                                            <span>信噪比</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="width: 845px ;height: 180px;margin-top: 70px" id="main10">
+
+                        </div>
+                        <div style="display : inline-block;width: 420px ;height: 160px;margin-top: 5px" id="main11">
+
+                        </div>
+                        <div style="display : inline-block;width: 420px ;height: 160px;margin-top: 5px" id="main12">
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    layui.config({
+        base: '/module/', //静态资源所在路径
+    }).extend({
+    }).use(['element', 'common', 'admin'], function () {
+        var $ = layui.$;
+        var admin = layui.admin;
+        var highlight = '#03b7c9';
+        let barWidth = 25;
+        let max = 100;
+        let maxList = [max, max, max];
+        $(function(){
+            //删除加载动画
+            $('#load').fadeOut(1000)
+            setTimeout(function(){
+                    $('#load').remove()
+                }
+                ,1100);
+        })
+
+        admin.reqNoLoad('baseStation-api/getStationMonitor', '', function (res) {
+            var data=res.data;
+            if(data!=undefined){
+                var l=Math.ceil(data.length/4);
+                var swiperHtml="";
+                for(var i=0;i<l;i++){
+                     swiperHtml+='<div class="swiper-slide">' +
+                    '            <div class="visual">' +
+                    '                <div class="visual_left">' +
+                    '                    <div id="vis0'+i+'" class="visual_box" style="display: none">' +
+                    '                        <div class="visual_title">' +
+                    '                            <span id="shoreTitle0'+i+'" ></span>' +
+                    '                            <img src="../../assets/css/station/images/ksh33.png">' +
+                    '                        </div>' +
+                    '                        <div class=" sfzcll">' +
+                    '                            <div class="visual_con">' +
+                    '                                <div class="visual_conTop">' +
+                    '                                    <div class="visual_conTop_box visual_conTop1">' +
+                    '                                        <div id="power0'+i+'" style="height: 50px">' +
+                    '                                            <span >电源状态</span>' +
+                    '                                        </div>' +
+                    '                                    </div>' +
+                    '                                    <div class="visual_conTop_box visual_conTop1">' +
+                    '                                        <div id="antenna0'+i+'">' +
+                    '                                            <span>天线状态</span>' +
+                    '                                        </div>' +
+                    '                                    </div>' +
+                    '                                    <div class="visual_conTop_box visual_conTop1">' +
+                    '                                        <div id="signalStrength0'+i+'">' +
+                    '                                            <span>信号强度</span>' +
+                    '                                        </div>' +
+                    '                                    </div>' +
+                    '                                    <div class="visual_conTop_box visual_conTop1">' +
+                    '                                        <div id="noiseRatio0'+i+'">' +
+                    '                                            <span>信噪比</span>' +
+                    '                                        </div>' +
+                    '                                    </div>' +
+                    '                                </div>' +
+                    '                            </div>' +
+                    '                        </div>' +
+                    '                        <div style="width: 845px ;height: 180px;margin-top: 70px" id="gaugeId0'+i+'">' +
+                    '                        </div>' +
+                    '                            <div style="display : inline-block;width: 420px ;height: 160px;margin-top: 5px" id="aChanelId0'+i+'">' +
+                    '                            </div>' +
+                    '                            <div style="display : inline-block;width: 420px ;height: 160px;margin-top: 5px" id="bChanelId0'+i+'">' +
+                    '                            </div>' +
+                    '                    </div>' +
+                    '                    <div id="vis2'+i+'" class="visual_box sfzcll" style="display: none">' +
+                    '                        <div class="visual_title">' +
+                    '                            <span id="shoreTitle2'+i+'"></span>' +
+                    '                            <img src="../../assets/css/station/images/ksh33.png">' +
+                    '                        </div>' +
+                    '                        <div class=" sfzcll">' +
+                    '                            <div class="visual_con">' +
+                    '                                <div class="visual_conTop">' +
+                    '                                    <div class="visual_conTop_box visual_conTop1">' +
+                    '                                        <div id="power2'+i+'" style="height: 50px">' +
+                    '                                            <span >电源状态</span>' +
+                    '                                        </div>' +
+                    '                                    </div>' +
+                    '                                    <div class="visual_conTop_box visual_conTop1">' +
+                    '                                        <div id="antenna2'+i+'">' +
+                    '                                            <span>天线状态</span>' +
+                    '                                        </div>' +
+                    '                                    </div>' +
+                    '                                    <div class="visual_conTop_box visual_conTop1">' +
+                    '                                        <div id="signalStrength2'+i+'">' +
+                    '                                            <span>信号强度</span>' +
+                    '                                        </div>' +
+                    '                                    </div>' +
+                    '                                    <div class="visual_conTop_box visual_conTop1">' +
+                    '                                        <div id="noiseRatio2'+i+'">' +
+                    '                                            <span>信噪比</span>' +
+                    '                                        </div>' +
+                    '                                    </div>' +
+                    '                                </div>' +
+                    '                            </div>' +
+                    '                        </div>' +
+                    '                        <div style="width: 845px ;height: 180px;margin-top: 70px" id="gaugeId2'+i+'">' +
+                    '                        </div>' +
+                    '                        <div style="display : inline-block;width: 420px ;height: 160px;margin-top: 5px" id="aChanelId2'+i+'">' +
+                    '                        </div>' +
+                    '                        <div style="display : inline-block;width: 420px ;height: 160px;margin-top: 5px" id="bChanelId2'+i+'">' +
+                    '                        </div>' +
+                    '                    </div>' +
+                    '                </div>' +
+                    '                <div class="visual_right">' +
+                    '                    <div id="vis1'+i+'" class="visual_box" style="display: none">' +
+                    '                        <div class="visual_title">' +
+                    '                            <span id="shoreTitle1'+i+'"></span>' +
+                    '                            <img src="../../assets/css/station/images/ksh33.png">' +
+                    '                        </div>' +
+                    '                        <div class=" sfzcll">' +
+                    '                            <div class="visual_con">' +
+                    '                                <div class="visual_conTop">' +
+                    '                                    <div class="visual_conTop_box visual_conTop1">' +
+                    '                                        <div id="power1'+i+'" style="height: 50px">' +
+                    '                                            <span >电源状态</span>' +
+                    '                                        </div>' +
+                    '                                    </div>' +
+                    '                                    <div class="visual_conTop_box visual_conTop1">' +
+                    '                                        <div id="antenna1'+i+'">' +
+                    '                                            <span>天线状态</span>' +
+                    '                                        </div>' +
+                    '                                    </div>' +
+                    '                                    <div class="visual_conTop_box visual_conTop1">' +
+                    '                                        <div id="signalStrength1'+i+'">' +
+                    '                                            <span>信号强度</span>' +
+                    '                                        </div>' +
+                    '                                    </div>' +
+                    '                                    <div class="visual_conTop_box visual_conTop1">' +
+                    '                                        <div id="noiseRatio1'+i+'">' +
+                    '                                            <span>信噪比</span>' +
+                    '                                        </div>' +
+                    '                                    </div>' +
+                    '                                </div>' +
+                    '                            </div>' +
+                    '                        </div>' +
+                    '                        <div style="width: 845px ;height: 180px;margin-top: 70px" id="gaugeId1'+i+'">' +
+                    '                        </div>' +
+                    '                        <div style="display : inline-block;width: 420px ;height: 160px;margin-top: 5px" id="aChanelId1'+i+'">' +
+                    '                        </div>' +
+                    '                        <div style="display : inline-block;width: 420px ;height: 160px;margin-top: 5px" id="bChanelId1'+i+'">' +
+                    '                        </div>' +
+                    '                    </div>' +
+                    '                    <div id="vis3'+i+'" class="visual_box visualSfzsfl" style="display: none">' +
+                    '                        <div class="visual_title">' +
+                    '                            <span id="shoreTitle3'+i+'"></span>' +
+                    '                            <img src="../../assets/css/station/images/ksh33.png">' +
+                    '                        </div>' +
+                    '                        <div class=" sfzcll">' +
+                    '                            <div class="visual_con">' +
+                    '                                <div class="visual_conTop">' +
+                    '                                    <div class="visual_conTop_box visual_conTop1">' +
+                    '                                        <div id="power3'+i+'" style="height: 50px">' +
+                    '                                            <span >电源状态</span>' +
+                    '                                        </div>' +
+                    '                                    </div>' +
+                    '                                    <div class="visual_conTop_box visual_conTop1">' +
+                    '                                        <div id="antenna3'+i+'">' +
+                    '                                            <span>天线状态</span>' +
+                    '                                        </div>' +
+                    '                                    </div>' +
+                    '                                    <div class="visual_conTop_box visual_conTop1">' +
+                    '                                        <div id="signalStrength3'+i+'">' +
+                    '                                            <span>信号强度</span>' +
+                    '                                        </div>' +
+                    '                                    </div>' +
+                    '                                    <div class="visual_conTop_box visual_conTop1">' +
+                    '                                        <div id="noiseRatio3'+i+'">' +
+                    '                                            <span>信噪比</span>' +
+                    '                                        </div>' +
+                    '                                    </div>' +
+                    '                                </div>' +
+                    '                            </div>' +
+                    '                        </div>' +
+                    '                        <div style="width: 845px ;height: 180px;margin-top: 70px" id="gaugeId3'+i+'">' +
+                    '                        </div>' +
+                    '                        <div style="display : inline-block;width: 420px ;height: 160px;margin-top: 5px" id="aChanelId3'+i+'">' +
+                    '                        </div>' +
+                    '                        <div style="display : inline-block;width: 420px ;height: 160px;margin-top: 5px" id="bChanelId3'+i+'">' +
+                    '                        </div>' +
+                    '                    </div>' +
+                    '                </div>' +
+                    '            </div>' +
+                    '        </div>'
+                }
+                $("#swiper").html(swiperHtml);
+                for(var i=0;i<data.length;i++){
+                    var t0=i%4;
+                    var t=parseInt(i/4);
+                        $("#vis"+t0+t).show();
+                        $("#shoreTitle"+t0+t).html(data[i].shoreName+"-"+data[i].shoreMmsi);
+                        $("#antenna"+t0+t).append("<span style='font-size: 25px;color:#20dbfd'> "+data[i].antennaStatus+"</span>");
+                        $("#power"+t0+t).append("<span style='font-size: 25px;color:#20dbfd'> 正常</span>");
+                        $("#signalStrength"+t0+t).append("<span style='font-size: 20px;color:#20dbfd'>"+ data[i].signalStrength+"dbm</span>");
+                        $("#noiseRatio"+t0+t).append("<span style='font-size: 25px;color:#20dbfd'>"+ data[i].noiseRatio+"db</span>");
+                        drawGaugeData(data[i].voltage,data[i].temperature,"gaugeId"+t0+t);
+                        drawChanel(data[i].AChanelName,data[i].AChanelValue,"aChanelId"+t0+t);
+                        drawChanel(data[i].BChanelName,data[i].BChanelValue,"bChanelId"+t0+t);
+                }
+                if(data.length>4){
+                    var mySwiper1 = new Swiper('.visual_swiper_staffInfo', {
+                        autoplay: true,//可选选项，自动滑动
+                        speed:1500,//可选选项，滑动速度
+                        autoplay: {
+                            delay: 15000,//毫秒
+                        }
+                    });
+                }
+
+            }
+        },'get')
+
+        function drawGaugeData(voltage,temperature, id){
+            var data = [
+                { name: '电压', value: voltage, unit: 'V', pos: ['25%', '80%'], range: [0, 250] },
+                { name: '温度', value: temperature, unit: '℃', pos: ['75%', '80%'], range: [-40, 160], splitNum: 10 },
+            ];
+          var option= makeGaugeOption(data)
+          echarts.init(document.getElementById(id)).setOption(option);
+        }
+        function drawChanel(name,value,id){
+            var data=[];
+            var green=[0,0,0];
+            var yellow=[0,0,0];
+            var red=[0,0,0];
+            for(var i in value){
+                if(value[i]<=50){
+                    green[i]=value[i]
+
+                }else if(value[i]<=80){
+                    green[i]=50;
+                    yellow[i]=value[i]-50;
+                }else {
+                    green[i]=50;
+                    yellow[i]=30;
+                    red[i]=value[i]-80;
+                }
+                data.push({name:name[i],value:value[i]})
+
+            }
+            echarts.init(document.getElementById(id)).setOption(makeBarOption(name,green,yellow,red,data));
+
+        }
+        function makeGaugeOption(data) {
+            var option = {
+                series: (function () {
+                    var result = [];
+                    data.forEach(function (item) {
+                        result.push(
+                            // 外围刻度
+                            {
+                                type: 'gauge',
+                                center: item.pos,
+                                radius: '120%', // 1行3个
+                                splitNumber: item.splitNum || 10,
+                                min: item.range[0],
+                                max: item.range[1],
+                                startAngle: 180,
+                                endAngle: 0,
+                                axisLine: {
+                                    show: true,
+                                    lineStyle: {
+                                        width: 2,
+                                        shadowBlur: 0,
+                                        color: [[1, highlight]],
+                                    },
+                                },
+                                axisTick: {
+                                    show: true,
+                                    lineStyle: {
+                                        color: highlight,
+                                        width: 1,
+                                    },
+                                    length: -5,
+                                    splitNumber: 10,
+                                },
+                                splitLine: {
+                                    show: true,
+                                    length: -14,
+                                    lineStyle: {
+                                        color: highlight,
+                                    },
+                                },
+                                axisLabel: {
+                                    distance: -20,
+                                    textStyle: {
+                                        color: highlight,
+                                        fontSize: '14',
+                                        fontWeight: 'bold',
+                                    },
+                                },
+                                pointer: {
+                                    show: 0,
+                                },
+                                detail: {
+                                    show: 0,
+                                },
+                            },
+
+                            // 内侧指针、数值显示
+                            {
+                                name: item.name,
+                                type: 'gauge',
+                                center: item.pos,
+                                radius: '120%',
+                                startAngle: 180,
+                                endAngle: 0,
+                                min: item.range[0],
+                                max: item.range[1],
+                                axisLine: {
+                                    show: true,
+                                    lineStyle: {
+                                        width: 20,
+                                        color: [[1, 'rgba(255,255,255,.1)']],
+                                    },
+                                },
+                                axisTick: {
+                                    show: 0,
+                                },
+                                splitLine: {
+                                    show: 0,
+                                },
+                                axisLabel: {
+                                    show: 0,
+                                },
+                                pointer: {
+                                    show: true,
+                                    length: '100%',
+                                },
+                                detail: {
+                                    show: true,
+                                    offsetCenter: [0, '-45%'],
+                                    textStyle: {
+                                        fontSize: 20,
+                                        color: '#fff',
+                                    },
+                                    formatter: ['{value} ' + (item.unit || ''), '{name|' + item.name + '}'].join(''),
+                                    rich: {
+                                        name: {
+                                            fontSize: 12,
+                                            lineHeight: 30,
+                                            color: '#ddd',
+                                        },
+                                    },
+                                },
+                                itemStyle: {
+                                    normal: {
+                                        color: highlight,
+                                    },
+                                },
+                                data: [
+                                    {
+                                        value: item.value,
+                                    },
+                                ],
+                                anchor: {
+                                    show: true,
+                                    showAbove: true,
+                                    size: 24,
+                                    itemStyle: {
+                                        color: '#fff',
+                                    },
+                                },
+                            }
+                        );
+                    });
+
+                    return result;
+                })(),
+            };
+            return option;
+        }
+        function makeBarOption(yName,green,yellow,red,data) {
+            var option = {
+                xAxis: {
+                    splitLine: {
+                        show: false,
+                    },
+                    axisLabel: {
+                        show: false,
+                    },
+                    axisTick: {
+                        show: false,
+                    },
+                    axisLine: {
+                        show: false,
+                    },
+                    max: max,
+                },
+                grid: {
+                    containLabel: true,
+                    left: 10,
+                    top: 0,
+                    right: 50,
+                    bottom: 0,
+                },
+                yAxis: [
+                    {
+                        inverse: true,
+                        axisLine: {
+                            show: false,
+                        },
+                        axisTick: {
+                            show: false,
+                        },
+                        axisLabel: {
+                            margin: 10,
+                            textStyle: {
+                                fontSize: 14,
+                                color: '#FFF',
+                            },
+                        },
+                        data: yName,
+                    },
+                ],
+
+                series: [
+                    {
+                        //内
+                        type: 'bar',
+                        barWidth,
+                        stack: 'total',
+                        legendHoverLink: false,
+                        symbolRepeat: true,
+                        silent: true,
+                        itemStyle: {
+                            color:'#00ff00',
+                        },
+                        data: green,
+                        z: 1,
+                        animationEasing: 'elasticOut',
+                    },{
+                        //内
+                        type: 'bar',
+                        barWidth,
+                        stack: 'total',
+                        legendHoverLink: false,
+                        symbolRepeat: true,
+                        silent: true,
+                        itemStyle: {
+                            color:'#ffff00',
+                        },
+                        data: yellow,
+                        z: 1,
+                        animationEasing: 'elasticOut',
+                    },
+                    {
+                        //内
+                        type: 'bar',
+                        barWidth,
+                        stack: 'total',
+                        legendHoverLink: false,
+                        symbolRepeat: true,
+                        silent: true,
+                        itemStyle: {
+                            color:'#ff0000',
+                        },
+                        data: red,
+                        z: 1,
+                        animationEasing: 'elasticOut',
+                    },
+
+                    {
+                        name: '背景',
+                        type: 'bar',
+                        barWidth: barWidth,
+                        barGap: '-100%',
+                        data: maxList,
+                        itemStyle: {
+                            normal: {
+                                color: 'rgba(200,200,50,0.2)',
+                                barBorderRadius: 0,
+                            },
+
+                        },
+                        label: {
+                            show: true,
+                            position: 'right',
+                            offset: [5, 0],
+                            color: '#fff',
+                            fontSize: 14,
+                            formatter: function(a, b) {
+                                for(var i in data){
+                                    if(data[i].name==a.name){
+                                        return data[i].value+'%'
+                                    }
+                                }
+                                return ``
+                            }
+                        },
+                        z: 0,
+                    },
+
+                    {
+                        //分隔
+                        type: 'pictorialBar',
+                        itemStyle: {
+                            color: '#061537',
+                        },
+                        symbolRepeat: 'fixed',
+                        symbolMargin: 2,
+                        symbol: 'rect',
+                        symbolClip: true,
+                        symbolSize: [5, barWidth],
+                        symbolPosition: 'start',
+                        data: maxList,
+                        z: 2,
+                        animationEasing: 'elasticOut',
+                    }
+                ],
+            };
+
+            return option;
+        }
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,459 @@
+<!-- template表单弹窗 -->
+<form id="auth-form" lay-filter="auth-form" class="layui-form model-form" style="height: 700px;overflow-y: auto">
+    <input name="id" type="hidden"/>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">策略类型：</label>
+        <div class="layui-input-block">
+            <select name="clType"   lay-verify="required" required lay-filter="typeChanged">
+                <option selected="selected" value="0">报文策略</option>
+                <option  value="1">船舶类型策略</option>
+                <option  value="2">船舶参数策略</option>
+            </select>
+        </div>
+    </div>
+    <div id="bwlx" >
+        <div class="layui-form-item" >
+            <label class="layui-form-label">报文类型：</label>
+            <div id="authMessageType" class="layui-input-block">
+
+            </div>
+        </div>
+    </div>
+    <div id="cblx" style="display: none">
+        <div class="layui-form-item" >
+            <label class="layui-form-label">船舶类型：</label>
+            <div class="layui-input-block">
+            <div id="authShipType" class="demo-tree-more" style="max-height: 300px;overflow-y: auto;"></div>
+
+            </div>
+        </div>
+
+
+    </div>
+    <div id="cbcs" style="display: none">
+        <div style="margin-left: 15px">船舶参数</div>
+        <div class="layui-form-item" >
+
+            <div class="layui-block" style="margin-top: 20px">
+                <label class="layui-form-label">船舶MMSI：</label>
+                <div class="layui-input-block">
+                    <textarea  id="authShipMmsi" name="authShipMmsi" rows="5" placeholder="请输入船舶MMSI以,分隔"  class="layui-textarea" ></textarea>
+<!--                            <select id="authShipMmsi" name="authShipMmsi" xm-select="authShipMmsi" placeholder="请选择船舶MMSI">-->
+<!--                            </select>-->
+                </div>
+            </div>
+            <div class="layui-block" style="margin-top: 20px">
+                <label class="layui-form-label">船舶名称：</label>
+                <div class="layui-input-block">
+<!--                    <input  placeholder="请输入船舶名称" type="text" class="layui-input" maxlength="20" />-->
+                    <textarea  id="authShipName" name="authShipName" rows="5" placeholder="请输入船舶名称以,分隔"  class="layui-textarea" ></textarea>
+<!--                    <select id="authShipName" name="authShipName" xm-select="authShipName" placeholder="请选择船舶名称">-->
+<!--                    </select>-->
+                </div>
+            </div>
+            <div class="layui-block" style="margin-top: 20px;margin-bottom: 150px">
+                <label class="layui-form-label">船舶IMO：</label>
+                <div class="layui-input-block">
+                    <textarea  id="authShipIMO" name="authShipIMO" rows="5" placeholder="请输入船舶IMO以,分隔"  class="layui-textarea"></textarea>
+<!--                    <select id="authShipIMO" name="authShipIMO" xm-select="authShipIMO" placeholder="请选择船舶IMO">-->
+<!--                    </select>-->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="stationArea" class="layui-form-item">
+        <label class="layui-form-label">基站/区域：</label>
+        <div class="layui-input-block">
+            <input type="radio" name="stationAreaTypeName" value="0" title="基站" checked lay-filter="redioChanged"/>
+            <input type="radio" name="stationAreaTypeName" value="1" title="区域" lay-filter="redioChanged"/>
+        </div>
+    </div>
+    <div id="station" style="height: 350px">
+        <div class="layui-form-item" >
+            <div id= "stationIds" class="layui-input-block">
+            </div>
+        </div>
+    </div>
+    <div id="area" style="display: none">
+        <div class="layui-form-item" >
+            <div class="layui-inline">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">东北角：</label>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">经度：</label>
+                        <div class="layui-input-inline">
+                            <input id="northeastLng" name="northeastLng" placeholder="请输入东北角经度" type="text" class="layui-input" maxlength="20"
+                                     />
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">纬度：</label>
+                        <div class="layui-input-inline">
+                            <input id="northeastLat" name="northeastLat" placeholder="请输入东北角纬度" type="text" class="layui-input" maxlength="20"
+                                    />
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">西南角：</label>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">经度：</label>
+                            <div class="layui-input-inline">
+                                <input id="southwestLng" name="southwestLng" placeholder="请输入西南角经度" type="text" class="layui-input" maxlength="20"
+                                        />
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">纬度：</label>
+                            <div class="layui-input-inline">
+                                <input id="southwestLat" name="southwestLat" placeholder="请输入西南角纬度" type="text" class="layui-input" maxlength="20"
+                                        />
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div  class="layui-form-item model-form-footer" >
+        <button class="layui-btn layui-btn-primary" ew-event="closeDialog" type="button">取消</button>
+        <button class="layui-btn" lay-filter="auth-form-submit" lay-submit>保存</button>
+    </div>
+</form>
+
+<script>
+    layui.use(['layer','tree','util', 'admin', 'form', 'formSelects','common'], function () {
+        var layer = layui.layer;
+        var admin = layui.admin;
+        var form = layui.form;
+        var formSelects = layui.formSelects;
+        var config=layui.common;
+        var tree = layui.tree;
+        var util = layui.util;
+
+        form.render('radio');
+        form.render('checkbox');
+        form.render('select');
+        var stationData=[];
+        var messageTypeData=[];
+        var shipTypeData=[];
+        var clType1 = 0;
+        var stationAreaType = 0;
+        var intelligentData = {};
+        function queryStation(){
+            admin.reqSync('station-management/shoreInfoDb/selectMaps', {}, function (data) {
+                if (data!=null&&data.length>0) {
+                    stationData=data;
+                }
+
+            }, 'post');
+        }
+        function queryMessageType(){
+            admin.reqSync('api-user/MessageType/findAll', {}, function (data) {
+                if (data != null && data.length > 0) {
+                    messageTypeData=data;
+                }
+            }, 'get');
+        }
+        function queryShipType() {
+            admin.reqSync('api-user/ShipType/getTreeData', {}, function (data) {
+                if (data != null && data.length > 0) {
+                    shipTypeData=data;
+                }
+            }, 'get');
+        }
+        function queryShips() {
+            //船舶参数
+            admin.reqSync('shipDynamicStatic-api/getShipInfo', JSON.stringify({}), function (data) {
+                if (data != null && data.ships!=undefined&& data.ships.length > 0) {
+                    var authShipMmsiData = new Array();
+                    var authShipNameSelectData = new Array();
+                    var authShipIMOSelectData = new Array();
+                    for (var i = 0; i < data.ships.length; i++) {
+                        authShipMmsiData.push({name: data.ships[i].mmsi, value: data.ships[i].mmsi});
+                        authShipNameSelectData.push({name: data.ships[i].ename, value: data.ships[i].mmsi});
+                        authShipIMOSelectData.push({name: data.ships[i].mmsi, value: data.ships[i].mmsi});
+                    }
+                    formSelects.data('authShipMmsi', 'local', {arr: authShipMmsiData});
+                    formSelects.data('authShipName', 'local', {arr: authShipNameSelectData});
+                    formSelects.data('authShipIMO', 'local', {arr: authShipIMOSelectData});
+                }
+                form.render();
+            }, 'post');
+        }
+        //查询租户数据权限
+        function getTenantData(tenantCode) {
+            admin.reqSync('api-user/tenantIntelligentData/getTenantIntelligentData', {tenantCode: tenantCode}, function (result) {
+                if (result != undefined &&result.clType!=undefined&& result.clType.length> 0) {
+                    intelligentData = JSON.parse(result.datas);
+                    intelligentData.clType=result.clType;
+                    intelligentData.stationAreaType=result.stationAreaType;
+                    clType1 = intelligentData.clType;
+                    //查基站
+                    var formData={};
+                    if(intelligentData.stationAreaType==0){
+                        stationAreaType=intelligentData.stationAreaType;
+                        setStation(stationData,intelligentData)
+                        if(clType1!=2){
+                            stationArea(stationAreaType);
+                        }else {
+                            stationArea();
+                        }
+
+
+                    }else if (intelligentData.stationAreaType==1){ //区域
+                        stationAreaType=intelligentData.stationAreaType;
+                        setArea();
+                        stationArea(stationAreaType);
+                    }else {
+                        setStation()
+                    }
+                    //报文策略
+                    if (intelligentData.clType == 0) {
+                        $("#stationArea").show();
+                        setMessageType(messageTypeData,intelligentData);
+                        cl(clType1);
+                    }
+                    else if (intelligentData.clType == 1) {
+                        //船舶类型
+                        $("#stationArea").show();
+                        initTree(shipTypeData)
+                        cl(clType1);
+                    } else if (intelligentData.clType == 2) {
+                        $("#stationArea").hide();
+
+                        if(intelligentData.shipMmsi!=undefined){
+                            formData.authShipMmsi=intelligentData.shipMmsi;
+                           // formSelects.value('authShipMmsi', intelligentData.shipMmsi);
+                        }
+                        if(intelligentData.shipMmsi!=undefined){
+                            formData.authShipName=intelligentData.shipName;
+                           // formSelects.value('authShipName', intelligentData.authShipName);
+                        }
+                        if(intelligentData.authShipIMO!=undefined){
+                            formData.authShipIMO=intelligentData.shipIMO;
+                           // formSelects.value('authShipIMO', intelligentData.authShipIMO);
+                        }
+                        cl();
+                    }
+
+                }else {
+                     setStation(stationData);
+                     setMessageType(messageTypeData)
+                }
+                formData.clType=clType1;
+                form.val('auth-form', formData);
+                $('input[name=stationAreaTypeName][value=' + stationAreaType + ']').get(0).checked = true;
+
+
+                form.render();
+            }, 'get');
+        }
+
+
+    function setStation(stations,intelligentData) {
+        var station="";
+        for(var i in stations){
+            if(intelligentData!=undefined&&intelligentData.station!=undefined&&intelligentData.station.indexOf(stations[i].shore_mmsi)>-1){
+                station+=" <input type='checkbox' name='stationName' value='"+stations[i].shore_mmsi+"' checked lay-skin='primary' title='"+stations[i].shore_name+"("+stations[i].shore_mmsi+")' >";
+            }else {
+                station+=" <input type='checkbox' name='stationName' value='"+stations[i].shore_mmsi+"' lay-skin='primary' title='"+stations[i].shore_name+"("+stations[i].shore_mmsi+")' >"
+            }
+        }
+        $("#stationIds").html(station)
+        form.render();
+    }
+    function setArea() {
+        $("#northeastLng").val(intelligentData.area==undefined?"":intelligentData.area.northeastLng);
+        $("#northeastLat").val(intelligentData.area==undefined?"":intelligentData.area.northeastLat);
+        $("#southwestLng").val(intelligentData.area==undefined?"":intelligentData.area.southwestLng);
+        $("#southwestLat").val(intelligentData.area==undefined?"":intelligentData.area.northeastLat);
+    }
+    function setMessageType(messageTypeData,intelligentData) {
+        var message = "";
+        for (var i in messageTypeData) {
+            if (intelligentData != undefined&&intelligentData.message != undefined&&intelligentData.message.indexOf(messageTypeData[i].id) > -1) {
+                message += "<div class='layui-input-inline'>" +
+                    "<input type='checkbox' name='messageTypeName' value='"+messageTypeData[i].id+"' checked lay-skin='primary' title='" + messageTypeData[i].messageName + "'style='width: 150px'/>" +
+                    "</div>"
+            }else {
+                message += "<div class='layui-input-inline'>" +
+                    "<input type='checkbox' name='messageTypeName' value='"+messageTypeData[i].id+"' lay-skin='primary' title='" + messageTypeData[i].messageName + "'style='width: 150px'/>" +
+                    "</div>"
+            }
+        }
+        $("#authMessageType").html(message);
+    }
+function initTree(treeData) {
+    tree.render({
+        elem: '#authShipType'
+        ,data: treeData
+        ,showCheckbox: true  //是否显示复选框
+        ,id: 'demoId1'
+        ,isJump: true //是否允许点击节点时弹出新窗口跳转
+        ,click: function(obj){
+            var data = obj.data;  //获取当前点击的节点数据
+            layer.msg('状态：'+ obj.state + '<br>节点数据：' + JSON.stringify(data));
+        }
+    });
+    if(intelligentData.shipType!=undefined){
+        tree.setChecked('demoId1', intelligentData.shipType);
+    }
+
+}
+        let dataAuth = admin.getTempData('t_dataAuth');
+        init()
+function init(){
+    queryStation();
+    queryMessageType();
+    queryShipType();
+    //queryShips();
+    getTenantData(dataAuth.data.tenantCode)
+    form.render();
+}
+
+        // 表单提交事件
+        form.on('submit(auth-form-submit)', function (data) {
+            var param={};
+            var datas={};
+            var cl=data.field.clType;
+            var sa=$("input:radio[name='stationAreaTypeName']:checked").val();
+           if(cl==0){
+               var m=[];
+               var boxes = $("input:checkbox[name='messageTypeName']:checked");
+               for(var i=0; i< boxes.length;i++ ){
+                   m.push(boxes[i].defaultValue);
+               }
+               datas.message=m
+           }else if(cl==1){
+               var ch=[];
+               var checkedData = tree.getChecked('demoId1');
+               for(var i=0;i<checkedData.length;i++){
+                   ch.push(checkedData[i].id);
+                   if(checkedData[i].children!=undefined&&checkedData[i].children.length>0){
+                       for(var j=0;j<checkedData[i].children.length;j++){
+                           ch.push(checkedData[i].children[j].id);
+                       }
+                   }
+               }
+               datas.shipType=ch
+           }else if(cl==2){
+               // var shipsId = $("input[name='authShipMmsi']").val().split(",");
+               // var shipsName = $("input[name='authShipName']").val().split(",");
+               // var shipsIMO = $("input[name='authShipIMO']").val().split(",");
+               datas.shipMmsi=data.field.authShipMmsi.replace(/，/g,",");
+               datas.shipName=data.field.authShipName.replace(/，/g,",");
+               datas.shipIMO=data.field.authShipIMO.replace(/，/g,",");
+
+           }
+           if(sa==0){
+               var s=[];
+               var sta = $("input:checkbox[name='stationName']:checked");
+               for(var i=0; i< sta.length;i++  ){
+                   s.push(sta[i].defaultValue);
+               }
+               datas.station=s
+               param.stationAreaType=sa
+           }else if(sa==1){
+               var area={}
+               area.northeastLng=$("#northeastLng").val();
+               area.northeastLat=$("#northeastLat").val();
+               area.southwestLng=$("#southwestLng").val();
+               area.southwestLat=$("#southwestLat").val();
+               datas.area=area
+               param.stationAreaType=sa
+           }
+            param.clType=cl;
+
+            param.datas=JSON.stringify(datas)
+            param.tenantCode=dataAuth.data.tenantCode;
+           // layer.load(2);
+            admin.req('api-user/tenantIntelligentData/saveOrUpdate', JSON.stringify(param), function (data) {
+                layer.closeAll('loading');
+                if (data.resp_code == 0) {
+                    layer.msg(data.resp_msg, {icon: 1, time: config.msgTime});
+                    admin.finishPopupCenter();
+                } else {
+                    layer.msg(data.resp_msg, {icon: 2, time: config.msgTime});
+                }
+            }, "POST");
+             return false;
+        });
+
+        form.on('select(typeChanged)', function (data) {
+            cl(data.value);
+            clChange(data.value);
+        });
+        form.on('radio(redioChanged)', function (data) {
+            stationArea(data.value);
+            if(data.value==stationAreaType){
+                setStation(stationData,intelligentData)
+            }else if(data.value==0){
+                setStation(stationData)
+            }else {
+                setArea();
+            }
+        });
+        function clChange(value) {
+            if(value==0){
+                if(clType1==value){
+                    setMessageType(messageTypeData,intelligentData)
+                }else {
+                    setMessageType(messageTypeData)
+                }
+                stationArea($("input:radio[name='stationAreaTypeName']:checked").val());
+            }else if(value==1){
+              initTree(shipTypeData)
+                stationArea($("input:radio[name='stationAreaTypeName']:checked").val());
+            }else if(value==2){
+                if(intelligentData.shipMmsi!=undefined){
+                    formSelects.value('authShipMmsi', intelligentData.shipMmsi);
+                }
+                if(intelligentData.shipMmsi!=undefined){
+                    formSelects.value('authShipName', intelligentData.authShipName);
+                }
+                if(intelligentData.authShipIMO!=undefined){
+                    formSelects.value('authShipIMO', intelligentData.authShipIMO);
+                }
+                stationArea()
+            }
+
+            form.render();
+        }
+        function cl(value) {
+
+            if(value==0){
+                $("#bwlx").show();
+                $("#cblx").hide();
+                $("#cbcs").hide();
+                $("#station").css("height",'350px')
+            }else if (value==1){
+                $("#bwlx").hide();
+                $("#cblx").show();
+                $("#cbcs").hide();
+                $("#station").css("height",'')
+            }else {
+                $("#bwlx").hide();
+                $("#cblx").hide();
+                $("#cbcs").show();
+            }
+            form.render();
+        }
+        function stationArea(value) {
+            if(value==0){
+                $("#stationArea").show();
+                $("#station").show();
+                $("#area").hide();
+            }else if (value==1){
+                $("#stationArea").show();
+                $("#station").hide();
+                $("#area").show();
+            }else {
+                $("#station").hide();
+                $("#area").hide();
+                $("#stationArea").hide()
+            }
+        }
+
+    });
+</script>

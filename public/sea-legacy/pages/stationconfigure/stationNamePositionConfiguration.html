@@ -1,0 +1,279 @@
+
+<div class="layui-card">
+    <div class="layui-card-header">
+        <h2 class="header-title">基站名称、位置配置</h2>
+    </div>
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <div class="layui-card-body" style="padding: 15px;">
+                <form class="layui-form" action="" lay-filter="StationBaseInfoConfig-form">
+
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:130px;"><i
+                                    style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>选择基站</label>
+                            <div class="layui-input-inline">
+                                <select name="shoreMmsi" id="shoreMmsiBCL" lay-filter="stationChanged3"
+                                        lay-verify="required">
+                                    <option selected="selected" value=""></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:130px;"><i
+                                    style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>基站名称</label>
+                            <div class="layui-input-inline">
+                                <input type="hidden" id="uniqueIdentifier" name="uniqueIdentifier" value=""/>
+                                <input type="hidden" id="positionSource" name="positionSource" value=""/>
+                                <input type="hidden" id="control27" name="control27" value=""/>
+                                <input type="hidden" id="sentenceStatusFlag" name="sentenceStatusFlag" value=""/>
+                                <input type="text" placeholder="请输入基站名称" name="shoreName" id="shoreName"
+                                       autocomplete="off" class="layui-input" maxlength="20" lay-verify="nameCheck"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:130px;"><i
+                                    style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>经度位置</label>
+                            <div class="layui-input-inline">
+                                <input type="text" placeholder="请输入基站经度" name="longitude1" id="longitude1"
+                                       autocomplete="off" lay-verify="twoDecimalPlace" class="layui-input">
+                            </div>
+                            <div class="layui-input-inline" style="width:100px">
+                                <select name="longitude2" id="longitude2" lay-filter="ewChanged">
+                                    <option selected="selected" value=""></option>
+                                    <option value="E">E</option>
+                                    <option value="W">W</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:130px;"><i
+                                    style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>纬度位置</label>
+                            <div class="layui-input-inline">
+                                <input type="text" placeholder="请输入基站纬度" name="latitude1" id="latitude1"
+                                       autocomplete="off" lay-verify="twoDecimalPlace" class="layui-input">
+                            </div>
+                            <div class="layui-input-inline" style="width:100px">
+                                <select name="latitude2" id="latitude2" lay-filter="nsChanged">
+                                    <option selected="selected" value=""></option>
+                                    <option value="N">N</option>
+                                    <option value="S">S</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:130px;"><i
+                                    style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>位置精确度</label>
+                            <div class="layui-input-inline">
+                                <select name="positionAccuracy" id="positionAccuracy" lay-filter="precisionChanged"
+                                        lay-verify="required">
+                                    <option selected="selected" value=""></option>
+                                    <option value="0">0</option>
+                                    <option value="1">1</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <div class="layui-inline" style="margin-left:50px;">
+                            <div class="layui-input-inline">
+                                <div class="layui-input-block">
+                                    <a class="layui-btn" lay-submit=""
+                                       lay-filter="BCL-submit">立即提交</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!--<script src="../static/module/checkutils.js"></script>-->
+<script>
+    layui.use(['form', 'table', 'util', 'common', 'admin', 'laydate'], function () {
+        var $ = layui.$;
+        var form = layui.form;
+        var laydate = layui.laydate;
+        var id = '';
+        var oldData = {};
+        var isFail = false;
+        var admin = layui.admin;
+        var config = layui.common;
+        var table = layui.table;
+        //获取基站下拉列表
+        getStationSelectList();
+        var checkutils = {
+            nameCheck: function(s){
+                var msgArr = s.split('');
+                for(var i in msgArr){
+                    if(msgArr[i].charCodeAt() < 0 || msgArr[i].charCodeAt() > 126){
+                        return false;
+                    }
+                }
+                return true;
+            },
+            // nameCheck: function(s){
+            //     var msgArr = s.split('');
+            //     for(var i in msgArr){
+            //         if(msgArr[i].charCodeAt() < 32 || msgArr[i].charCodeAt() > 95){
+            //             return false;
+            //         }
+            //     }
+            //     return true;
+            // },
+            twoDecimalPlace: function(s){//是否为小数点后两位
+                var re = /^[0-9]+\.[0-9]{2}$/ ;
+                return re.test(s)
+            },
+        }
+         // 自定义验证规则
+        form.verify({
+            nameCheck: function (s) {
+                if (s == '') {
+                    return '必填项不能为空';
+                } else if (s.length > 0) {
+                    if (!checkutils.nameCheck(s)) {
+                        return '请输入ASCII字符';
+                    }
+                }
+            },
+            twoDecimalPlace: function (s) {
+                if (s == '') {
+                    return '必填项不能为空';
+                } else if (s.length > 0) {
+                    if (!checkutils.twoDecimalPlace(s)) {
+                        return '请输入正数并保留小数点后两位';
+                    }
+                }
+            },
+        });
+
+        form.on('select(stationChanged3)', function (data) {
+            if (data.value == '') {
+                id = '';
+                $("#shoreName").val('');
+                $("#longitude1").val('');
+                $("#longitude2").val('');
+                $("#latitude1").val('');
+                $("#latitude2").val('');
+                $("#positionAccuracy").val('');
+                // //隐藏值
+                $("#uniqueIdentifier").val('');
+                $("#positionSource").val('');
+                $("#control27").val('');
+                $("#sentenceStatusFlag").val('');
+                form.render('select');
+                return
+            }
+            admin.req('stationConfigure/stationBaseInfoConfig/getByShoreMmsiBCL', JSON.stringify({shoreMmsi: data.value}), function (res) {
+                if (res.resp_code == '0') {
+                    oldData = res.datas;
+                    if (res.datas) {
+                        id = res.datas.id;
+                        $("#shoreName").val(res.datas.shoreName);
+                        $("#longitude1").val(Math.round((res.datas.longitude1) * 100) / 100);
+                        $("#longitude2").val(res.datas.longitude2);
+                        $("#latitude1").val(Math.round((res.datas.latitude1) * 100) / 100);
+                        $("#latitude2").val(res.datas.latitude2);
+                        $("#positionAccuracy").val(res.datas.positionAccuracy);
+                        $("#uniqueIdentifier").val(res.datas.uniqueIdentifier);
+                        $("#positionSource").val(res.datas.positionSource);
+                        $("#control27").val(res.datas.control27);
+                        $("#sentenceStatusFlag").val(res.datas.sentenceStatusFlag);
+                    } else {
+                        id = '';
+                        $("#shoreName").val('');
+                        $("#longitude1").val('');
+                        $("#longitude2").val('');
+                        $("#latitude1").val('');
+                        $("#latitude2").val('');
+                        $("#positionAccuracy").val('');
+                        $("#uniqueIdentifier").val('');
+                        $("#positionSource").val('');
+                        $("#control27").val('');
+                        $("#sentenceStatusFlag").val('');
+                    }
+                    form.render('select');
+                    layer.msg("获取成功！");
+                }else {
+                    layer.msg("获取失败！");
+                }
+            }, "post")
+        });
+
+        form.on('submit(BCL-submit)', function (data) {
+            var field = data.field;
+            if (!isFail && oldData != null && isNotChange(field)) {
+                layer.msg("没有任何值发生改变，无需提交");
+                return;
+            } else {
+                oldData = field
+            }
+            var param = {
+                id: field.id,
+                shoreMmsi: field.shoreMmsi,
+                shoreName: field.shoreName,
+                longitude1: field.longitude1,
+                longitude2: field.longitude2,
+                latitude1: field.latitude1,
+                latitude2: field.latitude2,
+                positionAccuracy: field.positionAccuracy,
+                uniqueIdentifier: field.uniqueIdentifier,
+                positionSource: field.positionSource,
+                control27: field.control27,
+                sentenceStatusFlag: field.control27,
+            }
+
+            if (id != '' && id != null) {
+                param.id = id;
+            }
+            admin.req('stationConfigure/stationBaseInfoConfig/updateBCL', JSON.stringify(param), function (res) {
+                if (res.resp_code == '0') {
+                    isFail = false;
+                    if (res.datas) {
+                        id = res.datas.id;
+                    }
+                    layer.msg("配置成功！");
+                } else {
+                    isFail = true;
+                    layer.msg("配置失败！");
+                }
+            }, "post");
+        })
+
+        function isNotChange(obj) {
+            for (var key in obj) {
+                var old = oldData[key] == null ? '' : oldData[key];
+                if (key!="shoreMmsi"&&(!oldData || obj[key] != old)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        function getStationSelectList() {
+            admin.req('station-maintain/baseStationAPI/selectAllBaseStation', "", function (res) {
+                var data = res;
+                for(var i in data){
+                    if(data[i].connectionStatus=="0"){
+                        $("#shoreMmsiBCL").prepend("<option  value='" + data[i].shoreMmsi + "'>" + data[i].shoreName + "</option>");
+                    }else {
+                        $("#shoreMmsiBCL").append("<option value='" + data[i].shoreMmsi + "' disabled='true'>" + data[i].shoreName + "(暂未连接)</option>")
+                    }
+                }
+                form.render();
+            },"post");
+        };
+    })
+</script>

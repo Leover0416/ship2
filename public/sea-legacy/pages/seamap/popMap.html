@@ -1,0 +1,229 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <link rel="icon" type="image/png" href="../../favicon.ico" />
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <script type="text/javascript" src="../../assets/libs/layui/layui.js"></script>
+    <link rel="stylesheet" href="../../assets/libs/layui/css/layui.css"/>
+    <link rel="stylesheet" href="../../assets/css/admin.css"/>
+    <link rel="stylesheet" href="../../assets/css/main.css" media="all">
+    <script type="text/javascript" src="../../module/apiUrl.js"></script>
+
+    <link rel="stylesheet" href="../../assets/libs/leaflet/leaflet/leaflet.css" />
+    <link rel="stylesheet" href="../../assets/libs/leaflet/Leaflet.MousePosition-master/src/L.Control.MousePosition.css" />
+
+    <script type="text/javascript" src="../../assets/libs/leaflet/leaflet/leaflet-src.js"></script>
+    <script src="../../assets/libs/leaflet/Leaflet.MousePosition-master/src/L.Control.MousePosition.js"></script>
+
+    <script src="../../assets/libs/leaflet/leaflet-Path.Drag/Path.Drag.js"></script>
+    <script src="../../assets/libs/leaflet/Leaflet.Editable-master/src/Leaflet.Editable.js"></script>
+    <style>
+        html {
+            height: 100%;
+            margin: 0;
+        }
+        body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden
+        }
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 95%;
+        }
+        .commonShow{
+            z-index: 99999;
+            position: absolute;
+            font-size:13px;
+            height:20px;
+        }
+        .no-hover-table tbody tr:hover {background-color: rgb(255, 255, 255)}
+
+        .autocomplete-suggestions { -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; border: 1px solid #999; background: #FFF; cursor: default; overflow: auto; -webkit-box-shadow: 1px 4px 3px rgba(50, 50, 50, 0.64); -moz-box-shadow: 1px 4px 3px rgba(50, 50, 50, 0.64); box-shadow: 1px 4px 3px rgba(50, 50, 50, 0.64); z-index: 999999999 !important;}
+
+        .leaflet-control-attribution {display: none}
+
+        .leaflet-touch .leaflet-bar a {
+            width: 42px;
+            height: 42px;
+            line-height: 42px;
+            font-size: 20px;
+        }
+
+        .leaflet-control-scale-line {font-size: 20px}
+    </style>
+</head>
+<body>
+    <div class="layui-card">
+        <div class="layui-card-body" style="height: 550px">
+            <div id='map'></div>
+            <input type="hidden" id="northWestPoint">
+            <input type="hidden" id="northEastPoint">
+            <input type="hidden" id="southEastPoint">
+            <input type="hidden" id="southWestPoint">
+<!--            <button id="btn-confirm" class="layui-btn icon-btn" style="margin-top: 565px;float: right"><i class="layui-icon">&#xe615;</i>确认</button>-->
+        </div>
+    </div>
+</body>
+<script>
+    layui.config({
+        base: '/module/', //静态资源所在路径
+    })
+        .extend({
+            admin:'admin',
+        })
+    layui.use(['element','common','admin','form','table','laydate', 'util'], function () {
+        var $ = layui.$;
+        var config=layui.common;
+        // 地图
+        var map;
+        // wms图层
+        var tileLayer;
+        // 选择区域西北坐标
+        var northWestPoint = "00000000000,0000";
+        // 选择区域东北坐标
+        var northEastPoint = "00000000000,0000";
+        // 选择区域东南坐标
+        var southEastPoint = "00000000000,0000";
+        // 选择区域西南坐标
+        var southWestPoint = "00000000000,0000";
+        var flag = false;
+        // 消息发送区域选择
+        var rectangleMeasure = {
+            startPoint: null,
+            endPoint: null,
+            rectangle: null,
+            tips: null,
+            layer: L.layerGroup(),
+            color: "#0D82D7",
+            addRectangle: function () {
+                rectangleMeasure.destory();
+                var bounds = [];
+                bounds.push(rectangleMeasure.startPoint);
+                bounds.push(rectangleMeasure.endPoint);
+                rectangleMeasure.rectangle = L.rectangle(bounds, {color: rectangleMeasure.color, weight: 1});
+                rectangleMeasure.rectangle.addTo(rectangleMeasure.layer);
+
+                northWestPoint = rectangleMeasure.rectangle.getBounds().getNorthWest().toString();
+                northEastPoint = rectangleMeasure.rectangle.getBounds().getNorthEast().toString();
+                southEastPoint = rectangleMeasure.rectangle.getBounds().getSouthEast().toString();
+                southWestPoint = rectangleMeasure.rectangle.getBounds().getSouthWest().toString();
+
+                $("#northWestPoint").val(northWestPoint);
+                $("#northEastPoint").val(northEastPoint);
+                $("#southEastPoint").val(southEastPoint);
+                $("#southWestPoint").val(southWestPoint);
+
+                rectangleMeasure.layer.addTo(map);
+            },
+            mousedown: function (e) {
+                rectangleMeasure.rectangle = null;
+                rectangleMeasure.tips = null;
+                map.dragging.disable();
+                rectangleMeasure.startPoint = e.latlng;
+                map.on('mousemove', rectangleMeasure.mousemove)
+            },
+            mousemove: function (e) {
+                flag = true
+                rectangleMeasure.endPoint = e.latlng;
+                rectangleMeasure.addRectangle();
+                map.off('mousedown ', rectangleMeasure.mousedown).on('mouseup', rectangleMeasure.mouseup);
+
+            },
+            mouseup: function (e) {
+                if (!flag) {
+                    return
+                }
+                map.dragging.enable();
+                document.getElementById('map').style.cursor = '';
+                map.off('mousemove', rectangleMeasure.mousemove).off('mouseup', rectangleMeasure.mouseup).off('mousedown', rectangleMeasure.mousedown);
+                rectangleMeasure.rectangle.enableEdit();
+            },
+            destory: function () {
+                if (rectangleMeasure.rectangle)
+                    rectangleMeasure.layer.removeLayer(rectangleMeasure.rectangle);
+            }
+        }
+
+        // 构建地图对象，并绑定到HTML中的map元素中
+        map = L.map('map',
+            {
+                center: [39, 119],
+                zoom: 9,
+                zoomControl: false,
+                editable: true,
+                minZoom: 3,
+                maxZoom: 18,
+                dragging: false,
+                doubleClickZoom: false,
+                maxBounds: L.latLngBounds(L.latLng(-90, -180), L.latLng(90, 180))
+            });
+
+        tileLayer = L.tileLayer.wms
+        (
+            config.seamap_server,
+            {
+                version: '1.3.0',
+                layers: 'ENC',
+                format: 'image/png',
+                CSBOOL: parseInt('1000000000000010', 2).toString(16),
+                CSVALUE: '10,5,20,10,1,2,1,500000,100000,200000,1'
+            }
+        );
+        map.addLayer(tileLayer);
+
+        var mousePositionp = L.control.mousePosition({
+            position: 'bottomright'
+        });
+        mousePositionp.addTo(map);
+
+        L.control.zoom({
+            position: 'bottomright'
+        }).addTo(map);
+
+        // 比例尺
+        L.control.scale({
+            maxWidth: 150,
+            nautic: true,
+            metric: false,
+            imperial: false,
+            position: 'bottomleft'
+        }).addTo(map);
+
+        map.on('editable:editing', function (e) {
+            northWestPoint = e.layer.getBounds().getNorthWest().toString();
+            northEastPoint = e.layer.getBounds().getNorthEast().toString();
+            southEastPoint = e.layer.getBounds().getSouthEast().toString();
+            southWestPoint = e.layer.getBounds().getSouthWest().toString();
+            $("#northWestPoint").val(northWestPoint);
+            $("#northEastPoint").val(northEastPoint);
+            $("#southEastPoint").val(southEastPoint);
+            $("#southWestPoint").val(southWestPoint);
+            console.log($("#northWestPoint").val(), $("#northEastPoint").val(), $("#southEastPoint").val(), $("#southWestPoint").val())
+        });
+
+        // 画面进入直接选矩形框
+        drawArea();
+
+        function drawArea() {
+            if (!rectangleMeasure.layer.getLayers().length > 0) {
+                document.getElementById('map').style.cursor = 'crosshair';
+                northWestPoint = "00000000000,0000";
+                northEastPoint = "00000000000,0000";
+                southEastPoint = "00000000000,0000";
+                southWestPoint = "00000000000,0000";
+                map.on('mousedown', rectangleMeasure.mousedown).on('mouseup', rectangleMeasure.mouseup);
+            } else {
+                return false;
+            }
+        }
+    })
+</script>

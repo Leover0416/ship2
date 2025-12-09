@@ -1,0 +1,187 @@
+<div class="layui-card">
+    <div class="layui-card-header">
+        <h2 class="header-title">MMSI、唯一标识配置</h2>
+    </div>
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <div class="layui-card-body" style="padding: 15px;">
+                <form class="layui-form" action="" lay-filter="StationBaseInfoConfig-form">
+
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:130px;"><i
+                                    style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>选择基站</label>
+                            <div class="layui-input-inline">
+                                <select name="shoreMmsi" id="shoreMmsiSID" lay-filter="stationChanged2"
+                                        lay-verify="required">
+                                    <option selected="selected" value=""></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:130px;">当前基站MMSI</label>
+                            <div class="layui-input-inline">
+                                <input type="text" placeholder="当前基站MMSI" name="shoreMmsi" id="shoreMmsi"
+                                       class="layui-input" readonly="true">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:130px;">修改基站MMSI</label>
+                            <div class="layui-input-inline">
+                                <input type="number" placeholder="请输入修改的基站MMSI" name="newMmsi" id="newMmsi" lay-verify="required"
+                                       onKeyUp="this.value=this.value.replace(/[^\d]/g,'');" autocomplete="off" class="layui-input"
+                                       oninput="if(value.length>9)value=value.slice(0,9)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:130px;">当前基站唯一标识</label>
+                            <div class="layui-input-inline">
+                                <input type="text" placeholder="当前基站唯一标识" name="uid" id="uid" lay-verify="required" readonly="true"
+                                       autocomplete="off" lay-verify="required" class="layui-input" >
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:130px;">修改基站唯一标识</label>
+                            <div class="layui-input-inline">
+                                <input type="text" placeholder="请输入修改的基站唯一标识" name="newUniqueIdentifier"
+                                       id="newUniqueIdentifier" lay-verify="required" autocomplete="off" class="layui-input"
+                                       onKeyUp="this.value=this.value.replace(/[^\w]/g,'');"  oninput="if(value.length>15)value=value.slice(0,15)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-inline" style="margin-left:50px;">
+                            <div class="layui-input-inline">
+                                <div class="layui-input-block">
+                                    <a class="layui-btn" lay-submit=""
+                                       lay-filter="stationBaseInfoConfig-submit">立即提交</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['form', 'table', 'util', 'common', 'admin', 'laydate'], function () {
+        var $ = layui.$;
+        var form = layui.form;
+        var laydate = layui.laydate;
+        var id = '';
+        var oldData = {};
+        var isFail = false;
+        var admin = layui.admin;
+        var config = layui.common;
+        var table = layui.table;
+        //获取基站下拉列表
+        getStationSelectList();
+        function getStationSelectList() {
+            admin.req('station-maintain/baseStationAPI/selectAllBaseStation', "", function (res) {
+                var data = res;
+                for(var i in data){
+                    if(data[i].connectionStatus=="0"){
+                        $("#shoreMmsiSID").prepend("<option  value='" + data[i].shoreMmsi + "'>" + data[i].shoreName + "</option>");
+                    }else {
+                        $("#shoreMmsiSID").append("<option value='" + data[i].shoreMmsi + "' disabled='true'>" + data[i].shoreName + "(暂未连接)</option>")
+                    }
+                }
+                form.render();
+            },"post");
+        };
+
+        form.on('select(stationChanged2)', function (data) {
+            if (data.value == '') {
+                id = '';
+                $("#shoreMmsi").val('');
+                $("#uid").val('');
+
+                $("#newUniqueIdentifier").val('');
+                $("#newMmsi").val('');
+                form.render('select');
+                return
+            }
+            admin.req('stationConfigure/stationBaseInfoConfig/getByShoreMmsiSID', JSON.stringify({shoreMmsi: data.value}), function (res) {
+                if (res.resp_code == '0') {
+                    oldData = res.datas;
+                    if (res.datas) {
+                        id = res.datas.id;
+                        $("#shoreMmsi").val(res.datas.shoreMmsi);
+                        $("#uid").val(res.datas.uid);
+                        $("#newUniqueIdentifier").val(res.datas.newUniqueIdentifier);
+                        if (res.datas.newMmsi == 0) {
+                            $("#newMmsi").val("");
+                        } else {
+                            $("#newMmsi").val(res.datas.newMmsi);
+                        }
+                    } else {
+                        id = '';
+                        $("#shoreMmsi").val('');
+                        $("#uid").val('');
+                        $("#newUniqueIdentifier").val('');
+                        $("#newMmsi").val('');
+                    }
+                    form.render('select');
+                    layer.msg("获取成功！");
+                }else {
+                    layer.msg("获取失败！");
+                }
+            }, "post")
+        });
+
+        form.on('submit(stationBaseInfoConfig-submit)', function (data) {
+            var field = data.field;
+            if (!isFail && oldData != null && isNotChange(field)) {
+                layer.msg("没有任何值发生改变，无需提交");
+                return;
+            } else {
+                oldData = field
+            }
+            var param = {
+                shoreMmsi: field.shoreMmsi,
+                uid: field.uid,
+                newUniqueIdentifier: field.newUniqueIdentifier,
+                newMmsi: field.newMmsi,
+            }
+            var requestUrl = 'stationConfigure/stationBaseInfoConfig/updateSID';
+            if (id != '' && id != null) {
+                param.id = id;
+            }
+            admin.req(requestUrl, JSON.stringify(param), function (res) {
+                if (res.resp_code == '0') {
+                    isFail = false;
+                    if (res.datas) {
+                        id = res.datas.id;
+                    }
+                    layer.msg("配置成功！");
+                } else {
+                    isFail = true;
+                    layer.msg("配置失败！");
+                }
+            }, "post");
+        })
+
+        function isNotChange(obj) {
+          if(obj.newMmsi==oldData.shoreMmsi&&obj.newUniqueIdentifier==oldData.uid){
+              return true;
+          }else {
+              return false;
+          }
+            // for (var key in obj) {
+            //     var old = oldData[key] == null ? '' : oldData[key];
+            //     if (!oldData || obj[key] != old) {;
+            //         return false;
+            //     }
+            // }
+            // return true;
+        }
+    })
+</script>

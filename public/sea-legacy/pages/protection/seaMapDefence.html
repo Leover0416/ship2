@@ -1,0 +1,3320 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <!--    <link rel="icon" type="image/png" href="../../favicon.ico"/>-->
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width">
+    <script src="../../module/jquery-3.4.1.js"></script>
+    <script type="text/javascript" src="../../assets/libs/layui/layui.js"></script>
+    <link rel="stylesheet" href="../../assets/libs/layui/css/layui.css"/>
+    <link rel="stylesheet" href="../../assets/css/admin.css"/>
+    <link rel="stylesheet" href="../../assets/css/main.css" media="all">
+    <link rel="stylesheet" href="../../assets/css/index.css">
+    <link rel="stylesheet" href="./custom.css">
+    <link rel="stylesheet" href="./custom2.css">
+    <link rel="stylesheet" href="../../assets/libs/leaflet/leaflet/leaflet.css"/>
+    <link rel="stylesheet"
+          href="../../assets/libs/leaflet/Leaflet.MousePosition-master/src/L.Control.MousePosition.css"/>
+    <link rel="stylesheet" href="../../assets/libs/leaflet/Leaflet.TrackPlayBack-master/dist/control.playback.css">
+    <link rel="stylesheet" href="../../assets/libs/leaflet/layui-autocomplete-master/src/layuiAutocomplete.css">
+    <link rel="stylesheet" href="../../assets/libs/leaflet/Leaflet.PolylineMeasure-master/Leaflet.PolylineMeasure.css">
+    <script type="text/javascript" src="../../assets/libs/leaflet/leaflet/leaflet-src.js"></script>
+    <script type="text/javascript" src="../../assets/libs/leaflet/canvasMaker.js"></script>
+    <script src="../../assets/libs/leaflet/Leaflet.MousePosition-master/src/L.Control.MousePosition.js"></script>
+    <script src="../../assets/libs/leaflet/leaflet-tracksymbol/leaflet-tracksymbol.js"></script>
+    <script src="../../assets/libs/leaflet/Leaflet.TrackPlayBack-master/dist/control.trackplayback.js"></script>
+    <script src="../../assets/libs/leaflet/Leaflet.TrackPlayBack-master/dist/leaflet.trackplayback.js"></script>
+    <script src="../../assets/libs/leaflet/Leaflet.PolylineMeasure-master/Leaflet.PolylineMeasure.js"></script>
+    <script src="../../assets/libs/leaflet/heatmap.js-master/build/heatmap.js"></script>
+    <script src="../../assets/libs/leaflet/heatmap.js-master/plugins/leaflet-heatmap/leaflet-heatmap.js"></script>
+    <script src="../../assets/libs/leaflet/leaflet-Path.Drag/Path.Drag.js"></script>
+    <script src="../../assets/libs/leaflet/Leaflet.Editable-master/src/Leaflet.Editable.js"></script>
+    <script src="../../assets/libs/leaflet/Leaflet.LabelTextCollision-master/docs/dist/leaflet.textpath.js"></script>
+    <script src="../../assets/libs/leaflet/Leaflet.LabelTextCollision-master/docs/dist/leaflet-polygon.fillPattern.js"></script>
+    <script src="../../assets/libs/leaflet.ChineseTmsProviders.js"></script>
+    <script src="./shipCountDefence.js"></script>
+    <script src="../../module/js/fishingAreas.js"></script>
+    <script src="../../module/js/virtualAtoNConfigureDefence.js"></script>
+    <script src="../../module/js/electronicFenceNewDefence.js"></script>
+    <script src="./custom2.js"></script>
+    <!-- 业务代码 -->
+    <script type="text/javascript" src="./seaMapDefence.js"></script>
+    <script>
+        document.head.appendChild(document.createElement('script')).src = '../../module/checkutils.js?ver=1.0.2';
+    </script>
+    <title>AIS数据服务</title>
+    <style>
+        html {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden
+        }
+
+        #map {
+            position: absolute;
+            top: 100px;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /*.layui-table-cell {*/
+        /*    text-align: left;*/
+        /*}*/
+
+        .layui-form-select dl {
+            border: 1px solid #000 !important;
+            background-color: rgba(36, 36, 36, 0.6) !important;
+            color: #DBD9D1 !important;
+        }
+
+        .layui-unselect {
+            color: #DBD9D1 !important;
+        }
+
+        .layui-laydate, .layui-laydate-hint {
+            box-shadow: 0 2px 4px rgb(0 0 0 / 12%);
+            baborder: 1px solid #000 !important;
+            background-color: rgba(36, 36, 36, 0.6) !important;
+            color: #DBD9D1 !important;
+        }
+
+        .layui-laydate-footer span {
+            display: inline-block;
+            vertical-align: top;
+            height: 26px;
+            line-height: 24px;
+            padding: 0 10px;
+            baborder: 1px solid #000 !important;
+            border-radius: 2px;
+            background-color: rgba(36, 36, 36, 0.6) !important;
+            font-size: 12px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all .3s;
+        }
+
+        .layui-laydate-content th {
+            color: #fff !important;
+        }
+
+        .layui-laydate-content td {
+            color: #fff !important;
+        }
+
+        .layui-laydate-content td:hover, .layui-laydate-list li:hover {
+            background-color: #eee;
+            color: #DBD9D1 !important;
+        }
+
+        .layui-laydate-content .laydate-day-prev, .layui-laydate-content .laydate-day-next {
+            color: #DBD9D1 !important;
+        }
+
+        .layui-laydate-list {
+            background-color: rgba(36, 36, 36, 0.8) !important;
+        }
+
+
+        #targetShipSendMessageLayer .layui-tab {
+            border: none !important;
+            margin: 0 !important;
+            background-color: transparent !important;
+        }
+
+        #targetShipSendMessageLayer .layui-bg-cyan {
+            background-color: rgba(36, 36, 36, 0.2) !important;
+        }
+
+        #sendSafeMsgControlLayer .layui-tab {
+            height: 570px !important;
+            border: none !important;
+            margin: 0 !important;
+            background-color: transparent !important;
+        }
+
+        #sendSafeMsgControlLayer .layui-bg-cyan {
+            background-color: rgba(36, 36, 36, 0.2) !important;
+        }
+
+        #sendSafeMsgControlLayer .layui-tab-content {
+            padding: 0 !important;
+        }
+
+        .layui-layer-setwin .layui-layer-close2 {
+            right: -12px !important;
+            top: -15px !important;
+            width: 15px !important;
+
+        }
+
+        .layui-layer-loading {
+            background: none !important;
+        }
+
+        /*.mydiv {*/
+        /*	width: 0;*/
+        /*	height: 0;*/
+        /*	border-top: 50px solid transparent;*/
+        /*	border-right: 100px solid #000;*/
+        /*	border-bottom: 50px solid transparent;*/
+        /*}*/
+        /*.my-div-span {*/
+        /*	opacity: 0.9;*/
+        /*	transform: translate3d(762px, 510px, 0px);*/
+        /*	color: rgb(255, 255, 255);*/
+        /*}*/
+        /*.my-div-span {*/
+        /*	position: absolute;*/
+        /*	padding: 1px 4px;*/
+        /*	border-radius: 2px;*/
+        /*	border: none;*/
+        /*	left: 3px;*/
+        /*	top: -8px;*/
+        /*	font-size: 12px;*/
+        /*	background-color: rgba(1,29,60,.8);*/
+        /*	box-shadow: none;*/
+        /*	color: #fff;*/
+        /*	margin-left: 8px;*/
+        /*}*/
+        .leaflet-control-playback {
+            background-color: rgba(36, 36, 36, 0.8) !important;
+            color: #DBD9D1 !important;
+        }
+
+        .leaflet-control-playback .buttonContainer a {
+            width: 30px !important;
+            height: 30px !important;
+        }
+
+        input[type=range] {
+            /*-webkit-appearance: none;*/
+            width: 150px;
+            border-radius: 10px; /*这个属性设置使填充进度条时的图形为圆角*/
+
+        }
+
+        /*input[type=range]::-webkit-slider-thumb {*/
+        /*	-webkit-appearance: none;*/
+        /*}*/
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 15px;
+            width: 15px;
+            margin-top: -4px; /*使滑块超出轨道部分的偏移量相等*/
+            /*border-radius: 50%; !*外观设置为圆形*!*/
+            /*border: solid 0.125em rgba(205, 224, 230, 0.5); !*设置边框*!*/
+            /*box-shadow: 0 .125em .125em #3b4547; !*添加底部阴影*!*/
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            height: 8px;
+            border-radius: 10px; /*将轨道设为圆角的*/
+            /*box-shadow: 0 1px 1px #def3f8, inset 0 .125em .125em #0d1112; !*轨道内置阴影效果*!*/
+            /*background-color: #DBD9D1!important;*/
+            /*background: -webkit-linear-gradient(#ffa200, #ffa200) no-repeat white;*/
+            /*color: #DBD9D1!important;*/
+        }
+
+        .shiptip {
+            background-color: rgba(0, 0, 0, 0.6) !important;
+            background-clip: padding-box;
+            color: #fff !important;
+            border: none !important;
+            display: block;
+            font: 12px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
+            font-weight: bold;
+            padding: 1px 3px;
+            position: absolute;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 6;
+        }
+
+        .leaflet-popup-content-wrapper {
+            background-color: rgba(0, 0, 0, 0.6) !important;
+            color: #fff !important;
+            border-radius: 0px;
+        }
+
+        .leaflet-popup-tip {
+            background-color: rgba(0, 0, 0, 0.6) !important;
+            color: #fff !important;
+        }
+
+        .layui-form-checked span, .layui-form-checked:hover span {
+            background-color: #403f33;
+        }
+
+        .layui-form-checked i, .layui-form-checked:hover i {
+            color: #403f33;
+        }
+
+        .layui-form-checkbox span {
+            border-radius: 0 0 0 0
+        }
+
+
+        #receiveMessageControl_id .layui-table-grid-down {
+            display: none;
+        }
+
+        #receiveMessageControl_id .layui-laypage .layui-laypage-curr .layui-laypage-em {
+            color: #fff !important;
+            background-color: rgba(36, 36, 36, 0.6) !important;
+        }
+
+        #receiveMessageControl_id .layui-laypage a, .layui-laypage span {
+            color: #DBD9D1 !important;
+        }
+
+        #receiveMessageControl_id .layui-table-page .layui-laypage a, .layui-table-page .layui-laypage span.layui-laypage-curr {
+            color: #DBD9D1 !important;
+        }
+
+        #receiveMessageControl_id .layui-laypage button, .layui-laypage input {
+            border: 1px solid #000;
+            color: #DBD9D1 !important;
+            background-color: rgba(36, 36, 36, 0.6) !important;
+            baborder: 1px solid #000 !important;
+        }
+
+        .layui-laypage-limits select {
+            border: 1px solid #000;
+            color: #DBD9D1 !important;
+            background-color: rgba(36, 36, 36, 0.6) !important;
+            baborder: 1px solid #000 !important;
+        }
+
+        element.style {
+        }
+
+        .layui-table-page .layui-laypage span {
+            margin-left: 0;
+            padding: 0;
+        }
+
+        .layui-table-page .layui-laypage a, .layui-table-page .layui-laypage span {
+            height: 26px;
+            line-height: 26px;
+            margin-bottom: 10px;
+            border: none;
+            background: 0 0;
+        }
+
+        .layui-laypage .layui-laypage-count, .layui-laypage .layui-laypage-limits, .layui-laypage .layui-laypage-refresh, .layui-laypage .layui-laypage-skip {
+            margin-left: 10px;
+            margin-right: 10px;
+            padding: 0;
+            border: none;
+        }
+
+        .layui-form-switch {
+            width: 50px !important;
+        }
+
+        .layui-nav .layui-nav-more {
+            position: inherit;
+        }
+
+        .pwd {
+            text-security: disc;
+            -webkit-text-security: disc;
+        }
+
+        input #oldPassword .layui-input {
+            background: #0C0C0C !important;
+        }
+
+        /*消息 表格切换*/
+        .layui-table-init {
+            display: none;
+        }
+
+        .layui-layer-loading .layui-layer-loading1 {
+            display: none;
+        }
+
+        .dashLines {
+            stroke-dasharray: 10;
+            stroke: yellow;
+        }
+
+        .dashLines-green {
+            stroke-dasharray: 10;
+            stroke: blue;
+        }
+
+        .layui-btn-sm-custom {
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+
+        .layui-btn-sm-custom:hover {
+            opacity: 1;
+            color: rgba(255, 255, 255, 1) !important;
+        }
+
+        .efence-coord-container {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .banner {
+            position: fixed;
+            width: 100%;
+            height: 100px;
+            background-image: url("images/banner1.png");
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+        }
+
+        .search-center {
+            position: fixed;
+            left: 50%;
+            transform: translate(-50%);
+            top: 105px;
+        !important;
+        }
+
+        .commonShow {
+            top: 40px;
+        }
+
+        #subNavigation_box {
+            top: auto
+        }
+
+        .search-input-wrapper input {
+            width: 350px
+        }
+
+        .search-input-wrapper {
+            width: 350px !important;
+        }
+
+        .slotIncrement-container > .layui-form-select > dl {
+            max-height: 160px
+        }
+
+        .slotOffset-container > .layui-form-select > dl {
+            max-height: 160px
+        }
+
+        .zhipei-row {
+            margin-bottom: 35px;
+        }
+
+        input::placeholder {
+            color: #6c6c6c;
+        }
+
+        .layui-input:disabled {
+            cursor: not-allowed;
+            color: #b4b3b3 !important;
+        }
+
+        .layui-input:disabled:hover {
+            border-color: black !important;
+        }
+
+        /*#electronicFenceInfoDetailLayerCustom > .layui-form > .layui-form-item > .layui-input-block > input:disabled {*/
+        /*    color: red!important;*/
+        /*}*/
+
+        .shipDetail_id {
+            margin-top: 140px !important;
+        }
+
+        #navigation_box #playbackTrackControl.layui-btn, #virtualAtoNControl.layui-btn, #userInfo.layui-btn, #userPassword.layui-btn {
+            border-bottom: 0px solid #000 !important;
+            border-radius: 0;
+        }
+
+        .targetPlay {
+            margin-top: 120px !important;
+        }
+
+        .stationDetail_id {
+            margin-top: 130px !important;
+            margin-left: 10px !important;
+        }
+
+        .atonDetail_id {
+            margin-top: 140px !important;
+        }
+
+        .trackList_id {
+            margin-top: 15px !important;
+            margin-left: -200px !important;
+        }
+
+        .element-item-wrapper1 .layui-form-switch.layui-form-onswitch {
+            background: rgba(39, 112, 212, 0.8) !important;
+        }
+
+        .element-item-wrapper1 .layui-form-switch em {
+            font-size: 14px;
+            line-height: 26px;
+            color: #FFF !important;
+        }
+    </style>
+    <link rel="stylesheet" href="mediaDefence.css">
+    <script src="../../assets/libs/html2canvas.js"></script>
+    <script src="../../assets/libs/canvas2image.js"></script>
+    <script src="../../assets/libs/leaflet/leaflet.pm/leaflet.pm.min.js"></script>
+    <script src="../../assets/libs/leaflet/leaflet.pm/turf.js"></script>
+    <link rel="stylesheet" href="../../assets/libs/leaflet/leaflet.pm/leaflet.pm.css">
+</head>
+
+<body class="seamapDefence-Auth">
+
+<div class="banner">
+
+</div>
+<!-- 地图 -->
+<div id='map'></div>
+<!-- 右上角导航栏 -->
+<div id="navigation_box" class="commonShow layui-form" style="margin-top:5px;width:100%;min-width: 120px;">
+    <div style="float:right;margin-right:10px;">
+
+        <ul class="layui-nav portal"
+            style="padding:0 0 0 17px;;margin-right:0px;background-color: rgba(36,36,36,0.6)!important;border: 1px solid #000;height: 38px;font-size: 15px;float:right;text-align:center;"
+            data-type="lt">
+            <li class="layui-nav-item">
+                <a class="layui-icon" id="down-none1"
+                   style="padding-left:0px;height: 39px;line-height:39px; font-size: 15px;">&#xe612;</a>
+                <dl class="layui-nav-child drop-down-style layui-nav-child-mobile"
+                    style="background-color: rgba(36,36,36,0.6)!important;border: 0px solid #000 !important;padding-top:0px;padding-bottom:0px;left: -65px;top: 40px">
+                    <dd>
+                        <button class="layui-btn layui-btn-sm " id="userInfo" name="userInfo"
+                                style="width:100px;height: 38px;background-color: rgba(112,112,112,0)!important;"
+                                lay-submit lay-filter="navigationBoxLayer"><i
+                                class="layui-icon " style="font-size: 15px;">
+                            个人信息</i></button>
+                    </dd>
+                    <dd>
+                        <button class="layui-btn layui-btn-sm " id="userPassword" name="userPassword"
+                                style="width:100px;height: 38px;background-color: rgba(112,112,112,0)!important;"
+                                lay-submit lay-filter="navigationBoxLayer"><i
+                                class="layui-icon " style="font-size: 15px;">
+                            修改密码</i></button>
+                    </dd>
+                    <dd>
+                        <button class="layui-btn layui-btn-sm " id="userExit" name="userExit"
+                                style="width:100px;height: 38px;background-color: rgba(112,112,112,0)!important;"
+                                lay-submit lay-filter="userExit"><i
+                                class="layui-icon" style="font-size: 15px;">
+                            退出</i></button>
+                    </dd>
+                </dl>
+            </li>
+        </ul>
+    </div>
+    <div class="layui-btn-group" style="float:right;margin-right:10px;transform-origin: right;transform: scaleX(0.93);">
+        <ul id="control" class="layui-nav"
+            style="padding:0 0 0 17px;background-color: rgba(36,36,36,0.6)!important;border: 1px solid #000;height: 38px;font-size: 15px;float:right;text-align:center;display: none"
+            data-type="lt">
+            <li class="layui-nav-item">
+                <a class="layui-icon" id="down-none2"
+                   style="padding-left:0px;height: 39px;line-height:39px; font-size: 15px;">&#xe671;</a>
+                <dl class="layui-nav-child drop-down-style"
+                    style="background-color: rgba(36,36,36,0.6)!important;border: 0px solid #000 !important;padding-top:0px;padding-bottom:0px;left: -15px;top: 40px">
+
+                    <dd>
+                        <button class="layui-btn layui-btn-sm " id="playbackTrackControl" name="playbackTrackControl"
+                                style="width:100px;height: 38px;background-color: rgba(112,112,112,0)!important;"
+                                lay-submit lay-filter="navigationBoxLayer"><i
+                                class="layui-icon" style="font-size: 15px;"> 轨迹
+                        </i></button>
+                    </dd>
+                    <dd>
+                        <button class="layui-btn layui-btn-sm " id="virtualAtoNControl" name="virtualAtoNControl"
+                                style="width:100px;height: 38px;background-color: rgba(112,112,112,0)!important; display: none"
+                                data-type="lt" lay-submit lay-filter="navigationBoxLayer"><i
+                                class="layui-icon" style="font-size: 15px;">电子航标
+                        </i></button>
+                    </dd>
+                </dl>
+            </li>
+        </ul>
+
+        <button class="layui-btn layui-btn-sm layui-btn-sm-custom" id="electronicFenceControl"
+                name="electronicFenceControl"
+                style="height: 38px; border: 1px solid rgb(0, 0, 0)!important;" lay-submit
+                lay-filter="navigationBoxLayer"><i
+                class="layui-icon" style="font-size: 15px;">
+            电子围栏</i></button>
+        <button class="layui-btn layui-btn-sm layui-btn-sm-custom" id="eFencehistory"
+                name="eFencehistory"
+                style="height: 38px; border: 1px solid rgb(0, 0, 0)!important;"
+                data-type="lt" lay-submit
+                lay-filter="navigationBoxLayer"><i
+                class="layui-icon" style="font-size: 15px;">
+            船舶事件</i></button>
+        <button class="layui-btn layui-btn-sm layui-btn-sm-custom" id="eFenceAlert"
+                name="eFenceAlert"
+                style="height: 38px; border: 1px solid rgb(0, 0, 0)!important;"
+                data-type="lt" lay-submit
+                lay-filter="navigationBoxLayer"><i
+                class="layui-icon" style="font-size: 15px;">
+            风险告警</i></button>
+
+        <button class="layui-btn layui-btn-sm " id="layerControl" name="layerControl"
+                style="width:100px;height: 38px;" data-type="lt" lay-submit lay-filter="navigationBoxLayer">
+            <i
+                    class="layui-icon" style="font-size: 15px;">图层
+            </i>
+        </button>
+
+    </div>
+</div>
+<!-- 右下角导航栏 -->
+<div id="subNavigation_box" class="commonShow layui-form"
+     style="bottom:150px;right:10px;width:30px;height:fit-content;">
+    <div style="height:30px;" lay-submit lay-filter="centerPositionSet">
+        <i id="centerPositionSet" class="layui-icon layui-icon-location"
+           style="font-size: 20px;padding:5px;line-height:30px"></i>
+    </div>
+    <div style="height:30px;" lay-submit lay-filter="measureDistance">
+        <i id="measureDistance" class="layui-icon layui-icon-util"
+           style="font-size: 20px;padding:5px;line-height:30px"></i>
+    </div>
+    <!--    <div style="height:30px" lay-submit lay-filter="legend">-->
+    <!--        <i id="legend" class="layui-icon layui-icon-picture-fine"-->
+    <!--           style="font-size: 20px;padding:5px;line-height:30px"></i>-->
+    <!--    </div>-->
+</div>
+<!--左侧导航栏 搜索/列表 -->
+<div id="search_box" class="commonShow layui-form" style="z-index: 199999;min-width: 100px;">
+    <div id="allCount" class="search-center">
+    </div>
+    <div class="search-box">
+        <div id="showTabBtn" style="float:left;margin-left:5px;margin-top:5px;" data-auth="user-btn-test">
+            <button class="layui-btn layui-btn-sm show-tab-btn-style" style="height: 38px;" lay-submit
+                    lay-filter="showAllList"><i class="layui-icon layui-icon-spread-left" style="font-size: 15px;">
+            </i></button>
+        </div>
+        <div class="showTabBtn-container search-input-wrapper"
+             style="float:left;margin-left:5px;width: 190px;margin-top:5px;">
+            <input type="text" style="font-size: 20px;" placeholder="查询船舶/岸站/助航设备" class="layui-input"
+                   id="saerchMMSIorName" autocomplete="off">
+            <ul id="autoComplete" class="search-list-style"
+                style="width: 400px;font-size: 15px;height:500px;line-height:30px;padding: 10px;margin-top: 48px;display: none;">
+            </ul>
+        </div>
+        <div style="float:left;margin-top:5px;" class="search-btn-wrapper ">
+            <button class="layui-btn layui-btn-sm search-btn-style" style="height: 38px;" id="search" name="search"
+                    lay-submit lay-filter="searchMMSI"><i class="layui-icon layui-icon-search"
+                                                          style="font-size: 15px;"></i> 搜索
+            </button>
+        </div>
+    </div>
+
+
+</div>
+
+<!--左侧面板 -->
+<div id="allList_left" class="commonShow layui-form"
+     style="z-index: 199999;width:23.3%;display: none;min-width: 380px;margin-top: 30px;margin-left: 5px">
+    <div id="allList_left_middle" style="margin-top: 30px;">
+        <div class="layui-tab">
+            <ul class="layui-tab-title">
+                <i id="tableHide" class="layui-icon layui-icon-prev"
+                   style="float:right;font-size: 15px;margin-right: 2%;margin-top: 13px"></i>
+                <li class="layui-this">船舶</li>
+                <li>岸站</li>
+                <li>助航设备</li>
+                <li id="dataCount"
+                    style="pointer-events: none;margin-left: 2%;font-size: 14px;padding-top: 2px;width: 40%;text-align: center"></li>
+            </ul>
+            <div class="layui-tab-content" style="padding: 0">
+                <div class="layui-tab-item layui-show" style="margin-top: 0">
+                    <table id="shipList" lay-filter="shipList"></table>
+                </div>
+                <div class="layui-tab-item">
+                    <table id="stationList" lay-filter="stationList"></table>
+                </div>
+                <div class="layui-tab-item">
+                    <table id="atonList" lay-filter="atonList"></table>
+                </div>
+                <div class="layui-tab-item">
+                    <table id="netList" lay-filter="netList"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id='layerControlLayer' class="layui-form" style="display: none;">
+    <div class="layui-form-item">
+        <label class="layui-form-label element-label-style">船舶</label>
+        <div class="layui-input-block element-container">
+            <div class="layui-input-block element-item-wrapper">
+                <input type="checkbox" id="layerControlLayer_shipTypeA" value="A" name="layerControlLayer_shipType"
+                       lay-filter="layerControlLayer_shipType" checked="checked" lay-skin="switch" lay-text="A类船|A类船">
+            </div>
+            <div class="layui-input-block element-item-wrapper">
+                <input type="checkbox" id="layerControlLayer_shipTypeB" value="B" name="layerControlLayer_shipType"
+                       lay-filter="layerControlLayer_shipType" checked="checked" lay-skin="switch" lay-text="B类船|B类船">
+            </div>
+
+            <div class="layui-input-block element-item-wrapper">
+                <input type="checkbox" id="layerControlLayer_shipName_id" name="layerControlLayer_shipName"
+                       lay-filter="layerControlLayer_shipName" lay-skin="switch" lay-text="船舶名称|船舶名称">
+            </div>
+
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label element-label-style">岸站</label>
+        <div class="layui-input-block element-container">
+            <div class="layui-input-block element-item-wrapper">
+                <input type="checkbox" id="layerControlLayer_stationShow_id" name="layerControlLayer_stationShow"
+                       lay-filter="layerControlLayer_stationShow" checked="checked" lay-skin="switch"
+                       lay-text="岸站显示|岸站显示">
+            </div>
+            <div class="layui-input-block element-item-wrapper">
+                <input type="checkbox" id="layerControlLayer_stationName_id" name="layerControlLayer_stationName"
+                       lay-filter="layerControlLayer_stationName" lay-skin="switch" lay-text="岸站名称|岸站名称">
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label element-label-style">航标</label>
+        <div class="layui-input-block element-container">
+            <div class="layui-input-block element-item-wrapper">
+                <input type="checkbox" id="layerControlLayer_atonShow_id" name="layerControlLayer_atonShow"
+                       lay-filter="layerControlLayer_atonShow" checked="checked" lay-skin="switch" lay-text="航标显示|航标显示">
+            </div>
+            <div class="layui-input-block element-item-wrapper">
+                <input type="checkbox" id="layerControlLayer_atonName_id" name="layerControlLayer_atonName"
+                       lay-filter="layerControlLayer_atonName" lay-skin="switch" lay-text="航标名称|航标名称">
+            </div>
+        </div>
+    </div>
+    <!--    <div class="layui-form-item">-->
+    <!--        <label class="layui-form-label element-label-style">其他</label>-->
+    <!--        <div class="layui-input-block element-container">-->
+    <!--            <div class="layui-input-block element-item-wrapper">-->
+    <!--                <input type="checkbox" id="layerControlLayer_fishingNetShow_id" name="layerControlLayer_fishingNetShow"-->
+    <!--                       lay-filter="layerControlLayer_fishingNetShow" lay-skin="switch" lay-text="网位仪|网位仪">-->
+    <!--            </div>-->
+    <!--            &lt;!&ndash;			<div class="layui-input-block element-item-wrapper">&ndash;&gt;-->
+    <!--            &lt;!&ndash;				<input type="checkbox" id="layerControlLayer_fishingAreas_id" name="layerControlLayer_fishingAreas"&ndash;&gt;-->
+    <!--            &lt;!&ndash;					   lay-filter="layerControlLayer_fishingAreas" lay-skin="switch" lay-text="渔业水域|渔业水域">&ndash;&gt;-->
+    <!--            &lt;!&ndash;			</div>&ndash;&gt;-->
+
+    <!--        </div>-->
+    <!--    </div>-->
+</div>
+
+<!-- 轨迹回放弹出层 -->
+<div id='playbackTrackControlLayer' class="layui-form" style="display: none">
+    <div class="layui-form-item" style="margin-top:10px;">
+        <label class="layui-form-label">MMSI:</label>
+        <div class="layui-input-block">
+            <input type="text" id="targetShipMMSI_playbackTrack" placeholder="请输入MMSI" class="layui-input"
+                   autocomplete="off"
+                   style="width: 250px;" lay-verify="required">
+            <ul id="targetShipMMSI_autoComplete" class=""
+                style="background-color: rgba(36,36,36,0.6)!important;width: 230px;font-size: 15px;line-height:35px;padding: 10px;display: none;position:absolute;z-index: 9999999;">
+            </ul>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">时间指定:</label>
+        <div class="layui-input-block">
+            <input type="text" id="trackPlayStartTime" readonly placeholder="开始时间" class="layui-input"
+                   style="width: 250px;;margin-right: 10px"
+                   lay-verify="required">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"> </label>
+        <div class="layui-input-block">
+            <input type="text" id="trackPlayEndTime" readonly placeholder="结束时间" class="layui-input"
+                   style="width: 250px;margin-right: 10px"
+                   lay-verify="required">
+        </div>
+    </div>
+    <div style="text-align: center;margin-bottom: 10px">
+        <button class="layui-btn layui-btn-normal" style="width: 100px;" name="ship" lay-submit
+                lay-filter="shipTrackPlayBack">查询
+        </button>
+        <!--		<button class="layui-btn layui-btn-normal" style="width: 100px;" name="ship" lay-submit-->
+        <!--				lay-filter="shipTrackPlayBackForTrackExport">查询-->
+        <!--		</button>-->
+    </div>
+</div>
+
+<!-- 用户信息弹出层 -->
+<div id='userInfoLayer' lay-filter="user-form" class="layui-form" style="display: none">
+    <div class="layui-form-item" style="margin-top:10px;">
+        <label class="layui-form-label">账号:</label>
+        <div class="layui-input-block">
+            <input type="text" id="username" name="username" placeholder="账号" class="layui-input" autocomplete="off"
+                   style="width: 250px;" lay-verify="required" disabled="disabled">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">用户名:</label>
+        <div class="layui-input-block">
+            <input type="text" id="nickname" name="nickname" placeholder="用户名" class="layui-input"
+                   style="width: 250px;;margin-right: 10px"
+                   lay-verify="required">
+        </div>
+    </div>
+    <!--	<div class="layui-form-item">-->
+    <!--		<label class="layui-form-label">手机号:</label>-->
+    <!--		<div class="layui-input-block">-->
+    <!--			<input type="text" id="mobile" name="mobile" maxlength="11" placeholder="手机号" class="layui-input"-->
+    <!--				   style="width: 250px;margin-right: 10px"-->
+    <!--				   lay-verify="required|mobile">-->
+    <!--		</div>-->
+    <!--	</div>-->
+    <div class="layui-form-item">
+        <label class="layui-form-label">性别:</label>
+        <div class="layui-input-block" id="userInfo_userSex">
+            <input type="radio" name="sex" value="1" title="女性">
+            <input type="radio" name="sex" value="0" title="男性">
+        </div>
+    </div>
+    <div style="text-align: center;margin-bottom: 10px">
+        <button class="layui-btn layui-btn-normal" style="width: 100px;" lay-submit
+                lay-filter="saveUserInfo">保存
+        </button>
+    </div>
+</div>
+<!-- 用户修改密码弹出层 -->
+<div id='userPasswordLayer' class="layui-form" style="display: none">
+    <!--	<input type="text"  style="height: 0px;width:0;color: transparent;border:0px"/>-->
+    <div class="layui-form-item" style="margin-top:10px;">
+        <label class="layui-form-label">原密码:</label>
+        <div class="layui-input-block">
+            <input type="text" id="oldPassword" name="oldPassword" placeholder="原密码" class="layui-input pwd"
+                   style="width: 250px;" lay-verify="required|psw|password" maxlength="12" minlength="4">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">新密码:</label>
+        <div class="layui-input-block">
+            <input type="text" id="newPassword" name="newPassword" placeholder="新密码" class="layui-input pwd"
+                   style="width: 250px;;margin-right: 10px"
+                   lay-verify="required|psw|password" maxlength="12" minlength="4">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">新密码确认:</label>
+        <div class="layui-input-block">
+            <input type="text" id="rePassword" name="rePassword" placeholder="新密码确认" class="layui-input pwd"
+                   style="width: 250px;margin-right: 10px"
+                   lay-verify="required|repsw|password" maxlength="12" minlength="4">
+        </div>
+    </div>
+    <div style="text-align: center;margin-bottom: 10px">
+        <button class="layui-btn layui-btn-normal" style="width: 100px;" lay-submit
+                lay-filter="saveUserPassword">保存
+        </button>
+    </div>
+</div>
+
+<!-- 船舶详细弹出层 -->
+<div id='shipDetailLayer' class="layui-form" style="display: none">
+    <table class="layui-table no-hover-table" lay-skin="nob">
+        <tbody>
+        <tr>
+            <td>MMSI：</td>
+            <td><input style="border: 0px;" id="ship_MMSI" readonly/><input type="hidden" id="shore_MMSI"/><input
+                    type="hidden" id="typeOfShip"/></td>
+            <td>船首向：</td>
+            <td><input style="border: 0px;" id="ship_heading" readonly></td>
+        </tr>
+        <tr>
+            <td>船名称：</td>
+            <td><input style="border: 0px;" id="ship_name" readonly/></td>
+            <td>呼号：</td>
+            <td><input style="border: 0px;" id="ship_call_sign" readonly/></td>
+        </tr>
+        <tr>
+            <td>IMO：</td>
+            <td><input style="border: 0px;" id="ship_IMO" readonly/></td>
+            <td>航迹向：</td>
+            <td><input style="border: 0px;" id="ship_course" readonly/></td>
+        </tr>
+        <tr>
+            <td>类型：</td>
+            <td><input style="border: 0px;" id="ship_type" readonly></td>
+            <td>&nbsp;&nbsp;航速：</td>
+            <td><input style="border: 0px;" id="ship_speed" readonly></td>
+        </tr>
+        <tr>
+            <td>状态：</td>
+            <td><input style="border: 0px;" id="ship_navigation_status" readonly></td>
+            <td>纬度：</td>
+            <td><input style="border: 0px;" id="ship_lat" readonly></td>
+        </tr>
+        <tr>
+            <td>船长/船宽：</td>
+            <td><input style="border: 0px;" id="ship_length_width" readonly></td>
+            <td>经度：</td>
+            <td><input style="border: 0px;" id="ship_lng" readonly></td>
+        </tr>
+        <tr>
+            <td>数据来源：</td>
+            <td><input style="border: 0px;" id="ship_data_source" readonly></td>
+            <td>目的地：</td>
+            <td><input style="border: 0px;" id="ship_destination" readonly></td>
+        </tr>
+        <tr>
+            <td>预到时间：</td>
+            <td><input style="border: 0px;" id="ship_eta" readonly></td>
+            <!--			<td>岸站距离：</td>-->
+            <!--			<td><input style="border: 0px;" id="ship_distance" readonly></td>-->
+            <td>更新时间：</td>
+            <td>
+                <input style="border: 0px;" id="receiveTime" readonly>
+            </td>
+        </tr>
+        <!--		<tr>-->
+        <!--			<td>更新时间：</td>-->
+        <!--			<td>-->
+        <!--				<input style="border: 0px;" id="receiveTime" readonly>-->
+        <!--			</td>-->
+        <!--			<td>-->
+
+        <!--			</td>-->
+        <!--			<td>-->
+
+        <!--			</td>-->
+        <!--		</tr>-->
+        </tbody>
+    </table>
+    <div style="text-align: center;margin-bottom:10px;margin-top:10px;display: flex;
+    flex-wrap: wrap;
+    justify-content: center;" id="shipDetailButton">
+        <button class="layui-btn layui-btn-normal " style="width: 100px; margin-top: 5px" lay-submit
+                name="targetShipTrackPlayBack"
+                lay-filter="showTargetLayer"><span class="showTargetLayerForTrackExport"></span>
+        </button>
+        <!--        <button class="layui-btn layui-btn-normal" style="width: 100px;" lay-submit name="targetShipTrackPlayBack"-->
+        <!--                lay-filter="showTargetLayer">轨迹回放-->
+        <!--        </button>-->
+
+
+        <!--        <button class="layui-btn layui-btn-normal" style="width: 100px; margin-top: 5px" lay-submit name="messageAsk"-->
+        <!--                lay-filter="messageAsk">消息问询-->
+        <!--        </button>-->
+
+    </div>
+</div>
+<!-- 航标详细弹出层 -->
+<div id='atonDetailLayer' class="layui-form" style="display: none">
+    <table class="layui-table no-hover-table" lay-skin="nob">
+        <tbody>
+        <tr>
+            <td style="width:100px">MMSI：</td>
+            <td style="width:100px"><input style="border: 0px;outline:none;width:150px" id="aton_MMSI" readonly></input>
+            </td>
+            <td style="width:60px">名称：</td>
+            <td><input style="border: 0px;outline:none;width:280px" id="aton_name" readonly></td>
+        </tr>
+        <tr>
+            <td style="width:100px">尺寸：</td>
+            <td><input style="border: 0px;outline:none;width:150px" id="aton_size" readonly></td>
+            <td style="width:60px">纬度：</td>
+            <td><input style="border: 0px;outline:none;width:150px" id="aton_lat" readonly></input></td>
+        </tr>
+        <tr>
+            <td style="width:100px">虚拟航标：</td>
+            <td><input style="border: 0px;outline:none;width:150px" id="aton_virtual" readonly></td>
+            <td style="width:60px">经度：</td>
+            <td><input style="border: 0px;outline:none;width:150px" id="aton_lng" readonly></td>
+        </tr>
+        <tr>
+            <td style="width:100px">类型：</td>
+            <td colspan="3"><input style="border: 0px;outline:none;width:550px" id="aton_type" readonly></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<!-- 网位仪详细弹出层 -->
+<div id='fishingNetDetailLayer' class="layui-form" style="display: none">
+    <table class="layui-table no-hover-table" lay-skin="nob">
+        <tbody>
+        <tr>
+            <td style="width:100px">MMSI：</td>
+            <td><input style="border: 0px;outline:none;width:100px" id="fishingNet_MMSI" readonly></td>
+            <td style="width:70px">名称：</td>
+            <td><input style="border: 0px;outline:none;width:150px" id="fishingNet_name" readonly></td>
+        </tr>
+        <tr>
+            <td style="width:100px">纬度：</td>
+            <td><input style="border: 0px;outline:none;width:100px" id="fishingNet_lat" readonly></td>
+            <td style="width:70px">经度：</td>
+            <td><input style="border: 0px;outline:none;width:100px" id="fishingNet_lng" readonly></td>
+        </tr>
+        <tr>
+            <td style="width:100px">接收时间：</td>
+            <td><input style="border: 0px;outline:none;width:150px" id="fishingNet_recvTime" readonly></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<!-- 指定船舶轨迹查询弹出层 -->
+<div id='targetShipTrackPlayBackLayer' class="layui-form" style="display: none">
+    <div class="layui-form-item" style="margin-top:10px;">
+        <label class="layui-form-label">时间指定:</label>
+        <div class="layui-input-block">
+            <input type="text" id="trackShipPlayStartTime" readonly placeholder="开始时间" class="layui-input"
+                   style="width: 250px;" lay-verify="required">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"> </label>
+        <div class="layui-input-block">
+            <input type="text" id="trackShipPlayEndTime" readonly placeholder="结束时间" class="layui-input"
+                   style="width: 250px;" lay-verify="required">
+        </div>
+    </div>
+    <div style="text-align: center;margin-bottom: 10px">
+        <button class="layui-btn layui-btn-normal custom-target-btn" style="width: 100px;" name="targetShip" lay-submit
+                lay-filter="shipTrackPlayBack">查询
+        </button>
+    </div>
+</div>
+
+
+<div id='targetShipExportLayer' class="layui-form" style="display: none">
+    <div class="layui-form-item" style="margin-top:10px;">
+        <label class="layui-form-label">时间指定:</label>
+        <div class="layui-input-block">
+            <input type="text" id="trackShipPlayStartTimeForTrackExport" placeholder="开始时间" class="layui-input"
+                   style="width: 285px;" lay-verify="required">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"> </label>
+        <div class="layui-input-block">
+            <input type="text" id="trackShipPlayEndTimeForTrackExport" placeholder="结束时间" class="layui-input"
+                   style="width: 285px;" lay-verify="required">
+        </div>
+    </div>
+    <div style="text-align: center;margin-bottom: 10px">
+        <button class="layui-btn layui-btn-normal custom-target-btn" style="width: 100px;" name="targetShip" lay-submit
+                lay-filter="shipTrackPlayBackForTrackExport">查询
+        </button>
+    </div>
+</div>
+
+<div id='targetShipExportTableLayer' class="layui-form" style="display: none">
+    <div class="targetShipExportTableLayer">
+        <div class="targetShipExportTableLayer-container">
+            <div class="targetShipExportTableLayer-label">
+                MMSI:
+            </div>
+            <div class="targetShipExportTableLayer-value">
+                <input style="border: 0px;" id="targetShipExportTableLayer-value-MMSI" readonly/>
+            </div>
+        </div>
+        <div class="targetShipExportTableLayer-container">
+            <div class="targetShipExportTableLayer-label">
+                船名称:
+            </div>
+            <div class="targetShipExportTableLayer-value">
+                <input style="border: 0px;" id="targetShipExportTableLayer-value-name" readonly/>
+
+            </div>
+        </div>
+        <div class="targetShipExportTableLayer-container">
+            <div class="targetShipExportTableLayer-label">
+                IMO:
+            </div>
+            <div class="targetShipExportTableLayer-value">
+                <input style="border: 0px;" id="targetShipExportTableLayer-value-IMO" readonly/>
+
+            </div>
+        </div>
+        <div class="targetShipExportTableLayer-container">
+            <div class="targetShipExportTableLayer-label">
+                类型:
+            </div>
+            <div class="targetShipExportTableLayer-value">
+                <input style="border: 0px;" id="targetShipExportTableLayer-value-type" readonly/>
+
+            </div>
+        </div>
+        <div class="targetShipExportTableLayer-container">
+            <div class="targetShipExportTableLayer-label">
+                呼号:
+            </div>
+            <div class="targetShipExportTableLayer-value">
+                <input style="border: 0px;" id="targetShipExportTableLayer-value-huhao" readonly/>
+
+            </div>
+        </div>
+
+        <table id="targetShipExportTableLayerTable" lay-filter="targetShipExportTableLayerTable"></table>
+
+        <div style="text-align: center;margin-bottom: 10px">
+            <button class="layui-btn layui-btn-normal shipTrackPlayBackForTrackExportBtn" style="width: 85%;"
+                    name="targetShip" lay-submit
+                    lay-filter="shipTrackPlayBackForTrackExportBtn">导出
+            </button>
+            <button class="layui-btn layui-btn-normal shipTrackPlayBackForTrackExportBtnFake"
+                    style="width: 85%;color:grey!important;display: none" name="targetShip">导出
+            </button>
+        </div>
+    </div>
+</div>
+<!-- 轨迹列表 -->
+<div id='trackListLayer' class="layui-form" style="display: none">
+    <ul id="trackList">
+
+    </ul>
+</div>
+<!-- 中心点设置 -->
+<div id='setCenterLayer' class="layui-form" style="display: none">
+    <div class="layui-form-item" style="margin-top:10px;">
+        <input type="hidden" id="seaMapId" value="">
+        <label class="layui-form-label">纬度:</label>
+        <div class="layui-input-block">
+            <input type="text" id="setCenter_lat" name="setCenter_lat" class="layui-input"
+                   style="width: 100px;margin-right: 10px"
+                   lay-verify="required">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">经度:</label>
+        <div class="layui-input-block">
+            <input type="text" id="setCenter_lng" class="layui-input" name="setCenter_lng"
+                   style="width: 100px;;margin-right: 10px"
+                   lay-verify="required">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">地图级别:</label>
+        <div class="layui-input-block">
+            <input type="text" id="setCenter_level" name="setCenter_level" class="layui-input"
+                   style="width: 100px;;margin-right: 10px"
+                   disabled>
+        </div>
+    </div>
+    <div style="text-align: center;margin-bottom: 10px">
+        <button class="layui-btn layui-btn-normal" style="width: 100px;" lay-submit
+                lay-filter="setCenter">保存
+        </button>
+    </div>
+</div>
+<!-- 图例 -->
+<div id='legendLayer' class="layui-form" style="display: none">
+    <div class="layui-form-item">
+        <img src="../../assets/images/legend1.png" height="670px" width="240px"/>
+    </div>
+</div>
+<!--历史列表按钮 -->
+<div id="historyButton" class="commonShow layui-form" style="z-index: 199999;min-width: 100%;display: none;">
+    <div style="float:left;margin-left:10px;margin-top:10px;">
+        <button class="layui-btn layui-btn-sm layui-bg-cyan" style="height: 38px;" lay-submit
+                lay-filter="showAllHistoryList"><i class="layui-icon layui-icon-spread-left" style="font-size: 15px;">
+            列表</i></button>
+    </div>
+    <div style="float:right;margin-right:10px;margin-top:10px;">
+        <button class="layui-btn layui-btn-sm layui-bg-cyan" style="height: 38px;" lay-submit
+                lay-filter="backToRealTime"><i class="layui-icon layui-icon-website" style="font-size: 15px;">
+            实时海图</i></button>
+    </div>
+    <div style="float:right;margin-right:10px;margin-top:10px;">
+        <span class="layui-badge layui-bg-orange" id="historyInfo" style="height: 38px;font-size: 15px;"></span>
+    </div>
+</div>
+<!--历史左侧面板 -->
+<div id="allHistoryList_left" class="commonShow layui-form"
+     style="z-index: 199999;background: #fff;width:22.3%;height:100%;box-shadow: 5px 0px 5px 0px rgba(0,0,0,0.2);display: none;min-width: 380px;">
+    <div id="allList_left_top1" class="layui-input-block" style="margin-left:87%;width: 100%;margin-top: 2%">
+        <button class="layui-btn layui-btn-sm layui-btn-primary"
+                style="height: 38px;margin-right: 10px;display: inline-block;" lay-submit
+                lay-filter="hideAllHistoryList">
+            <i class="layui-icon layui-icon-prev" style="font-size: 15px;"></i>
+        </button>
+    </div>
+    <div id="allHistoryList_left_middle" style="margin-top: 10px;background-color: #fff">
+        <div class="layui-tab">
+            <ul class="layui-tab-title">
+                <li class="layui-this">船舶</li>
+                <li>岸站</li>
+                <li>助航设备</li>
+            </ul>
+            <div class="layui-tab-content">
+                <div class="layui-tab-item layui-show">
+                    <h2 class="layui-colla-title"><label id="shipHistoryCount" style="float:right"></label>
+                    </h2>
+                    <table id="shipHistoryList" lay-filter="shipHistoryList"></table>
+                </div>
+                <div class="layui-tab-item">
+                    <h2 class="layui-colla-title"><label id="stationHistoryCount" style="float:right"></label>
+                    </h2>
+                    <table id="stationHistoryList" lay-filter="stationHistoryList"></table>
+                </div>
+                <div class="layui-tab-item">
+                    <h2 class="layui-colla-title"><label id="atonHistoryCount" style="float:right"></label>
+                    </h2>
+                    <table id="atonHistoryList" lay-filter="atonHistoryList"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--矩形坐标 -->
+<div id='rectangleMeasure' class="layui-form" style="display: none">
+    <table class="layui-table no-hover-table" lay-skin="nob">
+        <tbody>
+        <tr>
+            <td style="width:50px">西北：</td>
+            <td><input style="border: 0px;outline:none;width:150px" id="northWestPoint"></input></td>
+        </tr>
+        <tr>
+            <td style="width:50px">东北：</td>
+            <td><input style="border: 0px;outline:none;width:150px" id="northEastPoint"></td>
+        </tr>
+        <tr>
+            <td style="width:50px">东南：</td>
+            <td><input style="border: 0px;outline:none;width:150px" id="southEastPoint"></td>
+        </tr>
+        <tr>
+            <td style="width:50px">西南：</td>
+            <td><input style="border: 0px;outline:none;width:150px" id="southWestPoint"></td>
+        </tr>
+        </tbody>
+    </table>
+    <div style="text-align: center;margin-bottom:10px;margin-top:10px;">
+        <button class="layui-btn layui-btn-normal" style="width: 100px;" lay-submit
+                lay-filter="rectangleMeasureSave">保存
+        </button>
+        <button class="layui-btn layui-btn-normal" style="width: 100px;" lay-submit
+                lay-filter="rectangleMeasureEdit">编辑
+        </button>
+    </div>
+</div>
+<div id='myFleetSendMessageLayer' style="display: none">
+    <input type="hidden" id="fleetMessageId" value="">
+    <div class="layui-tab">
+        <ul class="layui-tab-title layui-form" style="margin-left: 10px;">
+            <li id="fleetAIS" class="layui-this">AIS</li>
+            <li id="fleetASM">ASM</li>
+            <li>VDE</li>
+        </ul>
+        <div class="layui-tab-content" style="padding: 0px;">
+            <div class="layui-tab layui-tab-item layui-show">
+                <ul class="layui-tab-title layui-nav layui-nav-tree layui-bg-cyan layui-inline"
+                    style="text-align:left; height: 100%;" lay-filter="">
+                    <li style="width:auto; text-align:left;" class="layui-nav-item layui-this"><a>二进制寻址</a></li>
+                    <li style="width:auto; text-align:left;" class="layui-nav-item"><a>文本寻址</a></li>
+                </ul>
+                <div class="layui-tab-content customs-tab-content"
+                     style="overflow-y:auto; height: 520px; width: 530px;float: right;margin-right: 10px;">
+                    <div class="layui-tab-item layui-show custom-tab-item1">
+                        <form action="" class="layui-form send-form">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">信道选择</label>
+                                <div class="layui-input-block">
+                                    <select name="channel" lay-verify="required">
+                                        <option value="">请选择</option>
+                                        <option value="0">不选</option>
+                                        <option value="1">信道A</option>
+                                        <option value="2">信道B</option>
+                                        <option value="3">信道A和信道B</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">内容</label>
+                                <div class="layui-input-block">
+										<textarea name="content" placeholder="请输入二进制寻址内容" lay-verify="normalASCII"
+                                                  class="layui-textarea" maxlength="156"></textarea>
+                                </div>
+                            </div>
+                            <a class="layui-btn layui-btn-normal custom-ship-ais-msg-btn"
+                               style="width: 100px;margin-top: 30px;"
+                               lay-submit lay-filter="fleetSendBinMessage">发送</a>
+                        </form>
+                    </div>
+
+                    <div class="layui-tab-item custom-tab-item1">
+                        <form action="" class="layui-form send-form">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">信道选择</label>
+                                <div class="layui-input-block">
+                                    <select name="channel" lay-verify="required">
+                                        <option value="">请选择</option>
+                                        <option value="0">不选</option>
+                                        <option value="1">信道A</option>
+                                        <option value="2">信道B</option>
+                                        <option value="3">信道A和信道B</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">内容</label>
+                                <div class="layui-input-block">
+										<textarea name="content" placeholder="请输入文本寻址内容" lay-verify="bitASCII"
+                                                  class="layui-textarea" maxlength="156"></textarea>
+                                </div>
+                            </div>
+                            <a class="layui-btn layui-btn-normal custom-ship-ais-msg-btn"
+                               style="width: 100px;margin-top: 30px;"
+                               lay-submit lay-filter="fleetSendTextMessage">发送</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-tab layui-tab-item">
+                <ul class="layui-tab-title layui-nav layui-nav-tree layui-bg-cyan layui-inline"
+                    style="text-align: left; height: 100%;" lay-filter="sendTypeRegionalBroadcast">
+                    <li style="width:auto; text-align:left" class="layui-nav-item layui-this">
+                        <a>潮汐窗口</a></li>
+                    <li style="width:auto; text-align:left" class="layui-nav-item">
+                        <a style="overflow: visible;">进港清理航道时间</a></li>
+                    <li style="width:auto; text-align:left" class="layui-nav-item">
+                        <a>泊位数据</a></li>
+                    <li style="width:auto; text-align:left" class="layui-nav-item">
+                        <a>区域通告</a></li>
+                    <li style="width:auto; text-align:left" class="layui-nav-item">
+                        <a>航线信息</a></li>
+                    <li style="width:auto; text-align:left" class="layui-nav-item">
+                        <a>文本描述</a></li>
+                </ul>
+                <div class="layui-tab-content customs-tab-content"
+                     style="overflow-y:auto; height: 520px; width: 530px;float: right;margin-right: 10px;">
+                    <div class="layui-tab-item custom-tab-item2 layui-show">
+                        <form action="" class="layui-form send-form">
+                            <div class="layui-form-item"
+                                 style="width: 540px; clear: none; float: right; margin-right: 10px;">
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 120px; text-align:right">时间戳：UTC月</label>
+                                    <div class="layui-input-block" style="margin-left: 150px;">
+                                        <input type="text" name="utcMonth" placeholder="请输入1~12"
+                                               lay-verify="from1To12Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 120px; text-align:right">时间戳：UTC日</label>
+                                    <div class="layui-input-block" style="margin-left: 150px;">
+                                        <input type="text" name="utcDay" placeholder="请输入1~31" lay-verify="from1To31Int"
+                                               autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 120px; text-align:right">位置#1经度</label>
+                                    <div class="layui-input-block" style="margin-left: 150px;">
+                                        <input type="text" name="positionLongitude1" placeholder="请输入±180"
+                                               lay-verify="from180To180Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 120px; text-align:right">位置#1维度</label>
+                                    <div class="layui-input-block" style="margin-left: 150px;">
+                                        <input type="text" name="positionLatitude1" placeholder="请输入±90"
+                                               lay-verify="from90To90Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 120px; text-align:right">UTC起始小时</label>
+                                    <div class="layui-input-block" style="margin-left: 150px;">
+                                        <input type="text" name="fromUtcHour1" placeholder="请输入0~23"
+                                               lay-verify="from0To23Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 120px; text-align:right">UTC起始分钟</label>
+                                    <div class="layui-input-block" style="margin-left: 150px;">
+                                        <input type="text" name="fromUtcMinute1" placeholder="请输入0~59"
+                                               lay-verify="from0To59Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 120px; text-align:right">UTC截至小时</label>
+                                    <div class="layui-input-block" style="margin-left: 150px;">
+                                        <input type="text" name="toUtcHour1" placeholder="请输入0~23"
+                                               lay-verify="from0To23Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 120px; text-align:right">UTC截至分钟</label>
+                                    <div class="layui-input-block" style="margin-left: 150px;">
+                                        <input type="text" name="toUtcMinute1" placeholder="请输入0~59"
+                                               lay-verify="from0To59Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 120px; text-align:right">流向预测#1</label>
+                                    <div class="layui-input-block" style="margin-left: 150px;">
+                                        <input type="text" name="currentDirectionPredicted1" placeholder="请输入0~359"
+                                               lay-verify="from0To359Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 120px; text-align:right">流速预测#1</label>
+                                    <div class="layui-input-block" style="margin-left: 150px;">
+                                        <input type="text" name="currentSpeedPredicted1" placeholder="请输入0~251"
+                                               lay-verify="from0To251Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 120px; text-align:right">位置#2经度</label>
+                                    <div class="layui-input-block" style="margin-left: 150px;">
+                                        <input type="text" name="positionLongitude2" placeholder="请输入±180"
+                                               lay-verify="from180To180Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 120px; text-align:right">位置#2维度</label>
+                                    <div class="layui-input-block" style="margin-left: 150px;">
+                                        <input type="text" name="positionLatitude2" placeholder="请输入±90"
+                                               lay-verify="from90To90Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 120px; text-align:right">UTC起始小时</label>
+                                    <div class="layui-input-block" style="margin-left: 150px;">
+                                        <input type="text" name="fromUtcHour2" placeholder="请输入0~23"
+                                               lay-verify="from0To23Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 120px; text-align:right">UTC起始分钟</label>
+                                    <div class="layui-input-block" style="margin-left: 150px;">
+                                        <input type="text" name="fromUtcMinute2" placeholder="请输入0~59"
+                                               lay-verify="from0To59Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 120px; text-align:right">流向预测#2</label>
+                                    <div class="layui-input-block" style="margin-left: 150px;">
+                                        <input type="text" name="currentDirectionPredicted2" placeholder="请输入0~359"
+                                               lay-verify="from0To359Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 120px; text-align:right">流速预测#2</label>
+                                    <div class="layui-input-block" style="margin-left: 150px;">
+                                        <input type="text" name="currentSpeedPredicted2" placeholder="请输入0~251"
+                                               lay-verify="from0To251Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 120px; text-align:right">位置#3经度</label>
+                                    <div class="layui-input-block" style="margin-left: 150px;">
+                                        <input type="text" name="positionLongitude3" placeholder="请输入±180"
+                                               lay-verify="from180To180Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 120px; text-align:right">位置#3维度</label>
+                                    <div class="layui-input-block" style="margin-left: 150px;">
+                                        <input type="text" name="positionLatitude3" placeholder="请输入±90"
+                                               lay-verify="from90To90Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 120px; text-align:right">UTC起始小时</label>
+                                    <div class="layui-input-block" style="margin-left: 150px;">
+                                        <input type="text" name="fromUtcHour3" placeholder="请输入0~23"
+                                               lay-verify="from0To23Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 120px; text-align:right">UTC起始分钟</label>
+                                    <div class="layui-input-block" style="margin-left: 150px;">
+                                        <input type="text" name="fromUtcMinute3" placeholder="请输入0~59"
+                                               lay-verify="from0To59Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 120px; text-align:right">UTC截至小时</label>
+                                    <div class="layui-input-block" style="margin-left: 150px;">
+                                        <input type="text" name="toUtcHour3" placeholder="请输入0~23"
+                                               lay-verify="from0To23Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 120px; text-align:right">UTC截至分钟</label>
+                                    <div class="layui-input-block" style="margin-left: 150px;">
+                                        <input type="text" name="toUtcMinute3" placeholder="请输入0~59"
+                                               lay-verify="from0To59Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 120px; text-align:right">流向预测#3</label>
+                                    <div class="layui-input-block" style="margin-left: 150px;">
+                                        <input type="text" name="currentDirectionPredicted3" placeholder="请输入0~359"
+                                               lay-verify="from0To359Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 120px; text-align:right">流速预测#3</label>
+                                    <div class="layui-input-block" style="margin-left: 150px;">
+                                        <input type="text" name="currentSpeedPredicted3" placeholder="请输入0~251"
+                                               lay-verify="from0To251Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px; margin-left: 30px;">
+                                    <button class="layui-btn layui-btn-normal custom-ship-asm-water-msg-btn"
+                                            style="width: 100px;margin-left: 110px" lay-submit
+                                            lay-filter="fleetSendMessage3">发送
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="layui-tab-item custom-tab-item3">
+                        <form action="" class="layui-form send-form">
+                            <div class="layui-form-item"
+                                 style="width: 540px; clear: none; float: right; margin-right: 10px;">
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 170px; text-align:right">消息链接ID</label>
+                                    <div class="layui-input-block layui-input-block-custom" style="margin-left: 200px;">
+                                        <input type="text" name="messageLinkageID" placeholder="请输入" maxlength="10"
+                                               lay-verify="from1To1023Int|required" autocomplete="off"
+                                               class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 170px; text-align:right">进港许可UTC时间：月</label>
+                                    <div class="layui-input-block layui-input-block-custom" style="margin-left: 200px;">
+                                        <input type="text" name="utcMonth" placeholder="请输入1~12"
+                                               lay-verify="from1To12Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 170px; text-align:right">进港许可UTC时间：日</label>
+                                    <div class="layui-input-block layui-input-block-custom" style="margin-left: 200px;">
+                                        <input type="text" name="utcDay" placeholder="请输入1~31" lay-verify="from1To31Int"
+                                               autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 170px; text-align:right">进港许可UTC时间：时</label>
+                                    <div class="layui-input-block layui-input-block-custom" style="margin-left: 200px;">
+                                        <input type="text" name="utcHour" placeholder="请输入0~23"
+                                               lay-verify="from0To23Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 170px; text-align:right">进港许可UTC时间：分</label>
+                                    <div class="layui-input-block layui-input-block-custom" style="margin-left: 200px;">
+                                        <input type="text" name="utcMinute" placeholder="请输入0~59"
+                                               lay-verify="from0To59Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 170px; text-align:right">港口码头名称</label>
+                                    <div class="layui-input-block layui-input-block-custom" style="margin-left: 200px;">
+                                        <input type="text" name="portName" placeholder="请输入" autocomplete="off"
+                                               lay-verify="bitASCII2"
+                                               class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 170px; text-align:right">目的港口</label>
+                                    <div class="layui-input-block layui-input-block-custom" style="margin-left: 200px;">
+                                        <input type="text" name="destination" placeholder="请输入" autocomplete="off"
+                                               lay-verify="bitASCII2"
+                                               class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 170px; text-align:right">经度</label>
+                                    <div class="layui-input-block layui-input-block-custom" style="margin-left: 200px;">
+                                        <input type="text" name="longitude" placeholder="请输入±180"
+                                               lay-verify="from180To180Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 170px; text-align:right">纬度</label>
+                                    <div class="layui-input-block layui-input-block-custom" style="margin-left: 200px;">
+                                        <input type="text" name="latitude" placeholder="请输入±90"
+                                               lay-verify="from90To90Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px; margin-left: 30px;">
+                                    <a class="layui-btn layui-btn-normal custom-ship-asm-water-msg-btn"
+                                       style="width: 100px;margin-left: 110px" lay-submit
+                                       lay-filter="fleetSendMessage7" data-address="address" data-type="7">发送</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="layui-tab-item custom-tab-item4">
+                        <form action="" class="layui-form send-form">
+                            <div class="layui-form-item"
+                                 style="width: 540px; clear: none; float: right; margin-right: 10px;">
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 180px; text-align:right">消息链接ID</label>
+                                    <div class="layui-input-block" style="margin-left: 210px;">
+                                        <input type="text" name="messageLinkageID" placeholder="请输入" maxlength="10"
+                                               lay-verify="from1To1023Int2|required" autocomplete="off"
+                                               class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 180px; text-align:right">泊位长度</label>
+                                    <div class="layui-input-block" style="margin-left: 210px;">
+                                        <input type="text" name="berthLength" placeholder="请输入1~511"
+                                               lay-verify="from1To511Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 180px; text-align:right">泊位水深</label>
+                                    <div class="layui-input-block" style="margin-left: 210px;">
+                                        <input type="text" name="waterDepthAtBerth" placeholder="请输入1~255"
+                                               lay-verify="from1To255Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 180px; text-align:right">泊位位置</label>
+                                    <div class="layui-input-block" style="margin-left: 210px;">
+                                        <!-- <input type="text" name="mooringPosition" placeholder="请输入" autocomplete="off" class="layui-input"> -->
+                                        <select name="mooringPosition" lay-verify="required">
+                                            <option value="0" selected="selected"></option>
+                                            <option value="1">对向左舷</option>
+                                            <option value="2">对向右舷</option>
+                                            <option value="3">地中海式锚泊</option>
+                                            <option value="4">系船浮标</option>
+                                            <option value="5">锚地</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 180px; text-align:right">靠泊UTC时间：月</label>
+                                    <div class="layui-input-block" style="margin-left: 210px;">
+                                        <input type="text" name="utcMonth" placeholder="请输入1~12"
+                                               lay-verify="from1To12Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 180px; text-align:right">靠泊UTC时间：日</label>
+                                    <div class="layui-input-block" style="margin-left: 210px;">
+                                        <input type="text" name="utcDay" placeholder="请输入1~31" lay-verify="from1To31Int"
+                                               autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 180px; text-align:right">靠泊UTC时间：时</label>
+                                    <div class="layui-input-block" style="margin-left: 210px;">
+                                        <input type="text" name="utcHour" placeholder="请输入0~23"
+                                               lay-verify="from0To23Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 180px; text-align:right">靠泊UTC时间：分</label>
+                                    <div class="layui-input-block" style="margin-left: 210px;">
+                                        <input type="text" name="utcMinute" placeholder="请输入0~59"
+                                               lay-verify="from0To59Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 180px; text-align:right">服务有效性</label>
+                                    <div class="layui-input-block" style="margin-left: 210px;">
+                                        <!-- <input type="text" name="servicesAvailability" placeholder="请输入" autocomplete="off" class="layui-input"> -->
+                                        <select name="servicesAvailability" lay-filter="servicesAvailability">
+                                            <option value="0" selected="selected">服务类型未知</option>
+                                            <option value="1">服务类型已知</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item"
+                                     style="margin-left: 210px;width: calc(100% - 210px) !important;">
+                                    <div class="check-box-group">
+                                        <input type="checkbox" value="1" lay-skin="primary"
+                                               name="typeOfServicesAvailable1" title="代理" disabled>
+                                        <input type="checkbox" value="2" lay-skin="primary"
+                                               name="typeOfServicesAvailable2" title="加煤/加油" disabled>
+                                        <input type="checkbox" value="3" lay-skin="primary"
+                                               name="typeOfServicesAvailable3" title="杂货店" disabled>
+                                        <input type="checkbox" value="4" lay-skin="primary"
+                                               name="typeOfServicesAvailable4" title="装卸工" disabled>
+                                        <input type="checkbox" value="5" lay-skin="primary"
+                                               name="typeOfServicesAvailable5" title="电气" disabled>
+                                        <input type="checkbox" value="6" lay-skin="primary"
+                                               name="typeOfServicesAvailable6" title="饮水" disabled>
+                                        <input type="checkbox" value="7" lay-skin="primary"
+                                               name="typeOfServicesAvailable7" title="海关" disabled>
+                                        <input type="checkbox" value="8" lay-skin="primary"
+                                               name="typeOfServicesAvailable8" title="货运" disabled>
+                                        <input type="checkbox" value="9" lay-skin="primary"
+                                               name="typeOfServicesAvailable9" title="起重机" disabled>
+                                        <input type="checkbox" value="10" lay-skin="primary"
+                                               name="typeOfServicesAvailable10" title="升降机" disabled>
+                                        <input type="checkbox" value="11" lay-skin="primary"
+                                               name="typeOfServicesAvailable11" title="医疗设施" disabled>
+                                        <input type="checkbox" value="12" lay-skin="primary"
+                                               name="typeOfServicesAvailable12" title="导航维修" disabled>
+                                        <input type="checkbox" value="13" lay-skin="primary"
+                                               name="typeOfServicesAvailable13" title="粮食" disabled>
+                                        <input type="checkbox" value="14" lay-skin="primary"
+                                               name="typeOfServicesAvailable14" title="船只维修" disabled>
+                                        <input type="checkbox" value="15" lay-skin="primary"
+                                               name="typeOfServicesAvailable15" title="检验员" disabled>
+                                        <input type="checkbox" value="16" lay-skin="primary"
+                                               name="typeOfServicesAvailable16" title="蒸汽" disabled>
+                                        <input type="checkbox" value="17" lay-skin="primary"
+                                               name="typeOfServicesAvailable17" title="拖船" disabled>
+                                        <input type="checkbox" value="18" lay-skin="primary"
+                                               name="typeOfServicesAvailable18" title="废料处理 (固体)" disabled>
+                                        <input type="checkbox" value="19" lay-skin="primary"
+                                               name="typeOfServicesAvailable19" title="废料处理 (液体)" disabled>
+                                        <input type="checkbox" value="20" lay-skin="primary"
+                                               name="typeOfServicesAvailable20" title="废料处理 (危险品)" disabled>
+                                        <input type="checkbox" value="21" lay-skin="primary"
+                                               name="typeOfServicesAvailable21" title="备用压舱物替换" disabled>
+                                        <input type="checkbox" value="22" lay-skin="primary"
+                                               name="typeOfServicesAvailable22" title="附加服务可用" disabled>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 180px; text-align:right">泊位名称</label>
+                                    <div class="layui-input-block" style="margin-left: 210px;">
+                                        <input type="text" name="nameOfBerth" placeholder="请输入" autocomplete="off"
+                                               maxlength="20" lay-verify="bitASCII" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 180px; text-align:right">泊位中心位置信息：经度</label>
+                                    <div class="layui-input-block" style="margin-left: 210px;">
+                                        <input type="text" name="centrePositionOfBerthLongitude" placeholder="请输入±180"
+                                               lay-verify="from180To180Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 180px; text-align:right">泊位中心位置信息：纬度</label>
+                                    <div class="layui-input-block" style="margin-left: 210px;">
+                                        <input type="text" name="centrePositionOfBerthLatitude" placeholder="请输入±90"
+                                               lay-verify="from90To90Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px; margin-left: 30px;">
+                                    <a class="layui-btn layui-btn-normal custom-ship-asm-water-msg-btn"
+                                       style="width: 100px;margin-left: 110px" lay-submit
+                                       lay-filter="fleetSendMessage9" data-address="address" data-type="9">发送</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="layui-tab-item custom-tab-item5">
+                        <form action="" class="layui-form send-form">
+                            <div class="layui-form-item"
+                                 style="width: 540px; clear: none; float: right; margin-right: 10px;">
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 190px; text-align:right">消息链接ID</label>
+                                    <div class="layui-input-block" style="margin-left: 220px;">
+                                        <input type="text" name="messageLinkageID" placeholder="请输入" maxlength="10"
+                                               lay-verify="from1To1023Int|required" autocomplete="off"
+                                               class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 190px; text-align:right">公告说明</label>
+                                    <div class="layui-input-block" style="margin-left: 220px;">
+                                        <input type="text" name="noticeDescription" placeholder="请输入0~127"
+                                               lay-verify="from0To127Int" maxlength="7" autocomplete="off"
+                                               class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 190px; text-align:right">区域公告起始UTC时间：月</label>
+                                    <div class="layui-input-block" style="margin-left: 220px;">
+                                        <input type="text" name="utcMonth" placeholder="请输入1~12"
+                                               lay-verify="from1To12Int" maxlength="4" autocomplete="off"
+                                               class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 190px; text-align:right">区域公告起始UTC时间：日</label>
+                                    <div class="layui-input-block" style="margin-left: 220px;">
+                                        <input type="text" name="utcDay" placeholder="请输入1~31" lay-verify="from1To31Int"
+                                               maxlength="5" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 190px; text-align:right">区域公告起始UTC时间：时</label>
+                                    <div class="layui-input-block" style="margin-left: 220px;">
+                                        <input type="text" name="utcHour" placeholder="请输入0~23"
+                                               lay-verify="from0To23Int" maxlength="5" autocomplete="off"
+                                               class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 190px; text-align:right">区域公告起始UTC时间：分</label>
+                                    <div class="layui-input-block" style="margin-left: 220px;">
+                                        <input type="text" name="utcMinute" placeholder="请输入0~59"
+                                               lay-verify="from0To59Int" maxlength="6" autocomplete="off"
+                                               class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 190px; text-align:right">公告持续时间</label>
+                                    <div class="layui-input-block" style="margin-left: 220px;">
+                                        <input type="text" name="duration" placeholder="请输入0~262142"
+                                               lay-verify="from0To262142Int" maxlength="18" autocomplete="off"
+                                               class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="text-align: center;margin-bottom:10px;margin-top:10px;">
+                                    <a id="targetAddShip1" class="layui-btn layui-btn-sm layui-btn-normal"
+                                       style="height: 38px; margin-left: 150px; width: 100px;">添加</a>
+                                </div>
+                                <div id="addShipDiv1">
+
+                                </div>
+                                <div style="margin-top: 10px; margin-left: 30px;">
+                                    <a class="layui-btn layui-btn-normal custom-ship-asm-water-msg-btn"
+                                       style="width: 100px;margin-left: 110px" lay-submit
+                                       lay-filter="fleetSendMessage11" data-address="address" data-type="11">发送</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="layui-tab-item custom-tab-item6">
+                        <form action="" class="layui-form send-form">
+                            <div class="layui-form-item"
+                                 style="width: 540px; clear: none; float: right; margin-right: 10px;">
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 170px; text-align:right">消息链接ID</label>
+                                    <div class="layui-input-block layui-input-block-custom" style="margin-left: 200px;">
+                                        <input type="text" name="messageLinkageID" placeholder="请输入" maxlength="10"
+                                               lay-verify="from1To1023Int|required" autocomplete="off"
+                                               class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 170px; text-align:right">发送者分类</label>
+                                    <div class="layui-input-block layui-input-block-custom" style="margin-left: 200px;">
+                                        <!-- <input type="text" name="senderClassification" placeholder="请输入" autocomplete="off" class="layui-input"> -->
+                                        <select name="senderClassification" lay-verify="required">
+                                            <option value=""></option>
+                                            <option value="0">船舶</option>
+                                            <option value="1">管理机关</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 170px; text-align:right">航线类型</label>
+                                    <div class="layui-input-block layui-input-block-custom" style="margin-left: 200px;">
+                                        <!-- <input type="text" name="routeType" placeholder="请输入" autocomplete="off" class="layui-input"> -->
+                                        <select name="routeType" lay-verify="required">
+                                            <option value=""></option>
+                                            <option value="1">强制航线</option>
+                                            <option value="2">推荐航线</option>
+                                            <option value="3">可选航线</option>
+                                            <option value="4">穿越冰区推荐航线</option>
+                                            <option value="5">船舶航线计划</option>
+                                            <option value="31">取消航线（通过识别消息ID删除航线）</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 170px; text-align:right">开始时间日期的UTC月</label>
+                                    <div class="layui-input-block layui-input-block-custom" style="margin-left: 200px;">
+                                        <input type="text" name="utcMonth" placeholder="请输入1~12"
+                                               lay-verify="from1To12Int" maxlength="4" autocomplete="off"
+                                               class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 170px; text-align:right">开始时间日期的UTC日</label>
+                                    <div class="layui-input-block layui-input-block-custom" style="margin-left: 200px;">
+                                        <input type="text" name="utcDay" placeholder="请输入1~31" lay-verify="from1To31Int"
+                                               maxlength="5" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 170px; text-align:right">开始时间日期的UTC时</label>
+                                    <div class="layui-input-block layui-input-block-custom" style="margin-left: 200px;">
+                                        <input type="text" name="utcHour" placeholder="请输入0~23"
+                                               lay-verify="from0To23Int" maxlength="5" autocomplete="off"
+                                               class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 170px; text-align:right">开始时间日期的UTC分钟</label>
+                                    <div class="layui-input-block layui-input-block-custom" style="margin-left: 200px;">
+                                        <input type="text" name="utcMinute" placeholder="请输入0~59"
+                                               lay-verify="from0To59Int" maxlength="6" autocomplete="off"
+                                               class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 170px; text-align:right">持续时间</label>
+                                    <div class="layui-input-block layui-input-block-custom" style="margin-left: 200px;">
+                                        <input type="text" name="duration" placeholder="请输入0~262142"
+                                               lay-verify="from0To262142Int" maxlength="18" autocomplete="off"
+                                               class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label"
+                                           style="width: 170px; text-align:right">航路点数量</label>
+                                    <div class="layui-input-block layui-input-block-custom" style="margin-left: 200px;">
+                                        <input type="text" name="numberOfWaypoints" placeholder="请输入1~16"
+                                               lay-verify="from1To16Int" maxlength="5" autocomplete="off"
+                                               class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;" class="dbl-form-item">
+                                    <label class="layui-form-label"
+                                           style="width: 70px; text-align:right">经度1</label>
+                                    <div class="layui-input-block"
+                                         style="width: 160px; margin-left: 10px; float: left">
+                                        <input type="text" style="width: 160px;" name="longitude1" placeholder="请输入±180"
+                                               lay-verify="from180To180Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <label class="layui-form-label"
+                                           style="width: 70px; text-align:right">纬度1</label>
+                                    <div class="layui-input-block"
+                                         style="width: 160px; margin-left: 10px;float: left">
+                                        <input type="text" style="width: 160px;" name="latitude1" placeholder="请输入±90"
+                                               lay-verify="from90To90Int" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px; margin-left: 30px;">
+                                    <a class="layui-btn layui-btn-normal custom-ship-asm-water-msg-btn"
+                                       style="width: 100px;margin-left: 110px" lay-submit
+                                       lay-filter="fleetSendMessage13" data-address="address" data-type="13">发送</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="layui-tab-item custom-tab-item7">
+                        <form action="" class="layui-form send-form">
+                            <div class="layui-form-item"
+                                 style="width: 540px; clear: none; float: right; margin-right: 10px;">
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label">消息链接ID</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="messageLinkageID" lay-verify="from1To1023Int|required"
+                                               placeholder="请输入" maxlength="10" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label class="layui-form-label">文本字符串</label>
+                                    <div class="layui-input-block">
+											<textarea name="textString" required placeholder="请输入" lay-verify="bitASCII"
+                                                      autocomplete="off" maxlength="155"
+                                                      class="layui-textarea"></textarea>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 10px; margin-left: 30px;">
+                                    <a class="layui-btn layui-btn-normal custom-ship-asm-water-msg-btn"
+                                       style="width: 100px;margin-left: 110px" lay-submit
+                                       lay-filter="fleetSendMessage14" data-address="address" data-type="14">发送</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-tab layui-tab-item">
+                <ul class="layui-tab-title layui-nav layui-nav-tree layui-bg-cyan layui-inline"
+                    style="text-align: left; height: 100%;" lay-filter="">
+                    <li style="width:auto; text-align:left" class="layui-nav-item layui-this"><a>测试报文</a></li>
+                    <li style="width:auto; text-align:left" class="layui-nav-item"><a>海图更新</a></li>
+                    <li style="width:auto; text-align:left" class="layui-nav-item"><a>航线规划</a></li>
+                </ul>
+                <div class="layui-tab-content customs-tab-content"
+                     style="overflow-y:auto; height: 520px; width: 530px;float: right;margin-right: 10px;padding: 0;">
+                    <div class="layui-tab-item custom-tab-item1 custom-tab-item1-1 layui-show">
+                        <form action="" class="layui-form send-form">
+                            <div class="layui-form-item"
+                                 style="width: 540px; clear: none; float: right; margin-right: 10px;">
+                                <div style="margin-top: 55px;">
+                                    <label class="layui-form-label">报文内容</label>
+                                    <div class="layui-input-block">
+										<textarea name="content" placeholder="请输入内容" required lay-verify="normalASCII"
+                                                  class="layui-textarea"
+                                                  maxlength="156"></textarea>
+                                    </div>
+                                </div>
+                                <a class="layui-btn layui-btn-normal custom-ship-asm-water-msg-btn"
+                                   style="width: 100px;margin-top: 30px;margin-left: 110px" lay-submit
+                                   lay-filter="fleetSendVDEMessage">发送</a>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="layui-tab-item custom-tab-item1 custom-tab-item1-1">
+                        <form action="" class="layui-form send-form">
+                            <div class="layui-form-item"
+                                 style="width: 540px; clear: none; float: right; margin-right: 10px;">
+                                <div style="margin-top: 30px;">
+                                    <label class="layui-form-label">选择文件</label>
+                                    <div class="layui-input-block">
+                                        <input type="file" id="files1" style="display: none" onchange="upFile1()">
+                                        <button type="button" class="layui-btn" id="fileImport1">
+                                            <i class="layui-icon"></i>上传文件
+                                        </button>
+                                        <input type="text" id="fileName1" autocomplete="off" class="layui-input"
+                                               value="未选择文件"
+                                               disabled
+                                               style="float:left;background-color: #FFF;margin-top:10px;margin-bottom: 10px;border:none;">
+                                        <!-- <input type="file" name = "file" id = "upFile" />  -->
+                                        <!-- <input type="button" id="fileImport" value="导入"> -->
+                                    </div>
+                                </div>
+                                <div style="margin-top: 55px;">
+                                    <label class="layui-form-label">传输方式</label>
+                                    <div class="layui-input-block">
+                                        <select name="transmission" lay-verify="required">
+                                            <option value="">请选择</option>
+                                            <option value="01">快速传输</option>
+                                            <option value="02">稳定传输</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <a class="layui-btn layui-btn-normal custom-ship-asm-water-msg-btn"
+                                   style="width: 100px;margin-top: 30px;margin-left: 110px" lay-submit
+                                   lay-filter="fleetSendMessageMap">发送</a>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="layui-tab-item custom-tab-item1 custom-tab-item1-1">
+                        <form action="" class="layui-form send-form">
+                            <div class="layui-form-item"
+                                 style="width: 540px; clear: none; float: right; margin-right: 10px;">
+                                <div style="margin-top: 30px;">
+                                    <label class="layui-form-label">选择文件</label>
+                                    <div class="layui-input-block">
+                                        <input type="file" id="files2" style="display: none" onchange="upFile2()">
+                                        <button type="button" class="layui-btn" id="fileImport2">
+                                            <i class="layui-icon"></i>上传文件
+                                        </button>
+                                        <input type="text" id="fileName2" autocomplete="off" class="layui-input"
+                                               value="未选择文件"
+                                               disabled
+                                               style="float:left;background-color: #FFF;margin-top:10px;margin-bottom: 10px;border:none;">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 55px;">
+                                    <label class="layui-form-label">传输方式</label>
+                                    <div class="layui-input-block">
+                                        <select name="transmission" lay-verify="required">
+                                            <option value="">请选择</option>
+                                            <option value="01">快速传输</option>
+                                            <option value="02">稳定传输</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <a class="layui-btn layui-btn-normal  custom-ship-asm-water-msg-btn"
+                                   style="width: 100px;margin-top: 30px;margin-left: 100px !important;" lay-submit
+                                   lay-filter="fleetSendMessageLine">发送</a>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--船队管理新增修改 -->
+<div id='myFleetInfoLayer' style="display: none">
+    <from id="fleet-form" lay-filter="fleet-form" class="layui-form">
+        <div class="layui-form-item" style="margin-top: 10px;margin-right: 10px">
+            <label class="layui-form-label">船队名称：</label>
+            <div class="layui-input-block">
+                <input type="hidden" id="fleetId" name="fleetId" value=""/>
+                <input name="fleetName" placeholder="请输入船队名称" type="text" class="layui-input" maxlength="255"
+                       lay-verify="required" required autocomplete="off"/>
+            </div>
+        </div>
+        <div class="layui-form-item" style="margin-right: 10px">
+            <label class="layui-form-label">船队颜色：</label>
+            <div class="layui-input-block">
+				<span style="width:170px;text-align: center;margin-right: 30px; line-height: 20px">
+					<a href="javascript:void(0)" id="a1" name="aName" class=""
+                       style="background:#e539cf;border: rgba(0,0,0,0) solid 1px">&nbsp;&nbsp;&nbsp;&nbsp;</a>
+					<a href="javascript:void(0)" id="a2" name="aName" class=""
+                       style="background:#ce95ff;border: rgba(0,0,0,0) solid 1px">&nbsp;&nbsp;&nbsp;&nbsp;</a>
+					<a href="javascript:void(0)" id="a3" name="aName" class=""
+                       style="background:#ed1b24;border: rgba(0,0,0,0) solid 1px">&nbsp;&nbsp;&nbsp;&nbsp;</a>
+					<a href="javascript:void(0)" id="a4" name="aName" class=""
+                       style="background:#ff7747;border: rgba(0,0,0,0) solid 1px">&nbsp;&nbsp;&nbsp;&nbsp;</a>
+					<a href="javascript:void(0)" id="a5" name="aName" class=""
+                       style="background:#ffba8c;border: rgba(0,0,0,0) solid 1px">&nbsp;&nbsp;&nbsp;&nbsp;</a>
+					<a href="javascript:void(0)" id="a6" name="aName" class=""
+                       style="background:#608baa;border: rgba(0,0,0,0) solid 1px">&nbsp;&nbsp;&nbsp;&nbsp;</a></br>
+                    <a href="javascript:void(0)" id="a7" name="aName" class=""
+                       style="background:#2b95f8;border: rgba(0,0,0,0) solid 1px">&nbsp;&nbsp;&nbsp;&nbsp;</a>
+					<a href="javascript:void(0)" id="a8" name="aName" class=""
+                       style="background:#51e0ff;border: rgba(0,0,0,0) solid 1px">&nbsp;&nbsp;&nbsp;&nbsp;</a>
+					<a href="javascript:void(0)" id="a9" name="aName" class=""
+                       style="background:#009345;border: rgba(0,0,0,0) solid 1px">&nbsp;&nbsp;&nbsp;&nbsp;</a>
+					<a href="javascript:void(0)" id="a10" name="aName" class=""
+                       style="background:#999900;border: rgba(0,0,0,0) solid 1px">&nbsp;&nbsp;&nbsp;&nbsp;</a>
+					<a href="javascript:void(0)" id="a11" name="aName" class=""
+                       style="background:#8cc63e;border: rgba(0,0,0,0) solid 1px">&nbsp;&nbsp;&nbsp;&nbsp;</a>
+					<a href="javascript:void(0)" id="a12" name="aName" class=""
+                       style="background:#75ffa2;border: rgba(0,0,0,0) solid 1px">&nbsp;&nbsp;&nbsp;&nbsp;</a>
+				</span>
+            </div>
+        </div>
+        <div class="layui-form-item" style="margin-right: 10px">
+            <label class="layui-form-label">备注：</label>
+            <div class="layui-input-block">
+                <textarea rows="3" id="fleetRemarks" name="fleetRemarks" placeholder="最长不能超过200个字符"
+                          class="layui-textarea" maxlength="200"></textarea>
+            </div>
+        </div>
+        <div style="text-align: center;">
+
+            <button class="layui-btn layui-btn-normal" style="width: 100px;" lay-submit
+                    lay-filter="saveFleetInfo">保存
+            </button>
+        </div>
+
+    </from>
+
+</div>
+<!--船队详细信息表-->
+<div id='fleetInfoDetailLayer' style="display: none">
+    <from class="layui-form">
+        <table class="layui-table" id="fleetInfoDetail-table" lay-filter="fleetInfoDetail-table"
+               style="max-height: 50px;overflow-y: auto"></table>
+    </from>
+</div>
+<!-- 添加船队船舶信息弹出层 -->
+<div id='FleetShipInfoLayer' style="display: none">
+    <from id="fleetShipInfo-form" lay-filter="fleetShipInfo-form" class="layui-form">
+        <div id="fleetShipType" class="layui-form-item" style="margin-top: 10px;margin-right: 10px">
+            <label class="layui-form-label" style="width: 120px;">选择船队：</label>
+            <div class="layui-input-block custom-add-select" style="margin-left: 150px;margin-right: 16px">
+                <select name="fleetShipInfoSelect" id="fleetShipInfoSelect" lay-filter="fleetShipInfoChange"
+                        lay-verify="required">
+                    <option value="webapp">请选择</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item" style="margin-top: 10px;margin-right: 10px">
+            <label class="layui-form-label" style="width: 120px;">船舶MMSI：</label>
+            <div class="layui-input-block">
+                <input type="hidden" name="fleetId" id="fleetInfoId" value=""/>
+                <input type="hidden" name="id" value=""/>
+                <input name="mmsi" id="mmsi" placeholder="请输入船舶MMSI" type="text" class="layui-input" autocomplete="off"
+                       maxlength="255" style="width: 80%"
+                       lay-verify="required" required/>
+            </div>
+        </div>
+        <div class="layui-form-item" style="margin-top: 10px;margin-right: 10px">
+            <label class="layui-form-label" style="width: 120px;">自定义船舶名称：</label>
+            <div class="layui-input-block">
+                <input name="shipName" placeholder="请输入船舶名称" type="text" class="layui-input" maxlength="255"
+                       lay-verify="required" autocomplete="off" required style="width: 80%"/>
+            </div>
+        </div>
+        <div class="layui-form-item" style="margin-top: 10px;margin-right: 10px">
+            <label class="layui-form-label" style="width: 120px;">联系人：</label>
+            <div class="layui-input-block">
+                <input name="shipPerson" placeholder="请输入船舶联系人" type="text" class="layui-input" maxlength="255"
+                       style="width: 80%" autocomplete="off"
+                       lay-verify="required" required/>
+            </div>
+        </div>
+        <div class="layui-form-item" style="margin-top: 10px;margin-right: 10px">
+            <label class="layui-form-label" style="width: 120px;">联系电话：</label>
+            <div class="layui-input-block">
+                <input name="shipNumber" placeholder="请输入联系电话" type="tel" class="layui-input" maxlength="255"
+                       style="width: 80%" autocomplete="off"
+                       lay-verify="required|phone" required/>
+            </div>
+        </div>
+        <div class="layui-form-item" style="margin-top: 10px;margin-right: 10px">
+            <label class="layui-form-label" style="width: 120px;">联系邮箱：</label>
+            <div class="layui-input-block">
+                <input name="shipMail" placeholder="请输入联系邮箱" type="text" class="layui-input" maxlength="255"
+                       style="width: 80%" autocomplete="off"
+                       lay-verify="email" required/>
+            </div>
+        </div>
+        <div class="layui-form-item" style="margin-right: 10px">
+            <label class="layui-form-label" style="width: 120px;">备注：</label>
+            <div class="layui-input-block">
+                <textarea rows="3" id="ShipRemarks" name="ShipRemarks" placeholder="最长不能超过200个字符" class="layui-textarea"
+                          maxlength="200" style="width: 80%"></textarea>
+            </div>
+        </div>
+        <div style="text-align: center;">
+
+            <button class="layui-btn layui-btn-normal custom-add-btn" style="width: 100px;" lay-submit
+                    lay-filter="saveFleetShipInfo">保存
+            </button>
+        </div>
+    </from>
+</div>
+<!--船队管理编辑-->
+<script type="text/html" id="fleet-table-bar">
+    <a class=" " style="padding-left:5px;color: #DBD9D1" lay-event="addFleetShipInfo"><i
+            class="layui-icon ">&#xe62e;</i></a>
+    <a class=" " style="padding-left:5px;color: #DBD9D1" lay-event="editFleetInfo" title="修改船队信息"><i
+            class="layui-icon ">&#xe642;</i></a>
+    <a class=" " style="padding-left:5px;color: #DBD9D1" lay-event="sendMessage" title="船队消息播发"><i class="layui-icon ">&#xe609;</i></a>
+    <a class=" " lay-event="delFleetInfo" style="padding-left:5px;color: #DBD9D1" title="删除船队信息"><i class="layui-icon ">&#x1006;</i></a>
+</script>
+<!--船舶管理编辑-->
+<script type="text/html" id="ship-table-bar">
+    <a class=" " style="padding-left:5px;color: #DBD9D1" lay-event="editShipTimeInfo"><i
+            class="layui-icon ">&#xe60a;</i></a>
+    <a class=" " style="padding-left:5px;color: #DBD9D1" lay-event="editShipInfo"><i
+            class="layui-icon ">&#xe642;</i></a>
+    <a class=" " style="padding-left:5px;color: #DBD9D1" lay-event="delShipInfo"><i class="layui-icon ">&#x1006;</i></a>
+</script>
+<!--航次信息 -->
+<div id='shipTimeLayer' style="display: none;">
+    <div class="layui-input-inline">
+        <input type="text" id="shipTime_mmsi" name="shipTime_mmsi" class="layui-input"
+               style="width: 0px;height: 0px;display: none;">
+    </div>
+    <from id="shipTime-form" lay-filter="shipTime-form" class="layui-form">
+        <table class="layui-table" id="shipTimeList" lay-filter="shipTimeList"></table>
+    </from>
+    <button class="layui-btn layui-btn-normal" style="width: 200px;margin-left: 300px" lay-submit
+            lay-filter="addShipTimeInfo"><i
+            class="layui-icon ">&#xe654;</i>
+    </button>
+</div>
+<!--航次操作-->
+<script type="text/html" id="shipTime-table-bar">
+    <a class=" " style="padding-left:5px;color: #DBD9D1" lay-event="editShipTimeInfo"><i
+            class="layui-icon ">&#xe642;</i></a>
+    <a class=" " style="padding-left:5px;color: #DBD9D1" lay-event="delShipTimeInfo"><i
+            class="layui-icon ">&#x1006;</i></a>
+</script>
+<!--航次编辑-->
+<div id='shipTimeDetailLayer' style="display: none;">
+    <from id="shipTimeDetail-form" lay-filter="shipTimeDetail-form" class="layui-form">
+        <div class="layui-input-block" style="margin-left: 10px;margin-top: 5px">
+            <div class="layui-input-inline">
+                <label class="layui-form-label" style="width:100px"><i
+                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>船舶MMSI:</label>
+                <div class="layui-input-inline">
+                    <input type="hidden" name="id" value=""/>
+                    <input type="text" id="shipTimeDetail_mmsi" name="mmsi" class="layui-input" lay-verify="required"
+                           disabled>
+                </div>
+            </div>
+            <div class="layui-input-inline">
+                <label class="layui-form-label" style="width:100px"><i
+                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>航次编号:</label>
+                <div class="layui-input-inline">
+                    <input type="number" id="shipTimeDetail_shipTimeNum" name="shipTimeNum" lay-verify="required"
+                           class="layui-input" onKeyUp="this.value=this.value.replace(/[^\d]/g,'');">
+                </div>
+            </div>
+        </div>
+        <div class="layui-input-block" style="margin-left: 10px;margin-top: 5px">
+            <div class="layui-input-inline">
+                <label class="layui-form-label" style="width:100px"><i
+                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>起始港:</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="shipTimeDetail_startPort" name="startPort" class="layui-input"
+                           lay-verify="required">
+                </div>
+            </div>
+            <div class="layui-input-inline">
+                <label class="layui-form-label" style="width:100px"><i
+                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>起始时间:</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="shipTimeDetail_startTime" name="startTime" lay-verify="required"
+                           class="layui-input">
+                </div>
+            </div>
+        </div>
+        <div class="layui-input-block" style="margin-left: 10px;margin-top: 5px">
+            <div class="layui-input-inline">
+                <label class="layui-form-label" style="width:100px"><i
+                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>到达港:</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="shipTimeDetail_arrivePort" name="arrivePort" class="layui-input"
+                           lay-verify="required">
+                </div>
+            </div>
+            <div class="layui-input-inline">
+                <label class="layui-form-label" style="width:100px"><i
+                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>到达时间:</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="shipTimeDetail_arriveTime" name="arriveTime" lay-verify="required"
+                           class="layui-input">
+                </div>
+            </div>
+        </div>
+        <div class="layui-input-block" style="margin-left: 10px;margin-top: 5px">
+            <div class="layui-input-inline">
+                <label class="layui-form-label" style="width:100px">载重货物:</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="shipTimeDetail_loadFreight" name="loadFreight" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-input-inline">
+                <label class="layui-form-label" style="width:100px">数量（吨/件）:</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="shipTimeDetail_quantity" name="quantity"
+                           class="layui-input">
+                </div>
+            </div>
+        </div>
+        <div class="layui-input-block" style="margin-left: 10px;margin-top: 5px">
+            <div class="layui-input-inline">
+                <label class="layui-form-label" style="width:100px">承运人:</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="shipTimeDetail_carrier" name="carrier" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-input-inline">
+                <label class="layui-form-label" style="width:100px">装货位置:</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="shipTimeDetail_loadPort" name="loadPort"
+                           class="layui-input">
+                </div>
+            </div>
+        </div>
+        <div class="layui-input-block" style="margin-left: 10px;margin-top: 5px">
+            <div class="layui-input-inline">
+                <label class="layui-form-label" style="width:100px">卸货位置:</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="shipTimeDetail_unloadPort" name="unloadPort" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-input-inline save-btn-style" style="margin-left: 150px;">
+                <button class="layui-btn layui-btn-normal" lay-submit
+                        lay-filter="saveShipTimeInfo">保存
+                </button>
+            </div>
+        </div>
+    </from>
+</div>
+
+<!-- 电子航标配置弹出层 -->
+<div id='virtualAtoNControlLayer' class="layui-form" style="display: none;overflow-x:hidden;overflow-y:hidden;">
+    <table class="layui-table" id="ownshore-table" lay-filter="ownshore-table"
+           style="max-height: 50px;overflow-y: auto"></table>
+</div>
+
+<div id='virtualAtoNEditLayer' class="layui-form" style="display: none;overflow-x:hidden;overflow-y:hidden;">
+    <form id="virtualAtonDetail-form" lay-filter="virtualAtonDetail-form" class="layui-form">
+        <div class="layui-input-block" style="margin-left: 10px;margin-top: 5px">
+            <div class="layui-input-inline">
+                <label class="layui-form-label" style="width:150px"><i
+                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>基站选择:</label>
+                <div class="layui-input-inline" style="width:180px">
+                    <input type="hidden" id="virtualAtonId" name="id" value="">
+                    <input type="text" id="virtualAtonStation" name="virtualAtonStation" class="layui-input" disabled>
+                    <!--                    <select name="virtualAtonStation" id="virtualAtonStation" lay-verify="required">-->
+                    <!--                        <option selected="selected" value=""></option>-->
+                    <!--                    </select>-->
+                </div>
+            </div>
+            <div class="layui-input-inline">
+                <label class="layui-form-label" style="width:150px"><i
+                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>序号:</label>
+                <div class="layui-input-inline" style="width:180px">
+                    <input type="text" id="virtualAtonSequence" name="virtualAtonSequence" class="layui-input"
+                           lay-verify="from1To80Int"
+                           oninput="value=value.replace(/[^\d]/g,'')" placeholder="请输入1-80整数" autocomplete="off">
+                    <!--                    <select name="virtualAtonSequence" id="virtualAtonSequence" lay-verify="required">-->
+                    <!--                        <option selected="selected" value=""></option>-->
+                    <!--                        <option value="1">1</option>-->
+                    <!--                        <option value="2">2</option>-->
+                    <!--                        <option value="3">3</option>-->
+                    <!--                        <option value="4">4</option>-->
+                    <!--                        <option value="5">5</option>-->
+                    <!--                        <option value="6">6</option>-->
+                    <!--                        <option value="7">7</option>-->
+                    <!--                        <option value="8">8</option>-->
+                    <!--                        <option value="9">9</option>-->
+                    <!--                        <option value="10">10</option>-->
+                    <!--                        <option value="11">11</option>-->
+                    <!--                        <option value="12">12</option>-->
+                    <!--                        <option value="13">13</option>-->
+                    <!--                        <option value="14">14</option>-->
+                    <!--                        <option value="15">15</option>-->
+                    <!--                        <option value="16">16</option>-->
+                    <!--                        <option value="17">17</option>-->
+                    <!--                        <option value="18">18</option>-->
+                    <!--                        <option value="19">19</option>-->
+                    <!--                        <option value="20">20</option>-->
+                    <!--                        <option value="21">21</option>-->
+                    <!--                        <option value="22">22</option>-->
+                    <!--                        <option value="23">23</option>-->
+                    <!--                        <option value="24">24</option>-->
+                    <!--                        <option value="25">25</option>-->
+                    <!--                        <option value="26">26</option>-->
+                    <!--                        <option value="27">27</option>-->
+                    <!--                        <option value="28">28</option>-->
+                    <!--                        <option value="29">29</option>-->
+                    <!--                        <option value="30">30</option>-->
+                    <!--                    </select>-->
+                </div>
+            </div>
+        </div>
+        <div class="layui-input-block" style="margin-left: 10px;margin-top: 5px">
+            <div class="layui-input-inline">
+                <label class="layui-form-label" style="width:150px"><i
+                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>发送信道:</label>
+                <div class="layui-input-inline" style="width:180px">
+                    <select name="virtualAtonChannel" id="virtualAtonChannel" lay-verify="required">
+                        <option selected="selected" value=""></option>
+                        <option value="0">A信道</option>
+                        <option value="1">B信道</option>
+                        <option value="2">AB信道轮流发</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-input-inline">
+                <label class="layui-form-label" style="width:150px"><i
+                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>发送间隔:</label>
+                <div class="layui-input-inline" style="width:180px">
+                    <select name="virtualAtonSendInterval" id="virtualAtonSendInterval" lay-verify="required">
+                        <option selected="selected" value=""></option>
+                        <option value="3">3分钟</option>
+                        <option value="4">4分钟</option>
+                        <option value="5">5分钟</option>
+                        <option value="6">6分钟</option>
+                        <option value="7">7分钟</option>
+                        <option value="8">8分钟</option>
+                        <option value="9">9分钟</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="layui-input-block" style="margin-left: 10px;margin-top: 5px">
+            <div class="layui-input-inline">
+                <label class="layui-form-label" style="width:150px"><i
+                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>有效标识:</label>
+                <div class="layui-input-inline" style="width:180px">
+                    <input type="radio" id="virtualAtonValidIdentification0" name="virtualAtonValidIdentification"
+                           lay-filter="virtualAtonValidIdentification" value="1" title="发送该节点">
+                    <input type="radio" id="virtualAtonValidIdentification1" name="virtualAtonValidIdentification"
+                           lay-filter="virtualAtonValidIdentification" value="0" title="不发送该节点" checked="">
+                </div>
+            </div>
+        </div>
+        <fieldset class="layui-elem-field layui-field-title"
+                  style="border: 1px solid #999999!important;width: 730px;margin-left: 10px">
+            <legend style="color: white">电子航标数据</legend>
+            <div class="layui-input-block" style="margin-left: 0px;margin-top: 5px">
+                <div class="layui-input-inline">
+                    <label class="layui-form-label" style="width:150px"><i
+                            style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>MMSI:</label>
+                    <div class="layui-input-inline">
+                        <div class="layui-input-inline">
+                            <input type="text" id="virtualAtonMmsi" name="virtualAtonMmsi" style="width:180px"
+                                   placeholder="请输入MMSI"
+                                   class="layui-input" lay-verify="required"
+                                   onKeyUp="this.value=this.value.replace(/[^\d]/g,'');"
+                                   oninput="if(value.length>9)value=value.slice(0,9)" autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-input-inline">
+                    <label class="layui-form-label" style="width:150px"><i
+                            style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>转发指示符:</label>
+                    <div class="layui-input-inline" style="width:180px">
+                        <select name="virtualAtonRepeatIndicator" id="virtualAtonRepeatIndicator" lay-verify="required">
+                            <option selected="selected" value=""></option>
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-input-block" style="margin-left: 0px;margin-top: 5px">
+                <div class="layui-input-inline">
+                    <label class="layui-form-label" style="width:150px"><i
+                            style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>助航设备名称:</label>
+                    <div class="layui-input-inline">
+                        <div class="layui-input-inline">
+                            <input type="text" id="virtualAtonName" name="virtualAtonName" style="width:180px"
+                                   class="layui-input" lay-verify="bitASCII" maxlength="34" placeholder="请输入34字符以内"
+                                   autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+                <!--                <div class="layui-input-inline">-->
+                <!--                    <label class="layui-form-label" style="width:150px">名称扩展:</label>-->
+                <!--                    <div class="layui-input-inline">-->
+                <!--                        <div class="layui-input-inline">-->
+                <!--                            <input type="text" id="virtualAtonNameExtend" name="virtualAtonNameExtend"-->
+                <!--                                   style="width:180px"-->
+                <!--                                   class="layui-input" lay-verify="bitASCII2" maxlength=14 bitASCII="14" placeholder="请输入14字符以内">-->
+                <!--                        </div>-->
+                <!--                    </div>-->
+                <!--                </div>-->
+                <div class="layui-input-inline">
+                    <label class="layui-form-label" style="width:150px"><i
+                            style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>时戳:</label>
+                    <div class="layui-input-inline">
+                        <div class="layui-input-inline">
+                            <input type="text" id="virtualAtonTimeStamp" name="virtualAtonTimeStamp" style="width:180px"
+                                   placeholder="请输入0-63整数"
+                                   class="layui-input" lay-verify="from0To63Int"
+                                   oninput="value=value.replace(/[^\d]/g,'')" autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-input-block" style="margin-left: 0px;margin-top: 5px">
+                <div class="layui-input-inline">
+                    <label class="layui-form-label" style="width:150px"><i
+                            style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>位置准确度:</label>
+                    <div class="layui-input-inline" style="width:180px">
+                        <select name="virtualAtonPositionAccuracy" id="virtualAtonPositionAccuracy"
+                                lay-verify="required">
+                            <option selected="selected" value=""></option>
+                            <option value="0">低</option>
+                            <option value="1">高</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-input-inline">
+                    <label class="layui-form-label" style="width:150px"><i
+                            style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>电子定位装置的类型:</label>
+                    <div class="layui-input-inline">
+                        <div class="layui-input-inline" style="width:180px">
+                            <select name="virtualAtonElectronicType" id="virtualAtonElectronicType"
+                                    lay-verify="required">
+                                <option selected="selected" value=""></option>
+                                <option value="0">默认值</option>
+                                <option value="1">GPS</option>
+                                <option value="2">GLONASS</option>
+                                <option value="3">GPS/GLONASS组合</option>
+                                <option value="4">Loran-C</option>
+                                <option value="5">Chayka</option>
+                                <option value="6">综合导航系统</option>
+                                <option value="7">正在研究</option>
+                                <option value="8">Galilio</option>
+                                <option value="15">内部GNSS</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-input-block" style="margin-left: 0px;margin-top: 5px">
+                <div class="layui-input-inline">
+                    <label class="layui-form-label" style="width:150px"><i
+                            style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>助航设备类型:</label>
+                    <div class="layui-input-inline" style="width:180px">
+                        <select name="virtualAtonType" id="virtualAtonType" lay-verify="required">
+                            <option selected="selected" value=""></option>
+                            <option value="0">未规定Aton类型</option>
+                            <option value="1">参考点</option>
+                            <option value="2">雷达信标</option>
+                            <option value="3">海面固定建筑</option>
+                            <option value="4">紧急沉船标志浮标</option>
+                            <option value="5">灯光，不带扇形扫描</option>
+                            <option value="6">灯光，带扇形扫描</option>
+                            <option value="7">导灯前</option>
+                            <option value="8">导灯后</option>
+                            <option value="9">信标，方位N</option>
+                            <option value="10">信标，方位E</option>
+                            <option value="11">信标，方位S</option>
+                            <option value="12">信标，方位W</option>
+                            <option value="13">信标，左舷</option>
+                            <option value="14">信标，右舷</option>
+                            <option value="15">信标，首选路线左舷</option>
+                            <option value="16">信标，首选路线右舷</option>
+                            <option value="17">信标，单独的危险物</option>
+                            <option value="18">信标，安全海域</option>
+                            <option value="19">信标，专用标志</option>
+                            <option value="20">方位标志N</option>
+                            <option value="21">方位标志E</option>
+                            <option value="22">方位标志S</option>
+                            <option value="23">方位标志W</option>
+                            <option value="24">左舷标志</option>
+                            <option value="25">右舷标志</option>
+                            <option value="26">首选路线左舷</option>
+                            <option value="27">首选路线右舷</option>
+                            <option value="28">单独的危险物</option>
+                            <option value="29">安全水域</option>
+                            <option value="30">专用标志</option>
+                            <option value="31">灯船/LANBY/钻探平台</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-input-inline">
+                    <label class="layui-form-label" style="width:150px"><i
+                            style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>偏置位置指示符:</label>
+                    <div class="layui-input-inline">
+                        <div class="layui-input-inline" style="width:180px">
+                            <select name="virtualAtonOffpositionIndicator" id="virtualAtonOffpositionIndicator"
+                                    lay-verify="required">
+                                <option selected="selected" value=""></option>
+                                <option value="0">准确位置</option>
+                                <option value="1">偏离位置</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-input-block" style="margin-left: 0px;margin-top: 5px">
+                <div class="layui-input-inline">
+                    <label class="layui-form-label" style="width:150px"><i
+                            style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>RAIM标志:</label>
+                    <div class="layui-input-inline">
+                        <div class="layui-input-inline" style="width:180px">
+                            <select name="virtualAtonRaimFlag" id="virtualAtonRaimFlag" lay-verify="required">
+                                <option selected="selected" value=""></option>
+                                <option value="0">RAIM未使用</option>
+                                <option value="1">RAIM正在使用</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-input-inline">
+                    <label class="layui-form-label" style="width:150px"><i
+                            style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>指配模式标志:</label>
+                    <div class="layui-input-inline">
+                        <div class="layui-input-inline" style="width:180px">
+                            <select name="virtualAtonAssignedModeFlag" id="virtualAtonAssignedModeFlag"
+                                    lay-verify="required">
+                                <option selected="selected" value=""></option>
+                                <option value="0">台站工作在自主和连续模式</option>
+                                <option value="1">台站工作在指配模式</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-input-block" style="margin-left: 0px;margin-top: 5px;margin-bottom: 10px">
+                <div class="layui-input-inline">
+                    <label class="layui-form-label" style="width:43px">
+                        <i class="layui-icon layui-icon-location"
+                           style="font-size: 21px;float: left;margin-left: 10px;background-color: unset;border: none"
+                           id="chooseVirtualAtonLonLat"></i>
+                    </label>
+                    <label class="layui-form-label" style="width:90px"><i
+                            style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>经度:</label>
+                    <div class="layui-input-inline">
+                        <div class="layui-input-inline">
+                            <input type="text" id="virtualAtonLongitude" name="virtualAtonLongitude" style="width:180px"
+                                   class="layui-input" lay-verify="from180To180Int" placeholder="请输入±180"
+                                   autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-input-inline">
+                    <label class="layui-form-label" style="width:150px"><i
+                            style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>纬度:</label>
+                    <div class="layui-input-inline">
+                        <div class="layui-input-inline">
+                            <input type="text" id="virtualAtonLatitude" name="virtualAtonLatitude" style="width:180px"
+                                   class="layui-input" lay-verify="from90To90Int" placeholder="请输入±90"
+                                   autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <div class="layui-input-block" style="margin-left: 350px">
+            <div class="layui-input-inline">
+                <button class="layui-btn layui-btn-normal" lay-submit
+                        lay-filter="saveVirtualAton">保存
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!--电子航标添加-->
+<script type="text/html" id="addVirtualAtoN-table-bar">
+    <a class=" " style="padding-left:5px;color: #DBD9D1" lay-event="addVirtualAtoNInfo"><i
+            class="layui-icon" title="添加电子航标">&#xe624;</i></a>
+</script>
+<!--电子航标操作-->
+<script type="text/html" id="virtualAtoN-table-bar">
+    <a class=" " style="padding-left:5px;color: #DBD9D1" lay-event="editVirtualAtoNInfo"><i
+            class="layui-icon" title="编辑电子航标">&#xe642;</i></a>
+    <a class=" " style="padding-left:5px;color: #DBD9D1" lay-event="delVirtualAtoNInfo"><i
+            class="layui-icon" title="删除电子航标">&#x1006;</i></a>
+</script>
+
+<!-- 关注船舶 管理弹出层 -->
+<div id='careShipLayer' style="display: none">
+    <from class="layui-form">
+        <div class="layui-form-item">
+            <div class="layui-input-inline" style="margin-left: 10px;">
+                <input type="checkbox" name="close" lay-filter="switchCareShip" lay-skin="switch" lay-text="ON|OFF">
+            </div>
+            <label class="layui-form-label" style="width: 110px;font-size: 15px;color: #dbd9d1;padding: 10px 5px">只显示我的关注</label>
+        </div>
+        <table class="layui-table" id="careShip-table" lay-filter="careShip-table"
+               style="max-height: 50px;overflow-y: auto"></table>
+        <div style=" text-align: center;margin-top: 20px">
+            <button class="layui-btn layui-btn-normal" style="width: 100px;" lay-submit
+                    lay-filter="addCareShipInfo">添加船舶
+            </button>
+        </div>
+    </from>
+</div>
+
+<!--关注船舶管理新增修改 -->
+<div id='careShipInfoLayer' style="display: none">
+    <from id="careShip-form" lay-filter="careShip-form" class="layui-form">
+        <div class="layui-form-item" style="margin-top: 10px;margin-right: 10px">
+            <label class="layui-form-label">船舶名称：</label>
+            <div class="layui-input-block">
+                <input type="hidden" id="id" name="id" value=""/>
+                <input name="careShipName" placeholder="请输入船舶名称" type="text" class="layui-input" maxlength="255"
+                       lay-verify="required" required autocomplete="off"/>
+            </div>
+        </div>
+        <div class="layui-form-item" style="margin-top: 10px;margin-right: 10px">
+            <label class="layui-form-label">船舶MMSI：</label>
+            <div class="layui-input-block">
+                <input type="hidden" id="careShipMmsi" name="careShipMmsi" value=""/>
+                <input name="careShipMmsi" placeholder="请输入船舶MMSI" type="text" class="layui-input" maxlength="255"
+                       lay-verify="required" required autocomplete="off"/>
+            </div>
+        </div>
+        <div class="layui-form-item" style="margin-right: 10px">
+            <label class="layui-form-label">船舶颜色：</label>
+            <div class="layui-input-block">
+				<span style="width:170px;text-align: center;margin-right: 30px; line-height: 38px;height: 20px">
+					<a href="javascript:void(0)" id="a13" name="bName" class=""
+                       style=" background:#b1fb06;border: rgba(0,0,0,0) solid 1px">&nbsp;&nbsp;&nbsp;&nbsp;</a>
+				</span>
+            </div>
+        </div>
+        <div class="layui-form-item" style="margin-right: 10px">
+            <label class="layui-form-label">备注：</label>
+            <div class="layui-input-block">
+                <textarea rows="3" id="remarkCare" name="remarkCare" placeholder="最长不能超过200个字符" class="layui-textarea"
+                          maxlength="200"></textarea>
+            </div>
+        </div>
+        <div style="text-align: center;">
+            <button class="layui-btn layui-btn-normal custom-care-btn" style="width: 100px;" lay-submit
+                    lay-filter="saveCareShip">保存
+            </button>
+        </div>
+    </from>
+
+</div>
+
+<!--关注船舶管理编辑-->
+<script type="text/html" id="careShip-table-bar">
+    <a class=" " style="padding-left:5px;color: #DBD9D1" lay-event="careShipInfoDetail" title="关注船舶详细信息"><i
+            class="layui-icon ">&#xe65f;</i></a>
+    <a class=" " style="padding-left:5px;color: #DBD9D1" lay-event="editCareShipInfo" title="修改关注船舶信息"><i
+            class="layui-icon ">&#xe642;</i></a>
+    <a class=" " lay-event="delCareShipInfo" style="padding-left:5px;color: #DBD9D1" title="删除关注船舶信息"><i
+            class="layui-icon ">&#x1006;</i></a>
+</script>
+<!--关注船舶管理新增修改 -->
+<div id='owmStationLayer' style="display: none">
+    <from class="layui-form">
+        <div class="layui-form-item">
+            <div class="layui-input-inline" style="margin-left: 20px;border-bottom: 20px;margin-top: 10px"
+                 id="ownStation">
+                <!--				<input type="checkbox" name="ownStationList" value="400015340" title="400015340" lay-filter="layerControlLayer_mapStyle" style="margin-top: 10px;margin-left: 20px" checked>-->
+            </div>
+            <!--			<div style="text-align: center;">-->
+            <!--				<button class="layui-btn layui-btn-normal" style="width: 100px;margin-top: 20px"  lay-submit-->
+            <!--						lay-filter="searchStationCoverage">查询</button>-->
+            <!--			</div>-->
+        </div>
+    </from>
+</div>
+
+<!-- 风险预警 弹出层 -->
+<div id='electronicFenceLayer' style="display: none">
+    <from class="layui-form layui-form-custom">
+        <table class="layui-table" id="electronicFence-table" lay-filter="electronicFence-table"
+               style="max-height: 50px;overflow-y: auto"></table>
+        <div style=" text-align: center;margin-top: 20px">
+            <button class="layui-btn layui-btn-normal addElectronicFenceInfo" style="width: 150px;" lay-submit
+                    lay-filter="addElectronicFenceInfo">添加预警
+            </button>
+        </div>
+    </from>
+</div>
+
+<!-- 风险预警历史 弹出层 -->
+<div id='electronicHistoryLayer' style="display: none">
+    <from class="layui-form">
+        <table class="layui-table" id="electronicHistory-table" lay-filter="electronicHistory-table"
+               style="max-height: 50px;overflow-y: auto"></table>
+        <!--        <div style=" text-align: center;margin-top: 20px">-->
+        <!--            <button class="layui-btn layui-btn-normal addElectronicFenceInfo" style="width: 150px;" lay-submit-->
+        <!--                    lay-filter="addElectronicFenceInfo">添加风险预警-->
+        <!--            </button>-->
+        <!--        </div>-->
+    </from>
+</div>
+
+<!-- 风险警告 弹出层 -->
+<div id='electronicAlertLayer' style="display: none">
+    <from class="layui-form">
+
+        <!--fss-->
+        <div class="layui-input-inline" style="margin-top: 10px">
+            <label class="layui-form-label" style="width:80px">预警区域名称：</label>
+            <div class="layui-input-inline">
+                <input id="electronicName" class="layui-input" type="text" placeholder="输入预警区域名称"/>
+            </div>
+
+        </div>
+        <div class="layui-input-inline" style="margin-top: 10px">
+            <label class="layui-form-label" style="width:80px">告警时间：</label>
+            <div class="layui-input-inline">
+                <input type="text" style="width:285px;" id="warningTime" name="warningTime" placeholder="请输入告警时间"
+                       autocomplete="off" class="layui-input" readonly>
+            </div>
+        </div>
+        <div class="layui-input-inline" style="margin-top: 10px;margin-left: 20px;">
+            <button id="electronicName-btn-search" class="layui-btn icon-btn"><i class="layui-icon">&#xe615;</i>搜索
+            </button>
+        </div>
+
+
+        <table class="layui-table" id="electronicAlert-table" lay-filter="electronicAlert-table"
+               style="max-height: 50px;overflow-y: auto"></table>
+        <!--        <div style=" text-align: center;margin-top: 20px">-->
+        <!--            <button class="layui-btn layui-btn-normal addElectronicFenceInfo" style="width: 150px;" lay-submit-->
+        <!--                    lay-filter="addElectronicFenceInfo">添加风险预警-->
+        <!--            </button>-->
+        <!--        </div>-->
+    </from>
+</div>
+
+<!-- 风险预警timeline 弹出层 -->
+<div id='electronicTimelineLayer' style="display: none">
+    <div id="timelineView" style="overflow-y: auto;height: 400px;"></div>
+    <div style="text-align: center; transform: translateX(-25px);">
+        <button class="layui-btn layui-btn-normal timelineExport" style="width: 100px;margin-top: 10px">导出
+        </button>
+        <button class="layui-btn layui-btn-normal timelineExportDisable"
+                style="width: 100px;margin-top: 10px;display: none;color: grey!important">导出
+        </button>
+    </div>
+
+</div>
+<!--风险预警操作-->
+<script type="text/html" id="electronicFence-table-bar">
+    <a class=" " style="padding-left:5px;color: #DBD9D1" lay-event="electronicFenceInfoDetail"
+       class="electronicFenceInfoDetail" title="预警详细信息"><i
+            class="layui-icon ">&#xe65f;</i></a>
+    <!--	<a class=" " style="padding-left:5px;color: #DBD9D1" lay-event="editElectronicFenceInfo" title="修改风险预警信息"><i class="layui-icon "  >&#xe642;</i></a>-->
+    <a class=" " lay-event="delElectronicFenceInfo" style="padding-left:5px;color: #DBD9D1" title="删除预警信息"><i
+            class="layui-icon ">&#x1006;</i></a>
+</script>
+<!--fss-->
+<script type="text/html" id="vhfCheck">
+    <div class="element-item-wrapper1">
+        <input type="checkbox" id="layerControlLayer_vhfCheck" name="layerControlLayer_vhfCheck" value="{{d.fenceId}}"
+               lay-filter="vhfCheck" lay-skin="switch" lay-text="播发|关闭" {{d.vhfFlag==1?'checked':''}}/>
+    </div>
+</script>
+
+<div id='electronicFenceInfoDetailLayerCustom' style="display: none">
+    <from id="electronicFence-form" lay-filter="electronicFence-form" class="layui-form">
+        <div class="layui-form-item" style="margin-top: 10px;margin-right: 10px">
+            <label class="layui-form-label" style="width:120px">名称：</label>
+            <div class="layui-input-block">
+                <input type="hidden" id="electronicFenceId" name="electronicFenceId" value=""/>
+                <input name="electronicFenceName" id="electronicFenceName" placeholder="请输入预警名称" type="text"
+                       class="layui-input" maxlength="20" style="width: 200px"
+                       lay-verify="required" required autocomplete="off"/>
+            </div>
+        </div>
+        <div id="event_template">
+            <label class="layui-form-label" style="width:120px">事件类型：</label>
+            <div class="layui-input-block" style="width: 200px;margin-left: 137px;">
+                <select name="eventType " lay-filter="eventTypes" class="layui-form-select" id="eventTypes"></select>
+            </div>
+        </div>
+
+        <div class="layui-form-item" style="margin-top: 10px;margin-right: 10px">
+            <label class="layui-form-label" style="width:120px">弹窗提示：</label>
+            <div class="layui-input-block">
+                <input lay-filter="alertSwitch" class="alertSwitch" type="radio" name="alertSwitch" value="1" title="是">
+                <input lay-filter="alertSwitch" class="alertSwitch" type="radio" name="alertSwitch" value="0" title="否"
+                       checked="">
+            </div>
+        </div>
+
+
+        <div class="layui-form-item" style="margin-top: 10px;margin-right: 10px">
+            <label class="layui-form-label" style="width:120px">绘制类型：</label>
+            <div class="layui-input-block">
+                <input lay-filter="drawType" class="drawType" type="radio" name="drawType" value="Polygon" title="多边形"
+                       checked="">
+                <input lay-filter="drawType" class="drawType" type="radio" name="drawType" value="Rectangle" title="矩形">
+                <input lay-filter="drawType" class="drawType" type="radio" name="drawType" value="Circle" title="圆形">
+            </div>
+            <!--        <div class="layui-form-item" style="margin-right: 10px">-->
+            <!--            <label class="layui-form-label" style="width:120px">有效开始时间：</label>-->
+            <!--            <div class="layui-input-block">-->
+            <!--                <input type="text" id="electronicFenceStartValidTime" name="electronicFenceStartValidTime"-->
+            <!--                       placeholder="开始时间" class="layui-input" style="width: 200px;margin-right: 10px"-->
+            <!--                       lay-verify="required">-->
+            <!--            </div>-->
+            <!--        </div>-->
+            <!--        <div class="layui-form-item" style="margin-right: 10px">-->
+            <!--            <label class="layui-form-label" style="width:120px">有效结束时间：</label>-->
+            <!--            <div class="layui-input-block">-->
+            <!--                <input type="text" id="electronicFenceEndValidTime" name="electronicFenceEndValidTime"-->
+            <!--                       placeholder="结束时间" class="layui-input" style="width: 200px;margin-right: 10px"-->
+            <!--                       lay-verify="required">-->
+            <!--            </div>-->
+            <!--        </div>-->
+
+            <div class="layui-form-item shapeRadius-container" style="margin-top: 10px;margin-right: 10px">
+                <label class="layui-form-label" style="width:120px">半径（海里）：</label>
+                <div class="layui-input-block">
+                    <input name="shapeRadius" id="shapeRadius" placeholder="请输入半径" type="text"
+                           class="layui-input" maxlength="20" style="width: 200px" value="0"
+                           onblur="eFencePointChange()"
+                           required autocomplete="off"/>
+                </div>
+            </div>
+
+
+            <div class="layui-form-item" style="margin-right: 10px">
+                <label class="layui-form-label" style="width:120px">预警点：</label>
+                <!--            <i class="layui-icon layui-icon-add-circle" style="font-size: 21px;float: left;padding: 9px 15px;"-->
+                <!--               id="drawElectronicFence"-->
+                <!--               name="drawElectronicFence" lay-filter="drawElectronicFence"></i>-->
+                <!--                <i class="layui-icon layui-icon-add-circle eFenceAddPoint"-->
+                <!--                   style="font-size: 21px;float: left;padding: 9px 15px;cursor: pointer;display: none"-->
+                <!--                   onclick="addRow()"></i>-->
+            </div>
+            <div id="eFenceView"></div>
+            <!--        <div class="layui-form-item" style="margin-right: 10px">-->
+            <!--            <ul id="electronicFencePointsList" style="margin-left: 40px"></ul>-->
+            <!--        </div>-->
+
+            <div id="event-forms"></div>
+            <div>
+                <fieldset class="layui-elem-field event-enter"
+                          style="border-color: white!important;margin-top: 10px;">
+                    <legend style="color: white;">高级别预警</legend>
+                    <div class="layui-field-box">
+                        <div class="layui-form-item" style="margin-top: 10px;margin-right: 10px">
+                            <label class="layui-form-label" style="width:90px">安全消息：</label>
+                            <div class="layui-input-block">
+                                <input name="highAlertContent" id="highAlertContent" placeholder="请输入高报警安全消息"
+                                       type="text"
+                                       class="layui-input" maxlength="156" style="width: 200px" lay-verify="bitASCIINew"
+                                       required autocomplete="off"/>
+                            </div>
+                        </div>
+                        <div class="layui-form-item" style="margin-top: 10px;margin-right: 10px">
+                            <label class="layui-form-label" style="width:90px">VHF消息：</label>
+                            <div class="layui-input-block">
+                                <input name="highAlertVHFContent" id="highAlertVHFContent" placeholder="请输入高报警VHF消息"
+                                       type="text"
+                                       class="layui-input" maxlength="200" style="width: 200px"
+                                       required autocomplete="off"/>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="layui-elem-field event-enter"
+                          style="border-color: white!important;margin-top: 10px;">
+                    <legend style="color: white;">中级别预警</legend>
+                    <div class="layui-field-box">
+                        <div class="layui-form-item" style="margin-top: 10px;margin-right: 10px">
+                            <label class="layui-form-label" style="width:90px">范围(海里)：</label>
+                            <div class="layui-input-block">
+                                <input name="meduimAlert" id="meduimAlert" placeholder="请输入中报警范围" type="text"
+                                       class="layui-input" maxlength="20" style="width: 200px" value="0"
+                                       onblur="distMediumChange()"
+                                       lay-verify="number|bigThanZero" required autocomplete="off"/>
+                            </div>
+                        </div>
+                        <div class="layui-form-item" style="margin-top: 10px;margin-right: 10px">
+                            <label class="layui-form-label" style="width:90px">安全消息：</label>
+                            <div class="layui-input-block">
+                                <input name="meduimAlertContent" id="meduimAlertContent" placeholder="请输入中报警安全消息"
+                                       type="text" lay-verify="bitASCIINew"
+                                       class="layui-input" maxlength="156" style="width: 200px"
+                                       required autocomplete="off"/>
+                            </div>
+                        </div>
+                        <div class="layui-form-item" style="margin-top: 10px;margin-right: 10px">
+                            <label class="layui-form-label" style="width:90px">VHF消息：</label>
+                            <div class="layui-input-block">
+                                <input name="meduimAlertVHFContent" id="meduimAlertVHFContent" placeholder="请输入中报警VHF消息"
+                                       type="text"
+                                       class="layui-input" maxlength="200" style="width: 200px"
+                                       required autocomplete="off"/>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="layui-elem-field event-enter"
+                          style="border-color: white!important;">
+                    <legend style="color: white;">低级别预警</legend>
+                    <div class="layui-field-box">
+                        <div class="layui-form-item" style="margin-top: 10px;margin-right: 10px">
+                            <label class="layui-form-label" style="width:90px">范围(海里)：</label>
+                            <div class="layui-input-block">
+                                <input name="lowAlert" id="lowAlert" placeholder="请输入低报警范围" type="text"
+                                       class="layui-input" maxlength="20" style="width: 200px" value="0"
+                                       onblur="distLowChange()"
+                                       lay-verify="number|bigThanZero" required autocomplete="off"/>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item" style="margin-top: 10px;margin-right: 10px">
+                            <label class="layui-form-label" style="width:90px">安全消息：</label>
+                            <div class="layui-input-block">
+                                <input name="lowAlertContent" id="lowAlertContent" placeholder="请输入低报警安全消息" type="text"
+                                       class="layui-input" maxlength="156" style="width: 200px" lay-verify="bitASCIINew"
+                                       required autocomplete="off"/>
+                            </div>
+                        </div>
+                        <div class="layui-form-item" style="margin-top: 10px;margin-right: 10px">
+                            <label class="layui-form-label" style="width:90px">VHF消息：</label>
+                            <div class="layui-input-block">
+                                <input name="lowAlertVHFContent" id="lowAlertVHFContent" placeholder="请输入低报警VHF消息"
+                                       type="text"
+                                       class="layui-input" maxlength="200" style="width: 200px"
+                                       required autocomplete="off"/>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div style="text-align: center;" id="saveElectronicFenceInfo">
+                <button class="layui-btn layui-btn-normal" style="width: 100px;margin-bottom: 10px; margin-top: 5px"
+                        lay-submit
+                        lay-filter="saveElectronicFenceInfo">保存
+                </button>
+            </div>
+        </div>
+    </from>
+</div>
+
+<script type="text/html" id="eFenceTemplate">
+    <div class="efence-coord-container">
+        {{# for(var i = 0; i < d.latlng[0].length; i++){ }}
+        <div>
+            <input style="margin-left: 15px;width: 42%; display: inline-block;" class="layui-input efence-coord"
+                   type="text" value="{{ d.latlng[0][i].lat }}" onblur="eFencePointChange()">
+            <input style="margin-left: 15px;width: 42%; display: inline-block;" class="layui-input efence-coord"
+                   type="text" value="{{ d.latlng[0][i].lng }}" onblur="eFencePointChange()">
+            <i style="cursor: pointer; font-size: 18px; color: black; font-weight: bold; {{# if(d.latlng[0][i].index <=2) { }}
+                    display: none
+{{# } }}" class="layui-icon layui-icon-reduce-circle eFenceReducePoint" index="{{ d.latlng[0][i].index }}"
+               name="removeElectronicFencePoint"></i>
+        </div>
+        {{# } }}
+    </div>
+</script>
+
+<script type="text/html" id="timelineForHistory">
+    <ul class="layui-timeline" style="padding: 15px">
+        {{# for(var i = 0; i < d.length; i++){ }}
+        <li class="layui-timeline-item">
+            <i class="layui-icon layui-timeline-axis"></i>
+            <div class="layui-timeline-content layui-text">
+                <h3 class="layui-timeline-title" style="color: white">{{ parseTime(d[i].time) }}</h3>
+                <p style="color: white">
+                    <!--                    船舶名称： das 235-->
+                    <!--                    <br>-->
+                    <!--                    告警级别：中报警-->
+                    <!--                    <br>-->
+                    {{ d[i].content }}
+                </p>
+            </div>
+        </li>
+        {{# } }}
+    </ul>
+</script>
+
+<script type="text/html" id="eFenceHistoryToolbar">
+    <a class=" " style="padding-left:5px;color: #DBD9D1" lay-event="eFenceHistoryToolbarDetail" title="详情"><i
+            class="layui-icon ">&#xe702;</i></a>
+</script>
+
+<script type="text/html" id="eFenceHistoryToolbarForAlert">
+    <a class=" " style="padding-left:5px;color: #DBD9D1" lay-event="eFenceHistoryToolbarDetail1" title="处理"><i
+            class="layui-icon ">&#xe609;</i></a>
+    {{# if(!d.resumeTime)  { }}
+    <a class=" " style="padding-left:5px;color: #DBD9D1" lay-event="eFenceHistoryToolbarDetail2" title="问询"><i
+            class="layui-icon ">&#xe626;</i></a>
+    <a class=" " style="padding-left:5px;color: #DBD9D1" lay-event="eFenceHistoryToolbarDetail3" title="指配"><i
+            class="layui-icon ">&#xe716;</i></a>
+    {{# } }}
+</script>
+
+<!-- 风险警告 弹出层 -->
+<div id='eFenceHistoryToolbarDetail1Process' style="display: none">
+    <from class="layui-form">
+        <div class="layui-form-item" style="margin-top: 10px;margin-right: 10px">
+            <label class="layui-form-label" style="width:90px">处理意见：</label>
+            <div class="layui-input-block">
+                <input type="hidden" id="eFenceHistoryToolbarDetailCommentId" value="">
+                <textarea name="eFenceHistoryToolbarDetailComment" id="eFenceHistoryToolbarDetailComment"
+                          placeholder="请输入处理意见"
+                          class="layui-textarea" maxlength="100" style="width: 200px" value="0" required
+                          autocomplete="off"/></textarea>
+
+            </div>
+            <div style="text-align: center;margin-top: 20px">
+                <button class="layui-btn layui-btn-normal" style="width: 100px;" lay-submit
+                        lay-filter="eFenceHistoryToolbarDetailSave">保存
+                </button>
+            </div>
+        </div>
+    </from>
+</div>
+
+<div id="buzhidaogansha" style="display: none">
+    <form class="layui-form">
+        <input type="hidden" id="assignAlarmId" name="assignAlarmId" value="">
+        <input type="hidden" id="assignShipMMSI" name="assignShipMMSI" value="">
+        <div class="layui-form-item" style="margin-top: 10px;margin-right: 10px">
+            <div class="zhipei-row layui-form-item">
+                <div class="layui-input-block">
+                    <label class="layui-form-label" style="width:130px;"><i
+                            style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>信道</label>
+                    <div class="layui-inline">
+                        <select name="channel" id="channel" class="layui-form-select" lay-verify="required">
+                            <option selected="selected" value="">请选择</option>
+                            <option value="1">A信道</option>
+                            <option value="2">B信道</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="zhipei-row layui-form-item">
+                <div class="layui-input-block">
+                    <label class="layui-form-label" style="width:130px;"><i
+                            style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>时隙增量</label>
+                    <div class="layui-inline slotIncrement-container">
+                        <select name="slotIncrement" id="slotIncrement" class="layui-form-select" lay-verify="required">
+                            <option selected="selected" value="">请选择</option>
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="zhipei-row layui-form-item">
+                <div class="layui-input-block">
+                    <label class="layui-form-label" style="width:130px;"><i
+                            style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>时隙偏置</label>
+                    <div class="layui-inline slotOffset-container">
+                        <select name="slotOffset" id="slotOffset" class="layui-form-select" lay-verify="required">
+                            <option selected="selected" value="">请选择</option>
+                            <option value="20">20</option>
+                            <option value="40">40</option>
+                            <option value="60">60</option>
+                            <option value="80">80</option>
+                            <option value="100">100</option>
+                            <option value="120">120</option>
+                            <option value="140">140</option>
+                            <option value="160">160</option>
+                            <option value="180">180</option>
+                            <option value="200">200</option>
+                            <option value="220">220</option>
+                            <option value="240">240</option>
+                            <option value="260">260</option>
+                            <option value="280">280</option>
+                            <option value="300">300</option>
+                            <option value="320">320</option>
+                            <option value="340">340</option>
+                            <option value="360">360</option>
+                            <option value="380">380</option>
+                            <option value="400">400</option>
+                            <option value="420">420</option>
+                            <option value="440">440</option>
+                            <option value="460">460</option>
+                            <option value="480">480</option>
+                            <option value="500">500</option>
+                            <option value="520">520</option>
+                            <option value="540">540</option>
+                            <option value="560">560</option>
+                            <option value="580">580</option>
+                            <option value="600">600</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="zhipei-row layui-form-item">
+                <div class="layui-input-block">
+                    <label class="layui-form-label" style="width:130px;"><i
+                            style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>开始时隙</label>
+                    <div class="layui-inline">
+                        <input type="number" name="slotStart" id="slotStart" class="layui-input" style="width: 212px"
+                               lay-verify="required"
+                               oninput="if(value>2249){value=2249} else if(value<0){value=0 }" maxlength="4"
+                               placeholder="请输入0-2249"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="text-align: center;margin-top: 20px">
+            <button type="button" class="layui-btn layui-btn-normal" style="width: 100px;" lay-submit
+                    lay-filter="assignSave">指配
+            </button>
+        </div>
+    </form>
+</div>
+<script type="text/html" id="tmp_select">
+    <div class="layui-form-item dynamic-form-select" style="margin-top: 10px;margin-right: 10px">
+        <label class="layui-form-label">${item.label}：</label>
+        <div class="layui-input-block">
+            <select name="${item.dataKey}" placeholder="${item.comment}"></select>
+        </div>
+    </div>
+</script>
+<script type="text/html" id="tmp_data_group">
+    <fieldset class="layui-elem-field  dynamic-form-group dynamic-form-group-${tmp.dataGroup}"
+              title="${eventType.comment}"
+              style="border-color: white!important;margin-top: 10px">
+        <legend style="color: white;">${tmp.dataGroup}</legend>
+        <div class="layui-field-box">
+        </div>
+    </fieldset>
+</script>
+<script type="text/html" id="tmp_input">
+    <div class="layui-form-item dynamic-form-input" title="${item.comment}" style="margin-top: 10px;margin-right: 10px">
+        <label class="layui-form-label">${item.label}：</label>
+        <div class="layui-input-block">
+            <input name="${item.dataKey}"
+                   placeholder="${item.comment}"
+                   type="${item.dataSubType}"
+                   class="layui-input"
+                   ${isReadonly(item)?"readonly":""}
+            ${item.dataRules ? `onkeyup="value=value.replace(${item.dataRules},'')" ` : ""}
+            maxlength="120"
+            ${(item.state >> 2 & 0b001 == 1)?`lay-verify="required"`:""}
+            autocomplete="off"/>
+        </div>
+    </div>
+</script>
+<script type="text/html" id="tmp_radio">
+    <div class="layui-form-item dynamic-form-radio" title="${item.comment}">
+        <label class="layui-form-label">${item.label}：</label>
+        <div class="layui-input-block">
+        </div>
+    </div>
+</script>
+<script type="text/html" id="tmp_checkbox">
+    <div class="layui-form-item dynamic-form-checkbox" title="${item.comment}">
+        <label class="layui-form-label">${item.label}：</label>
+        <div class="layui-input-block">
+        </div>
+    </div>
+</script>
+<script type="text/html" id="tmp_box">
+    <div class="dynamic-form-field dynamic-form-${tmp.dataKey}"
+         data-event-id=""
+         data-event-type="${tmp.eventType}"
+         data-id="${currentData.id}"
+         data-version="${currentData.version}"
+         data-key="${tmp.dataKey}">
+    </div>
+</script>
+<style>
+    .dynamic-form .dynamic-form-radio .layui-form-radio {
+        padding-left: 0px !important;
+        margin-left: 0px !important;
+    }
+
+    #event_template .layui-disabled {
+
+    }
+</style>
+</body>
+</html>

@@ -1,0 +1,200 @@
+<div class="layui-card">
+    <div class="layui-card-header">
+        <h2 class="header-title">正常目标管理(白名单)</h2>
+        <!--        <span class="layui-breadcrumb pull-right">-->
+        <!--          <a href="#!console">首页</a>-->
+        <!--          <a><cite>船台管理</cite></a>-->
+        <!--        </span>-->
+    </div>
+    <div class="layui-card-body ">
+
+        <div class="layui-form toolbar">
+            <div class="layui-form-item">
+                <label class="layui-form-label">船舶：</label>
+                <div class="layui-input-inline">
+                    <input id="ship-name-mmsi" class="layui-input search-input" type="text" placeholder="搜索船名或MMSI号"/>
+                </div>
+                <label id="AIStypeWhite" class="layui-form-label">AIS类型：</label>
+                <div id="AIStypeWhiteSelect" class="layui-input-inline">
+                    <select name="AIStypeWhiteValue" id="AIStypeWhiteValue">
+                        <option value="">请选择</option>
+                        <option value="1">A类船台</option>
+                        <option value="2">B类船台</option>
+                        <option value="3">AtoN</option>
+                    </select>
+                </div>
+                <label id="abnormalType" class="layui-form-label">异常类型：</label>
+                <div id="abnormalTypeSelect" class="layui-input-inline">
+                    <select name="abnormalTypeValue" id="abnormalTypeValue">
+                        <option value="">请选择</option>
+                        <option value="S03">AIS信息填写错误</option>
+                        <option value="S04">船台GPS定位无效</option>
+                        <option value="S07">身份重复船台辨识</option>
+                        <option value="S08">助航设备监测与识别</option>
+                        <option value="S11">一船多码/设备</option>
+                        <option value="S13">AIS信号丢失真实性辨识</option>
+                    </select>
+                </div>
+                <label class="layui-form-label">更新时间</label>
+                <div class="layui-input-inline">
+                    <input type="text" style="width:285px;" id="whiteupdateTime" name="whiteupdateTime" placeholder="更新时间"
+                           autocomplete="off" class="layui-input" readonly>
+                </div>
+
+                <button id="white-search" class="layui-btn icon-btn" style="margin-left: 130px"><i class="layui-icon">&#xe615;</i>查询
+                </button>
+                <button id="white-export" class="layui-btn icon-btn" style="margin-left: 10px"><i class="layui-icon">&#xe654;</i>导出excel
+                </button>
+            </div>
+        </div>
+        <table class="layui-table" id="white-table" lay-filter="white-table"></table>
+    </div>
+</div>
+
+<!-- 表格操作列 -->
+<script type="text/html" id="white-table-bar">
+    <a class="layui-btn layui-btn-xs" lay-event="white-ship-detail">查看详情</a>
+</script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.1.1/dist/echarts.min.js"></script>
+<script>
+    layui.use(['form', 'table', 'util', 'common', 'admin', 'laydate', 'jquery', 'layer', 'table', 'layedit', 'upload', 'element', 'carousel'], function () {
+        var form = layui.form;
+        var table = layui.table;
+        var config = layui.common;
+        var layer = layui.layer;
+        var util = layui.util;
+        var admin = layui.admin;
+        var laydate = layui.laydate;
+        //异常时间
+        laydate.render({
+            elem: '#whiteupdateTime',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            range: false
+        });
+        var $ = layui.jquery;
+        var element = layui.element;
+        carousel = layui.carousel;
+        // echarts = layui.echarts;
+        var table = layui.table;
+        var layedit = layui.layedit;
+        var upload = layui.upload;
+        // var dtree = layui.dtree;
+
+        // 渲染表格
+        table.render({
+            elem: '#white-table',
+            url: config.base_server + 'whiteList-api/whitelist/findPage',
+            method: 'GET',
+            headers: {'Authorization': 'Bearer ' + config.getToken().access_token},
+            page: true,
+            cols: [[
+                {type: 'numbers'},
+                {field: 'mmsi', title: 'MMSI'},
+                {field: 'name', title: '设备名称'},
+                {field: 'aisTypeName', title: 'AIS类型'},
+                {field: 'exTypes', title: '通过类型'},
+                {field: 'cnt', title: '通过数量'},
+                {
+                    field: 'updatetime', title: '更新时间', templet: function (e) {
+                        return layui.util.toDateString(e.updatetime, "yyyy-MM-dd HH:mm:ss")
+                    }
+                },
+                {fixed: 'right', align: 'center', toolbar: '#white-table-bar', title: '操作'}
+            ]]
+        });
+
+        // 导出excel按钮点击事件
+        $('#white-export').click(function () {
+            var mmsi = $('#ship-name-mmsi').val();
+            var aisType = $('#AIStypeWhiteValue').val();
+            var errorType = $('#abnormalTypeValue').val();
+            var updateTime = $('#whiteupdateTime').val();
+                var url = config.base_server + 'whiteList-api/whitelist/export'+ '?page=1&limit=10&mmsi'+  mmsi + '&aisType'+  aisType + '&errorType'+  errorType+ '&updateTime'+  updateTime;
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', url, true);
+                xhr.responseType = "blob";
+                xhr.setRequestHeader("client_type", "DESKTOP_WEB");
+                xhr.setRequestHeader("Authorization", "Bearer " + config.getToken().access_token);
+                xhr.onload = function () {
+                    if (this.status == 200) {
+                        var fileName = "正常目标管理(白名单).xlsx";
+                        var blob = this.response;
+                        var a = document.createElement('a');
+                        a.innerHTML = fileName;
+                        // 指定生成的文件名
+                        a.download = fileName;
+                        a.href = URL.createObjectURL(blob);
+                        document.body.appendChild(a);
+                        var evt = document.createEvent("MouseEvents");
+                        evt.initEvent("click", false, false);
+                        a.dispatchEvent(evt);
+                        document.body.removeChild(a);
+                    }
+                }
+                xhr.send();
+
+        });
+
+        // 工具条点击事件
+        table.on('tool(white-table)', function (obj) {
+            var data = obj.data;
+            var layEvent = obj.event;
+            if (layEvent === 'white-ship-detail') {// 修改
+                var index = layui.index;
+                admin.putTempData('mmsi', data.mmsi);
+                var title = '详情页面';
+                admin.popupCenter({
+                    title: title,
+                    path: 'pages/vdl/blackWhietList/whiteListDetail.html',
+                    area:['1500px','800px'],
+                    offset:'120px',
+                    finish: function () {
+                        table.reload('white-table', {});
+                    }
+                });
+
+            }
+        });
+
+        function jump(data) {
+            admin.putTempData('b_ship', data);
+            window.location.href = "#!whiteListDetail";
+
+        }
+
+        // 搜索按钮点击事件
+        $('#white-search').click(function () {
+
+            var mmsi = $('#ship-name-mmsi').val();
+            var aisType = $('#AIStypeWhiteValue').val();
+            var errorType = $('#abnormalTypeValue').val();
+            var updateTime = $('#whiteupdateTime').val();
+            var startTime="";
+            var endTime="";
+            if(updateTime.trim()!=undefined&&updateTime.trim()!="") {
+                var time = updateTime.trim().split("-");
+                startTime = time[0];
+                endTime = time[1];
+            }
+            table.reload('white-table', {where: {mmsi: mmsi, aisType: aisType, errorType: errorType, updateTime: updateTime}});
+        });
+
+
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

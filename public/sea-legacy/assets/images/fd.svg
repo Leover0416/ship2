@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="13px" height="22px" viewBox="0 0 13 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>编组 3</title>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="优化改进6" transform="translate(-512.000000, -56.000000)" stroke="#E5A4DD">
+            <g id="编组" transform="translate(513.000000, 57.000000)">
+                <polyline id="路径-15" points="0.804805416 0 4.20270305 6.44455191 5.06789239e-13 13.0802515"></polyline>
+                <line x1="11.7147293" y1="9.85059431" x2="4.20270305" y2="6.22617017" id="路径-16"></line>
+                <polyline id="路径-17" points="5.00445417 6.54012573 5.00445417 16.9411286 7.01519509 18.1903332 4.20270305 20 1.50780117 18.1903332 3.63110352 16.9411286 3.63110352 7.47363281"></polyline>
+                <line x1="3.96113416" y1="16.9411286" x2="5.20349121" y2="16.9411286" id="路径-18"></line>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,312 @@
+<div class="layui-card">
+    <div class="layui-card-header">
+        <h2 class="header-title">AIS指配模式配置</h2>
+    </div>
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <div class="layui-card-body" style="padding: 15px;">
+                <form class="layui-form" action="" lay-filter="AISAssigned-form">
+                    <div class="layui-form-item">
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label" style="width:130px;"><i
+                                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>选择基站</label>
+                                <div class="layui-input-inline">
+                                    <select name="shoreMmsiAISAssigned" id="shoreMmsiAISAssigned"
+                                            lay-filter="stationChangedAISAssigned" lay-verify="required">
+                                        <option selected="selected" value=""></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label" style="width:130px;"><i
+                                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>信道</label>
+                                <div class="layui-input-inline">
+                                    <select name="channelAISAssigned" id="channelAISAssigned" lay-verify="required">
+                                        <option selected="selected" value="">请选择</option>
+                                        <option value="1">A信道</option>
+                                        <option value="2">B信道</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label" style="width:130px;"><i
+                                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>A船舶MMSI</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" placeholder="请输入船舶MMSI" name="shipMMSIA" id="shipMMSIA" onKeyUp="this.value=this.value.replace(/[^\d]/g,'');"
+                                           autocomplete="off" lay-verify="required" class="layui-input" maxlength="32">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label" style="width:130px;"><i
+                                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>A船舶时隙增量</label>
+                                <div class="layui-input-inline">
+                                    <select name="slotIncrementA" id="slotIncrementA" lay-verify="required">
+                                        <option selected="selected" value="">请选择</option>
+                                        <option value="0">0</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label" style="width:130px;"><i
+                                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>A船舶开始时隙</label>
+                                <div class="layui-input-inline">
+                                    <input type="number" name="slotStartA" id="slotStartA" lay-verify="required"
+                                           oninput="if(value.length>4)value=value.slice(0,4)" placeholder="请输入0-2249"
+                                           autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label" style="width:130px;"><i
+                                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>A船舶时隙偏置</label>
+                                <div class="layui-input-inline">
+                                    <select name="slotOffsetA" id="slotOffsetA" lay-verify="required">
+                                        <option selected="selected" value="">请选择</option>
+                                        <option value="20">20</option>
+                                        <option value="40">40</option>
+                                        <option value="60">60</option>
+                                        <option value="80">80</option>
+                                        <option value="100">100</option>
+                                        <option value="120">120</option>
+                                        <option value="140">140</option>
+                                        <option value="160">160</option>
+                                        <option value="180">180</option>
+                                        <option value="200">200</option>
+                                        <option value="220">220</option>
+                                        <option value="240">240</option>
+                                        <option value="260">260</option>
+                                        <option value="280">280</option>
+                                        <option value="300">300</option>
+                                        <option value="320">320</option>
+                                        <option value="340">340</option>
+                                        <option value="360">360</option>
+                                        <option value="380">380</option>
+                                        <option value="400">400</option>
+                                        <option value="420">420</option>
+                                        <option value="440">440</option>
+                                        <option value="460">460</option>
+                                        <option value="480">480</option>
+                                        <option value="500">500</option>
+                                        <option value="520">520</option>
+                                        <option value="540">540</option>
+                                        <option value="560">560</option>
+                                        <option value="580">580</option>
+                                        <option value="600">600</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label" style="width:130px;">B船舶MMSI</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" placeholder="请输入船舶MMSI" name="shipMMSIB" id="shipMMSIB" onKeyUp="this.value=this.value.replace(/[^\d]/g,'');"
+                                           autocomplete="off" class="layui-input" maxlength="32">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label" style="width:130px;">B船舶时隙增量</label>
+                                <div class="layui-input-inline">
+                                    <select name="slotIncrementB" id="slotIncrementB">
+                                        <option selected="selected" value="">请选择</option>
+                                        <option value="0">0</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label" style="width:130px;">B船舶开始时隙</label>
+                                <div class="layui-input-inline">
+                                    <input type="number" name="slotStartB" id="slotStartB"
+                                           oninput="if(value.length>4)value=value.slice(0,4)" placeholder="请输入0-2249"
+                                           autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label" style="width:130px;">B船舶时隙偏置</label>
+                                <div class="layui-input-inline">
+                                    <select name="slotOffsetB" id="slotOffsetB">
+                                        <option selected="selected" value="">请选择</option>
+                                        <option value="20">20</option>
+                                        <option value="40">40</option>
+                                        <option value="60">60</option>
+                                        <option value="80">80</option>
+                                        <option value="100">100</option>
+                                        <option value="120">120</option>
+                                        <option value="140">140</option>
+                                        <option value="160">160</option>
+                                        <option value="180">180</option>
+                                        <option value="200">200</option>
+                                        <option value="220">220</option>
+                                        <option value="240">240</option>
+                                        <option value="260">260</option>
+                                        <option value="280">280</option>
+                                        <option value="300">300</option>
+                                        <option value="320">320</option>
+                                        <option value="340">340</option>
+                                        <option value="360">360</option>
+                                        <option value="380">380</option>
+                                        <option value="400">400</option>
+                                        <option value="420">420</option>
+                                        <option value="440">440</option>
+                                        <option value="460">460</option>
+                                        <option value="480">480</option>
+                                        <option value="500">500</option>
+                                        <option value="520">520</option>
+                                        <option value="540">540</option>
+                                        <option value="560">560</option>
+                                        <option value="580">580</option>
+                                        <option value="600">600</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline" style="margin-left:50px;">
+                                <div class="layui-input-inline">
+                                    <div class="layui-input-block">
+                                        <a class="layui-btn" lay-submit="" lay-filter="AISAssignedMode-submit">立即提交</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['form', 'util', 'common', 'admin'], function () {
+        var $ = layui.$;
+        var form = layui.form;
+        var admin = layui.admin;
+        //获取基站下拉列表
+        getStationSelectList();
+
+        function getStationSelectList() {
+            admin.req('station-maintain/baseStationAPI/selectAllBaseStation', "", function (res) {
+                var data = res;
+                for(var i in data){
+                    if(data[i].connectionStatus=="0"){
+                        $("#shoreMmsiAISAssigned").prepend("<option  value='" + data[i].shoreMmsi + "'>" + data[i].shoreName + "</option>");
+                    }else {
+                        $("#shoreMmsiAISAssigned").append("<option value='" + data[i].shoreMmsi + "' disabled='true'>" + data[i].shoreName + "(暂未连接)</option>")
+                    }
+                }
+                form.render();
+            },"post");
+
+        };
+
+        form.on('submit(AISAssignedMode-submit)', function (data) {
+            var field = data.field;
+            var slotStartA = $("#slotStartA").val();
+            var slotStartB = $("#slotStartB").val();
+            var shipMMSIB = $("#shipMMSIB").val();
+            var slotIncrementB = $("#slotIncrementB").val();
+            var slotOffsetB = $("#slotOffsetB").val();
+
+            if (slotStartA > 2249 || slotStartA < 0) {
+                layer.msg("A船舶开始时隙输入值不符合范围！");
+                return;
+            }
+
+            if (shipMMSIB != '' && shipMMSIB != undefined) {
+                if (slotIncrementB == '' || slotIncrementB == undefined) {
+                    layer.msg("B船舶时隙增量需要存在值！");
+                    return;
+                }
+                if (slotStartB == '' || slotStartB == undefined) {
+                    layer.msg("B船舶开始时隙需要存在值！");
+                    return;
+                }
+                if (slotOffsetB == '' || slotOffsetB == undefined) {
+                    layer.msg("B船舶时隙偏置需要存在值！");
+                    return;
+                }
+            }
+
+            if ((slotStartB != undefined && slotStartB != '') || (slotIncrementB != '' && slotIncrementB != undefined) || (slotOffsetB != '' && slotOffsetB != undefined)) {
+                if (shipMMSIB == null || shipMMSIB == undefined) {
+                    layer.msg("B船舶MMSI需要存在值！");
+                    return;
+                }
+            }
+
+            if (slotStartB != '' && slotStartB != undefined) {
+                if (slotStartA > 2249 || slotStartA < 0) {
+                    layer.msg("B船舶开始时隙输入值不符合范围！");
+                    return;
+                }
+            }
+
+            var param = {
+                shoreMmsi: field.shoreMmsiAISAssigned,
+                channel: field.channelAISAssigned,
+                shipMmsiA: field.shipMMSIA,
+                slotStartA: field.slotStartA,
+                slotIncrementA: field.slotIncrementA,
+                slotOffsetA: field.slotOffsetA,
+                shipMmsiB: field.shipMMSIB,
+                slotStartB: field.slotStartB,
+                slotIncrementB: field.slotIncrementB,
+                slotOffsetB: field.slotOffsetB,
+            }
+            var requestUrl = 'stationConfigure/AISAssignedMode/send';
+
+            admin.req(requestUrl, JSON.stringify(param), function (res) {
+                if (res.resp_code == '0') {
+                    layer.msg("配置成功！");
+                } else {
+                    layer.msg("配置失败！");
+                }
+            }, "post");
+        })
+
+
+    });
+
+</script>

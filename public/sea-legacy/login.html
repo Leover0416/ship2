@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>海事安全协同平台</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" href="assets/libs/layui/css/layui.css"/>
+    <link rel="stylesheet" href="assets/css/login.css" media="all">
+    <link rel="icon" type="image/png" href="./favicon.ico" />
+</head>
+
+<body>
+<div class="login-wrapper">
+    <div class="login-body">
+        <div class="login_sign">
+            <div class="login-page" style="height: 520px;">
+                <div class="login-box" style="width: 500px;">
+                    <div class="login-box-body login_body_back">
+                        <form class="layui-form" id="login_form">
+                            <div class="layui-form-item login_item" style="margin-top:80px;">
+                                <image class="innerImg" style="width:300px;height:300px;border-radius:50%;margin-left:50px;"src="assets/images/logo.png"/>
+                            </div>
+                            <legend style="font-family:verdana;font-size:300%;color:#144c98;text-align:center">
+                                海事安全协同平台
+                            </legend>
+                            <div class="layui-form-item login_item">
+                                <input id="username" type="text" name="username" autocomplete="off" maxlength="27" lay-verify="required" class="layui-input larry-input login_input login_user" placeholder="用户名">
+                            </div>
+                            <div class="layui-form-item login_item">
+                                <input type="password" name="password" autocomplete="off" maxlength="27" lay-verify="required" class="layui-input larry-input login_input login_password" placeholder="密码">
+                            </div>
+                            <div class="layui-form-item login_item">
+                                <button lay-filter="login-submit" class="layui-btn larry-btn login_btn" lay-submit>登 录</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 用户修改密码弹出层 -->
+    <div id='userPasswordLayer1' class="layui-form" style="display: none">
+        <div xmlns="http://www.w3.org/1999/html" style="margin-top: 10px;margin-left:20px "><b>您的密码还是默认密码，请重新修改密码</b></div>
+        <div class="layui-form-item" style="margin-top: 10px">
+            <label class="layui-form-label">新密码:</label>
+            <div class="layui-input-block">
+                <input type="password" id="newPassword" name="newPassword" placeholder="新密码" class="layui-input"
+                       style="width: 250px;" lay-verify="required" maxlength="15"
+                       minlength="8">
+<!--                <img src="../../assets/images/img_bi.png" id="IMGManager2" onclick="hideShowSeamap4()"-->
+<!--                     style="width: 20px;height: 10px;position: absolute;right: 30px;top: 14px;">-->
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">新密码确认:</label>
+            <div class="layui-input-block">
+                <input type="password" id="rePassword" name="rePassword" placeholder="新密码确认" class="layui-input"
+                       style="width: 250px;" lay-verify="required" maxlength="15"
+                       minlength="8">
+<!--                <img src="../../assets/images/img_bi.png" id="IMGManager3" onclick="hideShowSeamap5()"-->
+<!--                     style="width:20px;height: 10px;position: absolute;right: 30px;top: 14px;">-->
+            </div>
+        </div>
+        <div style="margin-top: 10px;font-size: 10px;margin-left: 20px;color: #6B6B6B;">长度8-15位数字、字母、特殊字符（ ~!@#$%^&*.,）组合</div>
+
+        <div style="text-align: center;margin-bottom: 10px;margin-top: 10px">
+            <button class="layui-btn layui-btn-normal" style="width: 100px;" lay-submit lay-filter="saveLoginPassword">
+                保存
+            </button>
+        </div>
+    </div>
+
+    <div class="login-footer">
+        <p>© 2023 <a href="javascript:;" target="_blank">遨海科技版权所有</a></p>
+    </div>
+</div>
+<script type="text/javascript" src="module/apiUrl.js"></script>
+<script type="text/javascript" src="assets/libs/layui/layui.js"></script>
+<script type="text/javascript" src="assets/libs/login.js"></script>
+<script type="text/javascript" src="module/Math.uuid.js"></script>
+
+<script>
+    layui.config({
+        base: 'module/'
+    }).use(['common', 'form', 'admin'], function () {
+        //页面唯一标识
+        let uuid = Math.uuid();
+        let $ = layui.jquery;
+        let form = layui.form;
+        let config = layui.common;
+        let admin = layui.admin;
+        let defalultPassword = "123456"
+        if (config.getToken()) {
+            //location.replace('./');
+            location.href ='index.html';
+            return;
+        }
+        $("input[name='deviceId']").val(uuid);
+        var oldPassWord = '';
+        var token = '';
+        // 表单提交
+        form.on('submit(login-submit)', function (obj) {
+            layer.load(2);
+            $.ajax({
+                url: config.base_server + 'api-uaa/oauth/user/token',
+                xhrFields: {
+                    withCredentials: true
+                },
+                data: obj.field,
+                type: 'POST',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'Basic ' + window.btoa(config.clientId + ":" + config.clientSecret));
+                },
+                success: function (data) {
+                    if (data.resp_code === 0) {
+                        token = data.datas;
+                        oldPassWord = obj.field.password;
+                        if (obj.field.password == defalultPassword) {
+                            layer.closeAll('loading');
+                            layer.open({
+                                    type: 1,
+                                    id: "pass",
+                                    content: $('#userPasswordLayer1'),
+                                    title: '修改密码',
+                                    skin: 'layui-layer-lan editPassWord',
+                                    area: ['400px', '280px'],  //自定义文本域宽高
+                                    cancel: function () {
+                                        $('#newPassword').val("");
+                                        $('#rePassword').val("");
+                                    }
+                                }
+                            );
+                        } else {
+                            config.putToken(data.datas);
+                            location.href ='index.html';
+                            // layer.msg('登录成功', {icon: 1, time: config.msgTime}, function () {
+                            // location.href ='index.html';
+                            //     //location.replace('./');
+                            //   //  location.href ='homePage.html';
+                            // });
+                        }
+                    } else {
+                        layer.closeAll('loading');
+                        layer.msg(data.resp_msg, {icon: 5, time: config.msgTime});
+                    }
+                },
+                error: function (xhr) {
+                    layer.closeAll('loading');
+                    layer.msg(xhr.responseJSON.resp_msg, {icon: 5, time: config.msgTime});
+                }
+            });
+            //阻止表单跳转
+            return false;
+        });
+
+        form.on('submit(saveLoginPassword)', function (data) {
+            var pwd1 = data.field.newPassword;
+            var pwd2 = data.field.rePassword;
+            // 对比两次输入的密码
+            if (pwd1 != pwd2) {
+                layer.msg("两次密码输入不一致,请重新输入", {icon: 2, time: 3000});
+            } else {
+                var t = checkPassword(data.field.newPassword)
+                if (t) {
+                    var param = {
+                        oldPassword: oldPassWord,
+                        newPassword: data.field.newPassword,
+                    }
+                    config.putToken(token);
+                    admin.req('api-user/user/password', JSON.stringify(param), function (data) {
+                        if (data.resp_code == 0) {
+                            layer.msg(data.resp_msg, {icon: 1, time: config.msgTime}, function () {
+                                config.removeToken();
+                                window.open('/login.html', "_self");
+                            });
+                        } else {
+                            layer.msg(data?.resp_msg || '系统异常，请稍后再试', {icon: 2, time: config.msgTime});
+                        }
+                    }, 'PUT');
+
+                } else {
+                    layer.msg("密码不符合规则，请重新输入", {icon: 2, time: 2000})
+                }
+            }
+        });
+
+        function checkPassword (password) {
+            //var  reg= /^(?![0-9a-zA-Z]+$)[a-zA-Z0-9~!@#$%^&*?_-]{6,12}$/
+            // var reg=/^(?![A-Za-z]+$)(?![A-Z\\d]+$)(?![A-Z\\W_]+$)(?![a-z\\d]+$)(?![a-z\\W_]+$)(?![\\d\\W_]+$)\\S{8,}$/
+            var reg=/^(?=.*\d)(?=.*[a-zA-Z])(?=.*[~!@#$%^&*.,])[\da-zA-Z~!@#$%^&*.,]{8,}$/
+            return  reg.test(password)
+        }
+
+        // 图形验证码
+        $('.login-captcha').attr("src", config.base_server + "api-uaa/validata/code/"+uuid);
+        $('.login-captcha').attr("style", "");
+
+        // 图形验证码
+        $('.login-captcha').click(function () {
+            this.src = this.src + '?t=' + (new Date).getTime();
+        });
+    });
+    function hideShowSeamap4() {
+        var demoImgNew = document.getElementById("IMGManager2");
+        var pwdNew = document.getElementById("newPassword");
+        if (pwdNew.type == "password") {
+            pwdNew.type = "text";
+            demoImgNew.src = "../../assets/images/img_zheng.png"; //图片路径（闭眼图片）
+        } else {
+            pwdNew.type = "password";
+            demoImgNew.src = "../../assets/images/img_bi.png"; // 图片路径（睁眼图片）
+        }
+    }
+
+    function hideShowSeamap5() {
+        var demoImgConfirm = document.getElementById("IMGManager3");
+        var PWD3Confirm = document.getElementById("rePassword");
+        if (PWD3Confirm.type == "password") {
+            PWD3Confirm.type = "text";
+            demoImgConfirm.src = "../../assets/images/img_zheng.png"; //图片路径（闭眼图片）
+        } else {
+            PWD3Confirm.type = "password";
+            demoImgConfirm.src = "../../assets/images/img_bi.png"; // 图片路径（睁眼图片）
+        }
+    }
+
+</script>
+</body>
+</html>

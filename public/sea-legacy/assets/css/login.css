@@ -1,0 +1,281 @@
+/** EasyWeb */
+
+body {
+    background-image: url("../images/bg_login4.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.login-wrapper, body, html {
+    height: 100%
+}
+
+.login-wrapper {
+    overflow: auto;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.login-body {
+    padding: 10px 10px 40px 10px;
+}
+
+.login-body > .layui-card {
+    max-width: 360px;
+    margin: 0 auto;
+}
+
+.login-body .layui-card-header {
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.login-body .layui-form-pane .layui-form-label {
+    width: 48px;
+}
+
+.login-body .layui-form-pane .layui-input-block {
+    margin-left: 48px;
+}
+
+.login-body .login-captcha {
+    width: 100%;
+    cursor: pointer;
+}
+
+.login-body .login-other > * {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 10px;
+    font-size: 14px;
+}
+
+.login-body .login-other .layui-icon {
+    position: relative;
+    top: 2px;
+    font-size: 26px;
+}
+
+.login-body .login-other a:hover {
+    opacity: .8;
+}
+
+.layui-icon-login-qq {
+    color: #3492ED
+}
+
+.layui-icon-login-wechat {
+    color: #4DAF29
+}
+
+.layui-icon-login-weibo {
+    color: #CF1900
+}
+
+/** 底部样式 */
+.login-footer {
+
+    text-align: center;
+    line-height: 30px;
+    color: rgba(255, 255, 255, 0.7) !important;
+    padding-bottom: 20px;
+    margin-top: 620px;
+    width: 100%;
+}
+
+.login-footer span {
+    padding: 0 5px
+}
+
+.login-footer a {
+    padding: 0 5px;
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.login-footer a:hover {
+    color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/** 头部样式 */
+.login-header {
+    font-size: 20px;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.85) !important;
+    padding: 10px;
+}
+
+.login-header img {
+    height: 40px;
+}
+
+.login_logo_img{
+    width:200px;
+    height:100px;
+}
+.login_bj_img {
+    width:100%;
+    height:100%;
+}
+.login-box {
+    width: 440px;
+    margin: 7% auto;
+}
+.login_input {
+    height:50px;
+    font-size: 20px;
+}
+.login_body_back {
+    /*padding-top: 20px;*/
+}
+.login_item {
+    width: 80%;
+    margin: 20px auto;
+}
+.login_btn {
+    width: 180px;
+    background-color:#007c3d;
+    height:50px;
+    margin-right: -15px;
+    font-size: 20px;
+    margin-left: 100px;
+}
+.login_font_color {
+    color:white;
+}
+.login_icon {
+    width:90%;
+    height:90%;
+}
+.login_marginR_20 {
+    margin-right: 20px;
+}
+.login_back_picture {
+    background: no-repeat center center fixed black;
+    width: 100%;
+    height:100%;
+}
+.login_logo {
+    width:200px;
+    height:100px;
+    margin: 0 auto;
+}
+.login_sign {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.login_shadow {
+    opacity:0.6;
+}
+/*@media (max-width:768px) {*/
+/*    .login-box {*/
+/*        width: 90%;*/
+/*        margin-top: 20px;*/
+/*    }*/
+/*    .login-box-body {*/
+/*        !*background: #fff;*!*/
+/*        !*padding: 20px;*!*/
+/*        border-top: 0;*/
+/*        color: #666;*/
+/*    }*/
+/*    .login-box-msg {*/
+/*        margin: 0;*/
+/*        text-align: center;*/
+/*        padding: 0 20px 20px 20px;*/
+/*    }*/
+/*    .login-logo {*/
+/*        font-size: 35px;*/
+/*        text-align: center;*/
+/*        margin-bottom: 25px;*/
+/*        font-weight: 300;*/
+/*        color: #444;*/
+/*    }*/
+/*}*/
+
+.login_item {
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 20px;
+}
+
+.login_company {
+    background-: #FFF url(../images/company.png) no-repeat 97% center;
+}
+
+.login_user {
+    background: #FFF url(../images/user.png) no-repeat 97% center;
+}
+
+.login_password {
+    background: #FFF url(../images/password.png) no-repeat 97% center;
+}
+
+.innerImg{
+    /* height: 100%; */
+    width:100%;
+}
+
+
+/** 移动设备样式 */
+@media screen and (min-height: 710px) {
+    .login-footer {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+    }
+}
+
+
+/*!** 移动设备样式 *!*/
+/*@media screen and (min-height: 590px) {*/
+/*    .login-footer {*/
+/*        position: absolute;*/
+/*        bottom: 0;*/
+/*        width: 100%;*/
+/*    }*/
+/*}*/
+
+@media screen and (min-height: 670px) {
+    .login-body {
+        padding: 110px 10px 40px 10px;
+    }
+}
+
+
+@media screen and (min-width: 350px) and (max-width: 600px){
+    .login-box-body {
+        transform: scale(0.9);
+        /*background: #fff;*/
+        color: #666;
+    }
+    .login_item {
+        transform: scale(0.9);
+        /* width: 80%; */
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 20px;
+    }
+}
+
+
+/** 辅助样式 */
+.layui-link {
+    color: #029789 !important;
+}
+
+.layui-link:hover {
+    opacity: .8;
+}
+
+.pull-right {
+    float: right;
+}
+
+.inline-block {
+    display: inline-block;
+}

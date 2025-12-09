@@ -1,0 +1,426 @@
+<div class="layui-card">
+    <div class="layui-card-header">
+        <h2 class="header-title">VDE公告牌配置</h2>
+    </div>
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <div class="layui-card-body" style="padding: 15px;">
+                <form class="layui-form" action="" lay-filter="TBBEdit-form">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:165px;"><i
+                                    style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>选择基站</label>
+                            <div class="layui-input-inline">
+                                <select name="shoreMmsi" id="shoreMmsiCha" lay-filter="stationChangedCha"
+                                        lay-verify="required">
+                                    <option selected="selected" value=""></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:165px;"><i
+                                    style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>发布规则</label>
+                            <div class="layui-input-inline">
+                                <select name="sendRule" id="sendRule" lay-verify="required">
+                                    <option selected="selected" value="">请选择</option>
+                                    <option value="0">0时隙发</option>
+                                    <option value="1">6时隙发</option>
+                                    <option value="2">12时隙发</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:165px;"><i
+                                    style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>版本</label>
+                            <div class="layui-input-inline">
+                                <input type="number" name="version" id="version" placeholder="请输入0-65535"
+                                       autocomplete="off" class="layui-input" lay-verify="required"
+                                       onKeyUp="this.value=this.value.replace(/[^\d]/g,'');"
+                                       oninput="if(value.length>5)value=value.slice(0,5)">
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:165px;"><i
+                                    style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>开始生效时间</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="effectiveTime" id="effectiveTime" lay-verify="required"
+                                       placeholder="yyyy-MM-dd HH:mm:ss" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:165px;"><i
+                                    style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>有效时长</label>
+                            <div class="layui-input-inline">
+                                <input type="number" name="effectiveDuration" id="effectiveDuration"
+                                       lay-verify="required" placeholder="请输入" autocomplete="off"
+                                       onKeyUp="this.value=this.value.replace(/[^\d]/g,'');"
+                                       oninput="if(value.length>10)value=value.slice(0,10)" class="layui-input">
+                            </div>
+                            <label class="layui-form-label" style="text-align: left;">分钟</label>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:165px;"><i
+                                    style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>TDMA帧长度</label>
+                            <div class="layui-input-inline">
+                                <select name="tdmaLength" id="tdmaLength" lay-search="" disabled="disabled">
+                                    <option value="">请选择</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="8">8</option>
+                                    <option value="10">10</option>
+                                    <option value="15" selected="selected">15</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:165px;"><i
+                                    style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>控制区东北角经纬度</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="position1" id="position1" lay-verify="required"
+                                       placeholder="请输入" autocomplete="off" class="layui-input" maxlength="50">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:165px;"><i
+                                    style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>控制区西南角经纬度</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="position2" id="position2" lay-verify="required"
+                                       placeholder="请输入" autocomplete="off" class="layui-input" maxlength="50">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <a class="layui-btn" id="setPosition">设置坐标</a>
+                        </div>
+                    </div>
+                    <hr>
+
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:165px;"><i
+                                    style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>A信道移动站许可</label>
+                            <div class="layui-input-inline">
+                                <select name="permissionA" id="permissionA" lay-verify="required">
+                                    <option value="">请选择</option>
+                                    <option value="0">不允许移动站使用</option>
+                                    <option value="1">允许移动站使用</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:165px;">B信道移动站许可</label>
+                            <div class="layui-input-inline">
+                                <select name="permissionB" id="permissionB" lay-verify="" lay-search="">
+                                    <option value="">请选择</option>
+                                    <option value="0">不允许移动站使用</option>
+                                    <option value="1">允许移动站使用</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:165px;"><i
+                                    style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>A信道RA选择间隔</label>
+                            <div class="layui-input-inline">
+                                <input type="number" name="selectionIntervalA" id="selectionIntervalA"
+                                       onKeyUp="this.value=this.value.replace(/[^\d]/g,'');" lay-verify="required"
+                                       placeholder="请输入0-511" autocomplete="off" class="layui-input"
+                                       oninput="if(value.length>3)value=value.slice(0,3)">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:165px;">B信道RA选择间隔</label>
+                            <div class="layui-input-inline">
+                                <input type="number" name="selectionIntervalB" id="selectionIntervalB"
+                                       onKeyUp="this.value=this.value.replace(/[^\d]/g,'');" placeholder="请输入0-511"
+                                       autocomplete="off" class="layui-input"
+                                       oninput="if(value.length>3)value=value.slice(0,3)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:165px;"><i
+                                    style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>A信道每帧最大短消息数</label>
+                            <div class="layui-input-inline">
+                                <input type="number" name="shortMessageCountA" id="shortMessageCountA"
+                                       onKeyUp="this.value=this.value.replace(/[^\d]/g,'');" lay-verify="required"
+                                       placeholder="请输入0-127" autocomplete="off" class="layui-input"
+                                       oninput="if(value.length>3)value=value.slice(0,3)">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:165px;">B信道每帧最大短消息数</label>
+                            <div class="layui-input-inline">
+                                <input type="number" name="shortMessageCountB" id="shortMessageCountB"
+                                       onKeyUp="this.value=this.value.replace(/[^\d]/g,'');" placeholder="请输入0-127"
+                                       autocomplete="off" class="layui-input"
+                                       oninput="if(value.length>3)value=value.slice(0,3)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:165px;"><i
+                                    style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>A信道帧结构</label>
+                            <div class="layui-input-inline">
+                                <select name="structureA" id="structureA" lay-verify="required">
+                                    <option value="">请选择</option>
+                                    <option value="0">默认</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:165px;">B信道帧结构</label>
+                            <div class="layui-input-inline">
+                                <select name="structureB" id="structureB">
+                                    <option value="">请选择</option>
+                                    <option value="0">默认</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="layui-form-item layui-layout-admin">
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:165px;"></label>
+                            <div class="layui-input-inline">
+                                <a class="layui-btn" lay-submit="" lay-filter="tbbEdit-submit">立即提交</a>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['form', 'table', 'util', 'common', 'admin', 'laydate'], function () {
+        var $ = layui.$;
+        var form = layui.form;
+        var laydate = layui.laydate;
+        var id = '';
+        var oldData = {};
+        var isFail = false;
+        var admin = layui.admin;
+        var config = layui.common;
+        var table = layui.table;
+
+     //   var loadIndex = layer.load(1);
+        getStationSelectList();
+
+        //日期
+        laydate.render({
+            elem: '#effectiveTime'
+            , type: 'datetime'
+        });
+
+        form.on('select(stationChangedCha)', function (data) {
+            if (data.value == '') {
+                claerForm();
+                form.render('select');
+                return
+            }
+            admin.req('stationConfigure/vdesTbbChannel/getByShoreMmsi', JSON.stringify({ shoreMmsi: data.value }), function (res) {
+                oldData = res.datas;
+                if (res.resp_code == 0) {
+                    id = res.datas.id;
+                    $("#sendRule").val(res.datas.sendRule);
+                    $("#version").val(res.datas.version);
+                    $("#effectiveTime").val(res.datas.effectiveTime);
+                    $("#effectiveDuration").val(res.datas.effectiveDuration);
+                    $("#tdmaLength").val(res.datas.tdmaLength);
+                    $("#position1").val(res.datas.position1 == ".000000,.000000" ? "0,0" : res.datas.position1);
+                    $("#position2").val(res.datas.position2 == ".000000,.000000" ? "0,0" : res.datas.position2);
+                    $("#channalFrequencyA").val(res.datas.channalFrequencyA);
+                    $("#permissionA").val(res.datas.permissionA);
+                    $("#selectionIntervalA").val(res.datas.selectionIntervalA);
+                    $("#shortMessageCountA").val(res.datas.shortMessageCountA);
+                    $("#structureA").val(res.datas.structureA);
+                    $("#channalFrequencyB").val(res.datas.channalFrequencyB);
+                    $("#permissionB").val(res.datas.permissionB);
+                    $("#selectionIntervalB").val(res.datas.selectionIntervalB);
+                    $("#shortMessageCountB").val(res.datas.shortMessageCountB);
+                    $("#structureB").val(res.datas.structureB);
+                } else {
+                    claerForm();
+                }
+                form.render('select');
+            }, "post");
+        });
+
+        form.on('submit(tbbEdit-submit)', function (data) {
+            var field = data.field;
+            if (!isFail && oldData != null && isNotChange(field)) {
+                layer.msg("没有任何值发生改变，无需提交");
+                return;
+            } else {
+                oldData = field
+            }
+
+            var param = {
+                shoreMmsi: field.shoreMmsi,
+                sendRule: field.sendRule,
+                version: field.version,
+                effectiveTime: field.effectiveTime,
+                effectiveDuration: field.effectiveDuration,
+                tdmaLength: field.tdmaLength,
+                position1: field.position1,
+                position2: field.position2,
+                channalFrequencyA: field.channalFrequencyA,
+                permissionA: field.permissionA,
+                selectionIntervalA: field.selectionIntervalA,
+                shortMessageCountA: field.shortMessageCountA,
+                structureA: field.structureA,
+                channalFrequencyB: field.channalFrequencyB,
+                permissionB: field.permissionB,
+                selectionIntervalB: field.selectionIntervalB,
+                shortMessageCountB: field.shortMessageCountB,
+                structureB: field.structureB
+            }
+            var requestUrl = 'stationConfigure/vdesTbbChannel/save';
+            if (id != '' && id != null) {
+                param.id = id;
+                requestUrl = 'stationConfigure/vdesTbbChannel/update';
+            }
+
+            admin.req(requestUrl, JSON.stringify(param), function (res) {
+                if (res.resp_code == '0') {
+                    isFail = false;
+                    if (res.datas) {
+                        id = res.datas.id;
+                    }
+                    layer.msg("配置成功！");
+                } else {
+                    isFail = true;
+                    layer.msg("配置失败！");
+                }
+            }, "post");
+        })
+
+        function isNotChange(obj) {
+            for (var key in obj) {
+                var old = oldData[key] == null ? '' : oldData[key];
+                if (!oldData || obj[key] != old) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        $("#setPosition").click(function () {
+            layer.open({
+                type: 2,
+                title: "选择坐标",
+                area: ["1000px", "670px"],
+                content: 'pages/seamap/popMap.html',
+                btn: ["确定"],
+                yes: function (index, layero) {
+                    var northEastPoint = $(layero).find("iframe").contents().find("#northEastPoint").val();
+                    var southWestPoint = $(layero).find("iframe").contents().find("#southWestPoint").val();
+                    if (northEastPoint == '' || southWestPoint == '') {
+                        layer.msg('请先选择坐标');
+                        return
+                    }
+                    var northEastArr = northEastPoint.substr(7).replace(')', '').replace(' ', '').split(',');
+                    var southWestArr = southWestPoint.substr(7).replace(')', '').replace(' ', '').split(',');
+                    $("input[name='position1']").val(northEastArr[1] + ',' + northEastArr[0])
+                    $("input[name='position2']").val(southWestArr[1] + ',' + southWestArr[0])
+
+                    layer.close(index);
+                }
+            });
+        })
+
+        function getStationSelectList() {
+            admin.req('station-maintain/baseStationAPI/selectAllBaseStation', "", function (res) {
+                var data = res;
+                for(var i in data){
+                    if(data[i].connectionStatus=="0"){
+                        $("#shoreMmsiCha").prepend("<option  value='" + data[i].shoreMmsi + "'>" + data[i].shoreName + "</option>");
+                    }else {
+                        $("#shoreMmsiCha").append("<option value='" + data[i].shoreMmsi + "' disabled='true'>" + data[i].shoreName + "(暂未连接)</option>")
+                    }
+                }
+                form.render();
+            },"post");
+
+        }
+
+        $("#version").blur(function () {
+            var a = $("#version").val();
+            if (a > 65535) {
+                $("#version").val("");
+                layer.msg('不能大于65535');
+            }
+        })
+
+        $("#selectionIntervalA").blur(function () {
+            var a = $("#selectionIntervalA").val();
+            if (a > 511) {
+                $("#selectionIntervalA").val("");
+                layer.msg('不能大于511');
+            }
+        })
+
+        $("#selectionIntervalB").blur(function () {
+            var a = $("#selectionIntervalB").val();
+            if (a > 511) {
+                $("#selectionIntervalB").val("");
+                layer.msg('不能大于511');
+            }
+        })
+
+        $("#shortMessageCountA").blur(function () {
+            var a = $("#shortMessageCountA").val();
+            if (a > 127) {
+                $("#shortMessageCountA").val("");
+                layer.msg('不能大于127');
+            }
+        })
+
+        $("#shortMessageCountB").blur(function () {
+            var a = $("#shortMessageCountB").val();
+            if (a > 127) {
+                $("#shortMessageCountB").val("");
+                layer.msg('不能大于127');
+            }
+        })
+
+        function claerForm() {
+            id = '';
+            $("#sendRule").val('');
+            $("#version").val('');
+            $("#effectiveTime").val('');
+            $("#effectiveDuration").val('');
+            $("#tdmaLength").val(15);
+            $("#position1").val('');
+            $("#position2").val('');
+            $("#channalFrequencyA").val('');
+            $("#permissionA").val('');
+            $("#selectionIntervalA").val('');
+            $("#shortMessageCountA").val('');
+            $("#structureA").val('');
+            $("#channalFrequencyB").val('');
+            $("#permissionB").val('');
+            $("#selectionIntervalB").val('');
+            $("#shortMessageCountB").val('');
+            $("#structureB").val('');
+        }
+    })
+
+</script>

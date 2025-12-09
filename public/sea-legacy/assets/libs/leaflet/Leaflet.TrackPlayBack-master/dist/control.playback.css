@@ -1,0 +1,32 @@
+.leaflet-control-playback{position:relative;background-color:#7cbdf5;padding:10px;}
+.leaflet-control-playback .optionsContainer{position:relative;display: none}
+.leaflet-control-playback .optionsContainer > div {
+    display: inline-block;
+}
+.leaflet-control-playback .buttonContainer {}
+.leaflet-control-playback .buttonContainer  a {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    text-decoration: none;
+}
+.leaflet-control-playback .buttonContainer .btn-stop {
+    background: url(./images/play.png) no-repeat center;
+}
+.leaflet-control-playback .buttonContainer .btn-start {
+    background: url(./images/stop.png) no-repeat center;
+}
+.leaflet-control-playback .buttonContainer .btn-restart {
+    background: url(./images/restart.png) no-repeat center;
+}
+.leaflet-control-playback .buttonContainer .btn-slow {
+    background: url(./images/slow.png) no-repeat center;
+}
+.leaflet-control-playback .buttonContainer .btn-quick {
+    background:  url(./images/quick.png) no-repeat center;
+}
+.leaflet-control-playback .buttonContainer .btn-close {
+    background: url(./images/close.png)   no-repeat center;
+}
+.leaflet-control-playback .infoContainer {}
+.leaflet-control-playback .sliderContainer {}

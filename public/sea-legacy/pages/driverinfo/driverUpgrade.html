@@ -1,0 +1,128 @@
+
+<form id="upgrade-form" lay-filter="upgrade-form" class="layui-form model-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">选择基站</label>
+        <div class="layui-input-block">
+            <select name="shoreMmsi" id="shoreMmsi" lay-filter="shoreName-form">
+                <option value=""></option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">ARM版本</label>
+        <div class="layui-input-block">
+            <input id="ARMVersion" name="ARMVersion" type="text" class="layui-input" readonly/>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">FPGA版本</label>
+        <div class="layui-input-block">
+            <input id="FPGAVersion" name="FPGAVersion" type="text" class="layui-input" readonly/>
+            <input id="uniqueIdentifier" name="uniqueIdentifier" type="hidden" />
+        </div>
+    </div>
+        <table id="upgrade-table" lay-filter="upgrade-table"></table>
+    <div class="layui-form-item model-form-footer" style="margin-top: 10px">
+        <button class="layui-btn layui-btn-primary" ew-event="closeDialog" type="button">取消</button>
+        <button class="layui-btn"  lay-filter="upgrade-form-submit" lay-submit>升级</button>
+    </div>
+
+</form>
+
+<script>
+    layui.use(['layer', 'common','admin', 'form','table'], function () {
+        var layer = layui.layer;
+        var config = layui.common;
+        var admin = layui.admin;
+        var form = layui.form;
+        var table = layui.table;
+        var data="";
+        //基站数据
+         getShoreInfo();
+        // 调用获取基站数据接口
+        function getShoreInfo() {
+            admin.req('station-maintain/baseStationAPI/selectAllBaseStation', "", function (res) {
+                data = res;
+                for(var i in data){
+                    if(data[i].connectionStatus=="0"){
+                        $("#shoreMmsi").prepend("<option  value='" + data[i].shoreMmsi + "'>" + data[i].shoreMmsi + "</option>");
+                    }else {
+                        $("#shoreMmsi").append("<option value='" + data[i].shoreMmsi + "' disabled='true'>" + data[i].shoreMmsi + "(暂未连接)</option>")
+                    }
+                }
+                    form.render();
+            },"post");
+        }
+
+        table.render({
+            elem: '#upgrade-table',
+            id:'upgrade-table',
+            url: config.base_server + 'driver-management/driverinfo/findPage',
+            method: 'GET',
+            headers:{'Authorization': 'Bearer ' + config.getToken().access_token},
+            page: true,
+            limit:5,
+            cols: [[
+                { type: 'radio', fixed: 'left' },
+                { field: 'driverName', title: '驱动名称' },
+                { field: 'fileName', title: '文件名' },
+                { field: 'driverUploader', title: '驱动上传人' ,width:100 },
+            ]],
+            done: function (res, curr, count) {
+
+            },
+        });
+
+//监听基站下拉框
+        form.on('select(shoreName-form)', function (res) {
+            for(var i in data){
+                if(data[i].shoreMmsi==res.value){
+                    $("#ARMVersion").val(data[i].armVersion);
+                    $("#FPGAVersion").val(data[i].fpgaVersion);
+                    $("#uniqueIdentifier").val(data[i].uniqueIdentifier);
+                    break;
+                }
+            }
+        });
+
+        //驱动升级按钮点击事件
+        form.on('submit(upgrade-form-submit)', function (data) {
+           var shoreMmsi=$("#shoreMmsi").val();
+           if(shoreMmsi==""){
+               layer.msg("请选择要升级的基站", {icon: 5, time: config.msgTime});
+               return false;
+           }
+            layer.confirm('升级需要3-5分钟，不可中途停止，确定升级此基站吗？', {
+                btn: ['确定','取消'] //按钮
+            }, function() {
+                var checkStatus = table.checkStatus('upgrade-table');
+                var data = checkStatus.data;
+                if (data.length > 0) {
+                    var param = {};
+                    param.shoreMmsi = shoreMmsi;
+                    param.id = data[0].id;
+                    param.fileName = data[0].fileName;
+                    param.filePath = data[0].filePath;
+                    param.uniqueIdentifier = $("#uniqueIdentifier").val();
+                    admin.req('driver-management/driverinfo/driverVersionUpdate', JSON.stringify(param), function (data) {
+                        layer.closeAll('loading');
+                        if (data.resp_code == 0) {
+                            layer.msg(data.resp_msg, {icon: 1, time: config.msgTime});
+                            admin.finishPopupCenter();
+                        } else {
+                            layer.msg(data.resp_msg, {icon: 2, time: config.msgTime});
+                        }
+                    }, "POST");
+                } else {
+                    layer.msg('请选择要升级的驱动', {icon: 5, time: config.msgTime});
+                    return false;
+                }
+            }, function(){
+                table.reload('upgrade-table', {})
+            });
+            return false;
+        });
+
+    });
+
+</script>

@@ -1,0 +1,188 @@
+<form id="role-form" lay-filter="role-form" class="layui-form model-form">
+    <input name="id" type="hidden"/>
+    <div id="tenType" class="layui-form-item">
+        <label class="layui-form-label">租户</label>
+        <div class="layui-input-block">
+            <select name="tenantCode" id="tenantCode" lay-filter="tenantChanged">
+                <option value="webapp">系统</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">角色名</label>
+        <div class="layui-input-block">
+            <input name="name" placeholder="请输入角色名" type="text" class="layui-input" maxlength="20"
+                   lay-verify="required" required/>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">Code</label>
+        <div class="layui-input-block">
+            <input name="code" placeholder="请输入Code" type="text" class="layui-input" maxlength="20"
+                   lay-verify="required" required/>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">菜单模板</label>
+        <div class="layui-input-block">
+            <select name="menutemplateId" id="menutemplateId">
+<!--                <option value="webapp">请选择</option>-->
+            </select>
+        </div>
+    </div>
+    <div id="sjmb" class="layui-form-item" style="display: none">
+        <label class="layui-form-label">数据模板</label>
+        <div class="layui-input-block">
+            <select name="intelligentdataId" id="dataId">
+<!--                <option value="webapp">请选择</option>-->
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item model-form-footer">
+        <button class="layui-btn layui-btn-primary" ew-event="closeDialog" type="button">取消</button>
+        <button class="layui-btn" lay-filter="role-form-submit" lay-submit>保存</button>
+    </div>
+</form>
+
+<script>
+    layui.use(['form', 'table', 'util', 'common', 'admin', 'formSelects'], function () {
+        var form = layui.form;
+        var table = layui.table;
+        var config = layui.common;
+        var layer = layui.layer;
+        var util = layui.util;
+        var admin = layui.admin;
+        var formSelects = layui.formSelects;
+
+        //回显role数据
+        var role = admin.getTempData('t_role');
+
+        var tenantCodeValue = config.getUser().tenantCode;
+        var tenantCode = tenantCodeValue;
+        init();
+        form.render();  //菜单渲染 把内容加载进去
+
+        if (role) {
+            // form.val('role-form', role);
+            //租户Code不能修改
+            $("input[name='code']").attr('disabled', true);
+            $("input[name='code']").attr('class', "layui-input layui-disabled");
+            $('#role-table').attr('method', 'POST');
+        }
+
+        form.on('select(tenantChanged)', function (data) {
+            $('#menutemplateId').empty();
+            $('#dataId').empty();
+            queryMenuTempaltes(data.value);
+            if (data.value == "webapp") {
+                $("#sjmb").hide();
+            }else {
+                $("#sjmb").show();
+                queryDataTempaltes(data.value)
+            }
+            form.render(); //菜单渲染 把内容加载进去
+        });
+
+        // 表单提交事件
+        form.on('submit(role-form-submit)', function (data) {
+            if (tenantCodeValue != "webapp") {
+                data.field.tenantCode = tenantCode;
+            }
+            // data.field.intelligentdataId=data.field.dataId;
+
+           layer.load(2);
+            admin.req('api-user/roles/saveOrUpdate', JSON.stringify(data.field), function (data) {
+                layer.closeAll('loading');
+                // console.log(data);
+                if (data.resp_code === 0) {
+                    layer.msg(data.resp_msg, {icon: 1, time: config.msgTime});
+                    admin.finishPopupCenter();
+                } else {
+                    layer.msg(data.resp_msg, {icon: 2, time: config.msgTime});
+                }
+            }, "POST");
+            return false;
+        });
+
+        function init() {
+            if (tenantCode == "webapp") {
+                $("#tenType").show();
+                tenantCode = '';
+                queryTenant();
+                let roleTenantCode = (typeof (role) == "undefined") ? 'webapp' : role.tenantCode;
+                queryMenuTempaltes(roleTenantCode);
+               // queryDataTempaltes(roleTenantCode);
+                if(role==undefined||role.tenantCode==undefined||role.tenantCode=="webapp"){
+                    $("#sjmb").hide();
+                }else {
+                    $("#sjmb").show();
+                    queryDataTempaltes(role.tenantCode);
+                }
+            } else {
+                $("#tenType").hide();
+                queryMenuTempaltes(tenantCode);
+                queryDataTempaltes(tenantCode);
+                // form.render();
+            }
+
+
+            // alert(role.dataId);
+            // alert(role.intelligentdataId);
+            form.val('role-form', role);
+        }
+
+        function queryTenant() {
+            // 获取所有租户
+            //layer.load(2);
+            admin.reqSync('api-user/tenant/allTenants', {}, function (data) {
+                if (0 == data.code) {
+                    // 渲染下拉框
+                    $.each(data.data, function (index, item) {
+                        $('#tenantCode').append(new Option(item.tenantName, item.tenantCode));
+                    })
+                } else {
+                    layer.msg('获取租户失败', {icon: 2, time: config.msgTime});
+                }
+            }, 'GET');
+        }
+
+        function queryDataTempaltes(tenantCode) {
+            // console.log(data);
+            // 获取所有数据模板
+           // layer.load(2);
+            admin.reqSync('api-user/intelligentData/selectList?tenantCode='+tenantCode, {}, function (data) {
+                if (data != undefined && data.length > 0) {
+                    // 渲染下拉框
+                    $('#dataId').append(new Option("请选择", "webapp"));
+                    $.each(data, function (index, item) {
+                        $('#dataId').append(new Option(item.name, item.id));
+                    })
+                } else {
+                    layer.msg('获取数据模板失败', {icon: 2, time: config.msgTime});
+                }
+            }, 'GET');
+            // form.render();
+        }
+
+        //添加界面  获取租户对应的菜单模板
+        function queryMenuTempaltes(tenantCode) {
+            // 获取所有菜单模板
+            admin.reqSync('api-user/menuTemplate/findMenuTemplates?tenantCode='+tenantCode, {}, function (data) {
+                if (0 == data.resp_code) {
+                    // 渲染下拉框
+                    $('#menutemplateId').append(new Option("请选择", "webapp"));
+                    $.each(data.datas, function (index, item) {
+                        $('#menutemplateId').append(new Option(item.name, item.id));
+                    })
+                } else {
+                    layer.msg('获取菜单模板失败', {icon: 2, time: config.msgTime});
+                }
+            }, 'GET');
+            // layer.closeAll('loading');
+            // $('#role-form').attr('method', 'POST');
+            // if (role) {
+            //     form.val('role-form', role);
+            // }
+    }
+    });
+</script>

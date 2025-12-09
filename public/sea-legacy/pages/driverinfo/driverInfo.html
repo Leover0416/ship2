@@ -1,0 +1,249 @@
+<div class="layui-card">
+	<div class="layui-card-header">
+		<h2 class="header-title">驱动列表</h2>
+<!--		<span class="layui-breadcrumb pull-right">-->
+<!--          <a href="#!console">首页</a>-->
+<!--          <a><cite>基站驱动服务</cite></a>-->
+<!--        </span>-->
+	</div>
+	<div class="layui-card-body">
+		<div class="layui-form toolbar">
+			<div class="layui-input-inline">
+			<label class="layui-form-label">驱动名称</label>
+			<div class="layui-input-inline">
+				<input type="text"  name="driverName" id="driverName" class="layui-input search-input" />
+			</div>
+			</div>
+			<button id="driver-btn-search" class="layui-btn icon-btn">搜索</button>
+			<button id="driver-btn-add" class="layui-btn icon-btn">添加驱动</button>
+			<button id="driver-btn-update" class="layui-btn icon-btn">驱动升级</button>
+		</div>
+
+		<table class="layui-table" id="driver-table" lay-filter="driver-table"></table>
+		<a href="" id="down" style="display: none"></a>
+	</div>
+</div>
+
+
+<!-- 表格操作列 -->
+<script type="text/html" id="driver-table-bar">
+	<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit">修改</a>
+</script>
+
+<!-- 表格状态列 -->
+
+<div class="layui-card-body">
+	<script type="text/html" id="roleList-table-button">
+		<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+		<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+		<a class="layui-btn layui-btn-warm   layui-btn-xs"  lay-event="download"><i class="layui-icon layui-icon-download-circle"></i>下载</a>
+	</script>
+	<script type="text/html" id="logList-table-button">
+		<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delLog" data-name="{{ d.id }}"><i class="layui-icon layui-icon-delete"></i>删除</a>
+	</script>
+	<script type="text/html" id="detail-table-button">
+		<a  lay-event="driverDetail" style="cursor:pointer"  data-name="{{ d.driverDetailPath }}">{{ d.driverDetail }}</a>
+	</script>
+</div>
+<script>
+	layui.use(['table', 'common', 'admin','util'], function () {
+		var table = layui.table;
+		var config = layui.common;
+		var layer = layui.layer;
+		var admin = layui.admin;
+		var util=layui.util;
+		// 渲染表格
+		table.render({
+			elem: '#driver-table',
+			url: config.base_server + 'driver-management/driverinfo/findPage',
+			method: 'GET',
+			headers:{'Authorization': 'Bearer ' + config.getToken().access_token},
+			page: true,
+			cols: [[
+				{ type: 'numbers' },
+				{
+					field: 'driverName',width: 200, title: '驱动名称',
+					event: 'collapse',
+					templet: function (d) {//展开折行
+						return '<div style="position: relative;\n' + '    padding: 0 10px 0 20px;">' + d.driverName + '<i style="left: 0px;" lay-tips="展开" class="layui-icon layui-colla-icon layui-icon-right"></i></div>'
+					}
+				},
+				{ field: 'fileName', title: '文件名' },
+				{ field: 'driverUploader',width: 120, title: '驱动上传人员' },
+				{ field: 'createTime', width: 200,templet: function (d) {
+					return  util.toDateString(d.createTime);
+					},title: '驱动上传时间' },
+				{ field: 'remarks', title: '备注' },
+				{ title: '操作', width: 210, align: 'center', fixed: 'right', toolbar: '#roleList-table-button' }
+			]],
+			done: function (res, curr, count) {
+			},
+		});
+
+		// 添加按钮点击事件
+		$('#driver-btn-add').click(function () {
+			showEditModel();
+		});
+// 添加按钮点击事件
+		$('#driver-btn-update').click(function () {
+
+			var title = '驱动升级';
+			admin.popupCenter({
+				title: title,
+				area: ['700px', '600px'],
+				path: 'pages/driverinfo/driverUpgrade.html',
+				finish: function () {
+					table.reload('driver-table', {});
+				}
+			});
+		});
+		// 工具条点击事件
+		table.on('tool(driver-table)', function (obj) {
+			var data = obj.data;
+			var layEvent = obj.event;
+			if (layEvent === 'edit') { // 修改
+				showEditModel(data);
+			} else if (layEvent === 'collapse') {
+				//日志
+				var trObj = layui.$(this).parent('tr'); //当前行
+				var accordion = true //开启手风琴，那么在进行折叠操作时，始终只会展现当前展开的表格。
+				var content = '<table></table>';//内容
+				//表格行折叠方法
+				collapseTable({
+					elem: trObj,
+					accordion: accordion,
+					content: content,
+					success: function (trObjChildren, index) { //成功回调函数
+						//trObjChildren 展开tr层DOM
+						//index 当前层索引
+						trObjChildren.find('table').attr("id", index);
+						table.render({
+							elem: "#" + index,
+							url: config.base_server + 'driver-management/driverUpgraderLog/findPage',
+							method: 'GET',
+							headers:{'Authorization': 'Bearer ' + config.getToken().access_token},
+							page: true,
+							limit: 20,
+							where: { driverId: data.id },
+							cellMinWidth: 60,
+							cols: [[
+								{
+									field: 'shoreMmsi',
+									title: '基站',
+									align: 'center',
+								},
+								{
+									field: 'driverUpgrader',
+									title: '驱动升级人员',
+									align: 'center',
+								},
+								{
+									field: 'createTime',
+									title: '驱动升级时间',
+									align: 'center',
+									templet: function (d) {
+										return  util.toDateString(d.createTime);
+									}
+								},
+								{
+									field: 'driverUpgraderResult',
+									title: '驱动升级结果',
+									align: 'center',
+								},
+								// {
+								// 	field: 'failCause',
+								// 	title: '失败原因',
+								// 	align: 'center',
+								// }
+							]],
+							done: function (res, curr, count) {
+
+							}
+						});
+					}
+				});
+			}else if (layEvent === 'del') {
+				layer.confirm('确定要删除该驱动吗？！', function (index) {
+					admin.req('driver-management/driverinfo/delete/'+data.id, {}, function (res) {
+						layer.msg('删除成功',{icon:1,time: config.msgTime});
+						reloadTable({});
+					}, 'delete');
+				});
+			}else if (obj.event === 'download') {
+				$("#down").attr("href",data.filePath);
+				$("#down")[0].click();
+				$("#down").removeAttr("href");
+			}
+		});
+
+		//显示表单弹窗
+		var showEditModel = function (data) {
+			admin.putTempData('t_driverinfo', data);
+			var title = data ? '修改驱动' : '添加驱动';
+			admin.popupCenter({
+				title: title,
+				area: ['700px', '450px'],
+				path: 'pages/driverinfo/driverInfoDetail.html',
+				finish: function () {
+					table.reload('driver-table', {});
+				}
+			});
+		};
+
+		// 搜索按钮点击事件
+		$('#driver-btn-search').click(function () {
+			var driverName = $('#driverName').val();
+			table.reload('driver-table', {where: {driverName: driverName}});
+		});
+
+		function reloadTable(data) {
+			var driverName = $('#driverName').val();
+			table.reload('driver-table', {where: {driverName: driverName}});
+		}
+
+//渲染驱动升级日志
+		function collapseTable(options) {
+			var trObj = options.elem;
+			if (!trObj) return;
+			var accordion = options.accordion,
+					success = options.success,
+					content = options.content || '';
+			var tableView = trObj.parents('.layui-table-view'); //当前表格视图
+			var id = tableView.attr('lay-id'); //当前表格标识
+			var index = trObj.data('index'); //当前行索引
+			var leftTr = tableView.find('.layui-table-fixed.layui-table-fixed-l tr[data-index="' + index + '"]'); //左侧当前固定行
+			var rightTr = tableView.find('.layui-table-fixed.layui-table-fixed-r tr[data-index="' + index + '"]'); //右侧当前固定行
+			var colspan = trObj.find('td').length; //获取合并长度
+			var trObjChildren = trObj.next(); //展开行Dom
+			var indexChildren = id + '-' + index + '-children'; //展开行索引
+			var leftTrChildren = tableView.find('.layui-table-fixed.layui-table-fixed-l tr[data-index="' + indexChildren + '"]'); //左侧展开固定行
+			var rightTrChildren = tableView.find('.layui-table-fixed.layui-table-fixed-r tr[data-index="' + indexChildren + '"]'); //右侧展开固定行
+			var lw = leftTr.width() + 15; //左宽
+			var rw = rightTr.width() + 15; //右宽
+			//不存在就创建展开行
+			if (trObjChildren.data('index') != indexChildren) {
+				//装载HTML元素
+				var tr = '<tr data-index="' + indexChildren + '"><td colspan="' + colspan + '"><div style="height: auto;padding-left:' + lw + 'px;padding-right:' + rw + 'px" class="layui-table-cell">' + content + '</div></td></tr>';
+				trObjChildren = trObj.after(tr).next().hide(); //隐藏展开行
+				var fixTr = '<tr data-index="' + indexChildren + '"></tr>';//固定行
+				leftTrChildren = leftTr.after(fixTr).next().hide(); //左固定
+				rightTrChildren = rightTr.after(fixTr).next().hide(); //右固定
+			}
+			//展开|折叠箭头图标
+			trObj.find('td[lay-event="collapse"] i.layui-colla-icon').toggleClass("layui-icon-right layui-icon-down");
+			//显示|隐藏展开行
+			trObjChildren.toggle();
+			//开启手风琴折叠和折叠箭头
+			if (accordion) {
+				trObj.siblings().find('td[lay-event="collapse"] i.layui-colla-icon').removeClass("layui-icon-down").addClass("layui-icon-right");
+				trObjChildren.siblings('[data-index$="-children"]').hide(); //展开
+				rightTrChildren.siblings('[data-index$="-children"]').hide(); //左固定
+				leftTrChildren.siblings('[data-index$="-children"]').hide(); //右固定
+			}
+			success(trObjChildren, indexChildren); //回调函数
+			heightChildren = trObjChildren.height(); //展开高度固定
+			rightTrChildren.height(heightChildren + 115).toggle(); //左固定
+			leftTrChildren.height(heightChildren + 115).toggle(); //右固定
+		};
+	});
+</script>

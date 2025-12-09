@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>TrackSymbol example</title>
+	<meta charset="utf-8" />
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+</head>
+<body>
+	<div id="map" style="width: 600px; height: 400px"></div>
+	<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+	<script src="leaflet-tracksymbol.js"></script>
+	<script>
+                var course = 0.0;
+                var position = L.latLng(54.15, 8.0);
+
+		var map = L.map('map').setView(position, 10);
+
+		var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+		L.tileLayer(osmUrl, {
+			maxZoom: 18
+		}).addTo(map);
+
+		var ts = L.trackSymbol(position, {
+			fill: true,
+          		stroke: true,
+			speed: 10.0,
+			course: course * Math.PI / 180.0,
+			heading: course * Math.PI / 180.0,
+			gpsRefPos: [100,100,20,20],
+	                radius: 3,
+        	        fillColor: "#0000ff",
+                	color: "#000000",
+                	weight: 2,
+                	opacity: 1,
+                	fillOpacity: 1
+		});
+		ts.addTo(map);
+
+		setInterval(function() {
+			course += Math.PI * 10.0 / 180.0;
+			ts.setCourse(course);
+			ts.setHeading(course);
+		}, 1000);
+
+	</script>
+</body>
+</html>

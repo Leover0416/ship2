@@ -1,0 +1,373 @@
+<script src="../../assets/libs/echarts/echarts.min.js"></script>
+<div class="layui-card">
+    <head></head>
+    <style>
+        .layui-form.toolbar .layui-form-select input {
+            height: 35px;
+            line-height: 35px;
+            width: 120px;
+            overflow: hidden;
+        }
+    </style>
+    <div class="layui-card-header">
+        <h2 class="header-title">GPS定位异常</h2>
+    </div>
+    <div class="layui-card-body">
+        <!-- 饼状图 -->
+        <div class="layui-card">
+            <!--<div class="layui-card-header">图表统计</div>-->
+            <div class="layui-col-md4" id="Dynamic-aisType" style="height: 220px;display: inline-block;"></div>
+            <div class="layui-col-md4" id="Dynamic-errorType" style="height: 220px;display: inline-block;"></div>
+            <div class="layui-col-md4" id="Dynamic-dealResult" style="height: 220px;display: inline-block;"></div>
+        </div>
+        <!--<div class="layui-form">-->
+        <div class="layui-form toolbar">
+            <div class="layui-form-item" style="margin-bottom: 0px">
+                <label class="layui-form-label" style="width: 50px;padding-left: 0px">船舶：</label>
+                <div class="layui-input-inline" style="width:100px">
+                    <input id="dynamicShip" style="width:120px" class="layui-input search-input" type="text"
+                           placeholder="输入关键字"/>
+                </div>
+
+                <label class="layui-form-label">AIS类型：</label>
+                <div id="dynamicAisType" class="layui-input-inline" style="width:100px">
+                    <select name="dynamicAisTypeSelect" id="dynamicAisTypeSelect" style="width:100px">
+                        <option value="">请选择</option>
+                        <option value="1">A类船</option>
+                        <option value="2">B类船</option>
+                    </select>
+                </div>
+
+                <label class="layui-form-label">报文类型：</label>
+                <div id="dynamicMessageType" class="layui-input-inline" style="width:100px">
+                    <select name="dynamicMessageTypeSelect" id="dynamicMessageTypeSelect" style="width:100px">
+                        <option value="">请选择</option>
+                        <option value="1">1号</option>
+                        <option value="2">2号</option>
+                        <option value="3">3号</option>
+                        <option value="18">18号</option>
+                        <option value="19">19号</option>
+                    </select>
+                </div>
+                <label class="layui-form-label">异常类型：</label>
+                <div id="dynamicAbnormal" class="layui-input-inline" style="width:130px">
+                    <select name="dynamicAbnormalSelect" id="dynamicAbnormalSelect">
+                        <option value="">请选择</option>
+                        <option value="301">船名异常</option>
+                        <option value="302">呼号异常</option>
+                        <option value="303">IMO异常</option>
+                        <option value="304">船舶MMSI异常</option>
+                        <option value="305">船舶尺寸异常</option>
+                        <option value="306">船舶类型异常</option>
+                        <option value="307">船舶目的地异常</option>
+
+                    </select>
+                </div>
+                <label class="layui-form-label">处理结果：</label>
+                <div id="dynamicResult" class="layui-input-inline" style="width:130px">
+                    <select name="dynamicResultSelect" id="dynamicResultSelect">
+                        <option value="">请选择</option>
+                        <option value="ABNORMAL">异常</option>
+                        <option value="RECTIFIED">已整改</option>
+                        <option value="MISJUDGED">误判</option>
+                        <option value="PROCESSING">处理中的</option>
+                        <option value="NORMAL">正常的</option>
+                        <option value="REJUDGE">重判定</option>
+                    </select>
+                </div>
+
+
+                <label class="layui-form-label">异常时间</label>
+                <div class="layui-input-inline" style="width:100px">
+                    <input type="text" style="width:180px;" id="dynamicWarningTime" name="dynamicWarningTime"
+                           placeholder="请输入异常时间"
+                           autocomplete="off" class="layui-input" readonly>
+                </div>
+
+                <button id="aisDynamicInformation-btn-search" class="layui-btn icon-btn" style="margin-left: 100px;"><i
+                        class="layui-icon">&#xe615;</i>搜索
+                </button>
+                <button id="aisDynamicInformation-btn-add" class="layui-btn icon-btn"><i
+                        class="layui-icon">&#xe654;</i>导出excel
+                </button>
+            </div>
+        </div>
+        <table class="layui-table" id="aisDynamicInformation-table" lay-filter="aisDynamicInformation-table"></table>
+    </div>
+</div>
+
+<!-- 表格操作列 -->
+<script type="text/html" id="aisDynamicInformation-table-bar">
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="dynamicDetail">查看详情</a>
+</script>
+<script>
+    layui.use(['form', 'table', 'util', 'common', 'admin', 'laydate', 'jquery', 'layer', 'table', 'layedit', 'upload', 'element', 'carousel'], function () {
+        var form = layui.form;
+        var table = layui.table;
+        var config = layui.common;
+        var layer = layui.layer;
+        var util = layui.util;
+        var admin = layui.admin;
+        var laydate = layui.laydate;
+        var $ = layui.jquery;
+        carousel = layui.carousel;
+        var table = layui.table;
+        //异常时间
+        laydate.render({
+            elem: '#dynamicWarningTime',
+            type: 'datetime',
+            format: 'yyyy/MM/dd HH:mm:ss',
+            range: true
+        });
+
+        // 渲染表格
+        table.render({
+            elem: '#aisDynamicInformation-table',
+            url: config.base_server + 'AISDynamicInfo-Api/errorDynamicInfo/findPage',
+            method: 'GET',
+            headers: {'Authorization': 'Bearer ' + config.getToken().access_token},
+            page: true,
+            cols: [[
+                {type: 'numbers'},
+                {field: 'mmsi', title: 'MMSI'},
+                {field: 'msgShipName', title: '船名（报文）'},
+                // {field: 'aisName', title: '船名（数据库）'},
+                {field: 'aisType', title: 'AIS类型', templet: function (e) {
+                        return e.aisType == 1 ? "A类船" : "B类船";}},
+                {field: 'msgId', title: '报文类型', templet: function (e) {
+                        return e.msgId == '' ? "" : e.msgId + "号";}},
+                {field: 'resultTypeString', title: '异常类型', templet: function (e) {
+                        return e.resultTypeString == '' ? "" : e.resultTypeString + "异常";}},
+                {field: 'receiveTime', title: '异常时间', templet: function (e) {
+                        return layui.util.toDateString(e.receiveTime, "yyyy-MM-dd HH:mm:ss")}},
+                {field: 'validatorCount', title: '异常次数'},
+                {field: 'errorStatusNameList', title: '处理结果'},
+                {fixed: 'right',align: 'center',toolbar: '#aisDynamicInformation-table-bar',title: '操作',width: 175},
+                //详情界面
+                {field: 'errorContent', title: '情况说明', hide: true},
+                // {field: 'repeat', title: '转发标识符', hide: true},
+                // {field: 'partNumber', title: '部分编号', hide: true}
+            ]]
+        });
+
+        // 搜索按钮点击事件
+        $('#aisDynamicInformation-btn-search').click(function () {
+            var warningTime = $('#dynamicWarningTime').val();
+            var startTime;
+            var endTime;
+            if (warningTime.trim() != undefined && warningTime.trim() != "") {
+                var time = warningTime.trim().split("-");
+                startTime = new Date(time[0]).getTime();
+                endTime = new Date(time[1]).getTime();
+            }
+            var param = {
+                mmsi: $('#dynamicShip').val(),
+                aisType: $('#dynamicAisTypeSelect').val(),
+                msgId: $('#dynamicMessageTypeSelect').val(),
+                errorStatusNameList: $('#dynamicResultSelect').val(),
+                resultTypeString: $('#dynamicAbnormalSelect').val(),
+                startTime: startTime,
+                endTime: endTime
+            }
+            table.reload('aisDynamicInformation-table', {where: param});
+        });
+
+        table.on('tool(aisDynamicInformation-table)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'dynamicDetail') {
+                showEditModel(data);
+            }
+        });
+
+        var showEditModel = function (data) {
+            admin.putTempData('aisDynamic', data);
+            admin.popupCenter({
+                offset: ['65px', '235px'],
+                area: ['1100px', '800px'],
+                path: 'pages/vdl/aisDynamicInformationDetail.html',
+            });
+        };
+
+        //指定图表配置项和数据
+        admin.req('AISDynamicInfo-Api/errorDynamicInfo/findAllInfo', {}, function (data) {
+            var aisDynamicEchart = echarts.init(document.getElementById('Dynamic-aisType'));
+            var aisDynamicEchartOption = {
+                title: {
+                    text: 'AIS类型统计',
+                    x: 'center'
+                },
+                graphic: {
+                    type: "text",
+                    left: "center",
+                    top: "48%",
+                    style: {
+                        text: data.circleDto.aisType.total == 0 ? "当前无统计数据" : "合计" + data.circleDto.aisType.total,
+                        textAlign: "center",
+                        fill: "#000",
+                        fontSize: 12,
+                    },
+                },
+                tooltip: {},
+                series: [{
+                    type: 'pie', //饼状
+                    radius: ['30%', '50%'], //圆的大小
+                    center: ['50%', '50%'], //居中
+                    data: data.circleDto.aisType.item
+                }]
+            };
+            // 使用刚指定的配置项和数据显示图表。
+            aisDynamicEchart.setOption(aisDynamicEchartOption, true);
+            //指定图表配置项和数据
+            var errorDynamicEchart = echarts.init(document.getElementById('Dynamic-errorType'));
+            var errorDynamicEchartOption = {
+                title: {
+                    text: '异常类型统计',
+                    x: 'center'
+                },
+                graphic: {
+                    type: "text",
+                    left: "center",
+                    top: "48%",
+                    style: {
+                        text: data.circleDto.resultType.total == 0 ? "当前无统计数据" : "合计" + data.circleDto.resultType.total,
+                        textAlign: "center",
+                        fill: "#000",
+                        fontSize: 12,
+                    },
+                },
+                tooltip: {},
+                series: [{
+                    type: 'pie', //饼状
+                    radius: ['30%', '50%'], //圆的大小
+                    center: ['50%', '50%'], //居中
+                    data: data.circleDto.resultType.item
+                }]
+            };
+            // 使用刚指定的配置项和数据显示图表。
+            errorDynamicEchart.setOption(errorDynamicEchartOption, true);
+            //指定图表配置项和数据
+            var dealResultDynamicEchart = echarts.init(document.getElementById('Dynamic-dealResult'));
+            var dealResultDynamicEchartOption = {
+                title: {
+                    text: '异常处理结果',
+                    x: 'center'
+                },
+                graphic: {
+                    type: "text",
+                    left: "center",
+                    top: "48%",
+                    style: {
+                        text: data.circleDto.status.total == 0 ? "当前无统计数据" : "合计" + data.circleDto.status.total,
+                        textAlign: "center",
+                        fill: "#000",
+                        fontSize: 12,
+                    },
+                },
+                tooltip: {},
+                series: [{
+                    type: 'pie', //饼状
+                    radius: ['30%', '50%'], //圆的大小
+                    center: ['50%', '50%'], //居中
+                    data: data.circleDto.status.item
+                }]
+            };
+            // 使用刚指定的配置项和数据显示图表。
+            dealResultDynamicEchart.setOption(dealResultDynamicEchartOption, true);
+        }, 'GET');
+
+        // excel按钮点击事件
+        $('#aisDynamicInformation-btn-add').click(function () {
+            $(".aisDynamicInformation-btn-add").attr("disabled", "disabled");
+            var xmlhttp = new XMLHttpRequest();
+            var url = config.base_server + 'AISDynamicInfo-Api/getExcel';
+            var param = getParam();
+            var content = JSON.stringify(param)
+            xmlhttp.open("POST", url);
+            xmlhttp.withCredentials = true;
+            xmlhttp.setRequestHeader("Content-Type", "application/json");
+            xmlhttp.setRequestHeader('Authorization', 'Bearer ' + config.getToken().access_token);
+            xmlhttp.responseType = 'blob';
+            xmlhttp.send(content);
+            xmlhttp.onreadystatechange = function (oEvent) {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    const url = window.URL.createObjectURL(new Blob([oEvent.currentTarget.response], {
+                        type: 'application/octet-stream;charset=utf-8'
+                    }))
+                    const link = document.createElement('a')
+                    link.style.display = 'none'
+                    link.href = url
+                    const fileName = parseTime(new Date()) + '-AIS信息填写错误.xlsx'
+                    link.setAttribute('download', fileName)
+                    document.body.appendChild(link)
+                    link.click()
+                    document.body.removeChild(link)
+                    $(".timelineExport").show()
+                    $(".timelineExportDisable").hide()
+                }
+            }
+        });
+
+        function getParam() {
+            var warningTime = $('#dynamicWarningTime').val();
+            var startTime;
+            var endTime;
+            if (warningTime.trim() != undefined && warningTime.trim() != "") {
+                var time = warningTime.trim().split("-");
+                startTime = new Date(time[0]).getTime();
+                endTime = new Date(time[1]).getTime();
+            }
+            var param = {
+                mmsi: $('#dynamicShip').val(),
+                type: $('#dynamicAisTypeSelect').val(),
+                messageType: $('#dynamicMessageTypeSelect').val(),
+                resultType: $('#dynamicAbnormalSelect').val(),
+                errorStatus: $('#dynamicResultSelect').val(),
+                startTime: startTime,
+                endTime: endTime
+            }
+            return param;
+        }
+
+        function parseTime(time, cFormat) {
+            if (arguments.length === 0) {
+                return null
+            }
+            const format = cFormat || '{y}-{m}-{d} {h}:{i}:{s}'
+            let date
+            if (typeof time === 'undefined' || time === null || time === 'null') {
+                return ''
+            } else if (typeof time === 'object') {
+                date = time
+            } else {
+                if ((typeof time === 'string') && (/^[0-9]+$/.test(time))) {
+                    time = parseInt(time)
+                }
+                if ((typeof time === 'number') && (time.toString().length === 10)) {
+                    time = time * 1000
+                }
+                date = new Date(time)
+            }
+            const formatObj = {
+                y: date.getFullYear(),
+                m: date.getMonth() + 1,
+                d: date.getDate(),
+                h: date.getHours(),
+                i: date.getMinutes(),
+                s: date.getSeconds(),
+                a: date.getDay()
+            }
+            const time_str = format.replace(/{(y|m|d|h|i|s|a)+}/g, (result, key) => {
+                let value = formatObj[key]
+                // Note: getDay() returns 0 on Sunday
+                if (key === 'a') {
+                    return ['日', '一', '二', '三', '四', '五', '六'][value]
+                }
+                if (result.length > 0 && value < 10) {
+                    value = '0' + value
+                }
+                return value || 0
+            })
+            return time_str
+        }
+    });
+</script>

@@ -1,0 +1,277 @@
+<script src="../../assets/libs/echarts/echarts.min.js"></script>
+<div class="layui-card">
+    <div class="layui-card-header">
+        <h2 class="header-title">一船多码</h2>
+    </div>
+    <div class="layui-card-body">
+        <div class="layui-card">
+            <div class="layui-row">
+                <div class="layui-col-md6" id="Multi-aisType" style="height: 220px;display: inline-block;"></div>
+                <div class="layui-col-md6" id="Multi-errorType" style="height: 220px;display: inline-block;"></div>
+            </div>
+        </div>
+
+        <div class="layui-form toolbar">
+            <div class="layui-form-item" style="margin-bottom: 0px">
+                <label class="layui-form-label">船舶：</label>
+                <div class="layui-input-inline" style="width:150px">
+                    <input id="searchAisNameMulti" name="searchAisNameMulti" class="layui-input search-input" type="text"
+                           placeholder="输入关键字"/>
+                </div>
+                <label class="layui-form-label">AIS类型：</label>
+                <div class="layui-input-inline" style="width:150px">
+                    <select name="searchAisTypeMulti" id="searchAisTypeMulti">
+                        <option value="">请选择</option>
+                        <option value="1">A类船</option>
+                        <option value="2">B类船</option>
+                    </select>
+                </div>
+                <label class="layui-form-label">异常时间</label>
+                <div class="layui-input-inline" style="width:150px">
+                    <input type="text" id="searchWarningTimeMulti" name="searchWarningTimeMulti" placeholder="请输入异常时间"
+                           autocomplete="off" class="layui-input" readonly>
+                </div>
+                <button id="multi-btn-search" filter="multi-btn-search" class="layui-btn icon-btn"><i
+                        class="layui-icon">&#xe615;</i>搜索
+                </button>
+                <button id="multi-btn-excel" class="layui-btn icon-btn"><i
+                        class="layui-icon">&#xe654;</i>导出excel
+                </button>
+            </div>
+
+        </div>
+
+        <table class="layui-table" id="multipleAisRecognition-table" lay-filter="multipleAisRecognition-table"></table>
+    </div>
+</div>
+
+<!-- 表格操作列 -->
+<script type="text/html" id="multipleAisRecognition-table-bar">
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看详情</a>
+</script>
+
+<script>
+    layui.use(['table', 'admin', 'laydate','common'], function () {
+        var $ = layui.jquery;
+        var config = layui.common;
+        var admin = layui.admin;
+        var laydate = layui.laydate;
+        var table = layui.table;
+
+        //异常时间
+        laydate.render({
+            elem: '#searchWarningTimeMulti',
+            type: 'datetime',
+            format: 'yyyy/MM/dd HH:mm:ss',
+            range: true
+        });
+
+        // 渲染表格
+        table.render({
+            elem: '#multipleAisRecognition-table',
+            url: config.base_server + 'multipleAisRecognition/findPageList',
+            method: 'GET',
+            headers: {'Authorization': 'Bearer ' + config.getToken().access_token},
+            page: true,
+            cols: [[
+                {type: 'id', title: 'id', hide: true},
+                {type: 'numbers'},
+                {field: 'name', title: '船名'},
+                {field: 'aisTypeAB', title: 'AIS类型'},
+                {field: 'callsign', title: '呼号'},
+                {field: 'shipLength', title: '船长'},
+                {field: 'shipBreadth', title: '船宽'},
+                {field: 'mmsiCnt', title: '重复次数'},
+                {field: 'receiveTimeYMD', title: '异常时间'},
+                {
+                    fixed: 'right',
+                    align: 'center',
+                    toolbar: '#multipleAisRecognition-table-bar',
+                    title: '操作',
+                    width: 175
+                }
+
+            ]]
+        })
+
+        // 初始化饼状图
+        admin.req('multipleAisRecognition/findAllInfo', {}, function (data) {
+            var aisTypeEchart = echarts.init(document.getElementById('Multi-aisType'));
+            var aisTypeEchartOption = {
+                title: {
+                    text: 'AIS类型统计',
+                    x: 'center'
+                },
+                graphic: {
+                    type: "text",
+                    left: "center",
+                    top: "48%",
+                    style: {
+                        text: data.circleDto.aisType.total==0?"当前无统计数据":"合计" + data.circleDto.aisType.total,
+                        textAlign: "center",
+                        fill: "#000",
+                        fontSize: 12,
+                    },
+                },
+                tooltip: {
+
+                },
+                series: [{
+                    type: 'pie', //饼状
+                    radius: ['30%', '50%'], //圆的大小
+                    center: ['50%', '50%'], //居中
+                    data:data.circleDto.aisType.item
+
+                }]
+            };
+            // 使用刚指定的配置项和数据显示图表。
+            aisTypeEchart.setOption(aisTypeEchartOption, true);
+
+            var errorTypeEchart = echarts.init(document.getElementById('Multi-errorType'));
+            var errorTypeEchartOption = {
+                title: {
+                    text: '异常类型统计',
+                    x: 'center'
+                },
+                graphic: {
+                    type: "text",
+                    left: "center",
+                    top: "48%",
+                    style: {
+                        text: data.circleDto.resultType.total==0?"当前无统计数据":"合计" + data.circleDto.resultType.total,
+                        textAlign: "center",
+                        fill: "#000",
+                        fontSize: 12,
+                    },
+                },
+                tooltip: {
+
+                },
+                series: [{
+                    type: 'pie', //饼状
+                    radius: ['30%', '50%'], //圆的大小
+                    center: ['50%', '50%'], //居中
+                    data:data.circleDto.resultType.item
+
+                }]
+            };
+            // 使用刚指定的配置项和数据显示图表。
+            errorTypeEchart.setOption(errorTypeEchartOption, true);
+
+        }, 'GET');
+
+
+        // excel按钮点击事件
+        $('#multi-btn-excel').click(function () {
+            $(".multi-btn-excel").attr("disabled", "disabled");
+            var xmlhttp = new XMLHttpRequest();
+            var url = config.base_server + 'multipleAisRecognition/getExcel';
+            var param = getParam();
+            var content = JSON.stringify(param)
+            xmlhttp.open("POST", url);
+            xmlhttp.withCredentials = true;
+            xmlhttp.setRequestHeader("Content-Type", "application/json");
+            xmlhttp.setRequestHeader('Authorization', 'Bearer ' + config.getToken().access_token);
+            xmlhttp.responseType = 'blob';
+            xmlhttp.send(content);
+            xmlhttp.onreadystatechange = function (oEvent) {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    const url = window.URL.createObjectURL(new Blob([oEvent.currentTarget.response], {
+                        type: 'application/octet-stream;charset=utf-8'
+                    }))
+                    const link = document.createElement('a')
+                    link.style.display = 'none'
+                    link.href = url
+                    const fileName = parseTime(new Date()) + '-一船多码分析.xlsx'
+                    link.setAttribute('download', fileName)
+                    document.body.appendChild(link)
+                    link.click()
+                    document.body.removeChild(link)
+                }
+            }
+
+        });
+
+        // 搜索按钮点击事件
+        $('#multi-btn-search').click(function () {
+            var param = getParam();
+            table.reload('multipleAisRecognition-table', {where: param});
+        });
+
+        // 工具条点击事件
+        table.on('tool(multipleAisRecognition-table)', function (obj) {
+            var data = obj.data;
+            var layEvent = obj.event;
+            if (layEvent === 'detail') { // 修改
+
+                admin.putTempData('multipleAis', data);
+                admin.popupCenter({
+                    offset: ['65px', '235px'],
+                    area: ['1100px', '800px'],
+                    path: 'pages/vdl/multiMmsiDetail.html',
+                });
+            }
+        });
+
+        function getParam() {
+            var warningTime = $('#searchWarningTimeMulti').val();
+            var startTime;
+            var endTime;
+            if (warningTime.trim() != undefined && warningTime.trim() != "") {
+                var time = warningTime.trim().split("-");
+                startTime = new Date(time[0]).getTime();
+                endTime = new Date(time[1]).getTime();
+            }
+            var param = {
+                name: $('#searchAisNameMulti').val(),
+                type: $('#searchAisTypeMulti').val(),
+                startTime: startTime,
+                endTime: endTime
+            }
+            return param;
+        }
+
+        function parseTime(time, cFormat) {
+            if (arguments.length === 0) {
+                return null
+            }
+            const format = cFormat || '{y}-{m}-{d} {h}:{i}:{s}'
+            let date
+            if (typeof time === 'undefined' || time === null || time === 'null') {
+                return ''
+            } else if (typeof time === 'object') {
+                date = time
+            } else {
+                if ((typeof time === 'string') && (/^[0-9]+$/.test(time))) {
+                    time = parseInt(time)
+                }
+                if ((typeof time === 'number') && (time.toString().length === 10)) {
+                    time = time * 1000
+                }
+                date = new Date(time)
+            }
+            const formatObj = {
+                y: date.getFullYear(),
+                m: date.getMonth() + 1,
+                d: date.getDate(),
+                h: date.getHours(),
+                i: date.getMinutes(),
+                s: date.getSeconds(),
+                a: date.getDay()
+            }
+            const time_str = format.replace(/{(y|m|d|h|i|s|a)+}/g, (result, key) => {
+                let value = formatObj[key]
+                // Note: getDay() returns 0 on Sunday
+                if (key === 'a') {
+                    return ['日', '一', '二', '三', '四', '五', '六'][value]
+                }
+                if (result.length > 0 && value < 10) {
+                    value = '0' + value
+                }
+                return value || 0
+            })
+            return time_str
+        }
+
+    });
+</script>

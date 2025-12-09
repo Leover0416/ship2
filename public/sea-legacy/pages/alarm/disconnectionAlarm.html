@@ -1,0 +1,114 @@
+<div class="layui-card">
+    <div class="layui-card-header">
+        <h2 class="header-title">断连告警列表</h2>
+    </div>
+
+    <div class="layui-card-body">
+        <div class="layui-form toolbar">
+            <div class="layui-input-inline">
+                <label class="layui-form-label">告警设备</label>
+                <div class="layui-input-inline">
+                    <input type="text" style="width:170px;" id="shoreName" name="shoreName" placeholder="请输入告警设备名称" autocomplete="off" class="layui-input" >
+                </div>
+            </div>
+            <div class="layui-input-inline">
+                <label class="layui-form-label">时间</label>
+                <div class="layui-input-inline">
+                    <input type="text" style="width:285px;" id="warningTime" name="warningTime" placeholder="请输入告警时间" autocomplete="off" class="layui-input" readonly>
+                </div>
+            </div>
+            <button id="disconnectionalarm-btn-search" class="layui-btn icon-btn"><i class="layui-icon">&#xe615;</i>搜索</button>
+        </div>
+
+        <table class="layui-table" id="disconnectionalarm-table" lay-filter="disconnectionalarm-table"></table>
+    </div>
+</div>
+
+<script>
+    layui.use(['form', 'table',  'common', 'admin','laydate'], function () {
+        var form = layui.form;
+        var table = layui.table;
+        var config = layui.common;
+        var layer = layui.layer;
+        var admin = layui.admin;
+        var laydate = layui.laydate;
+        //告警时间
+        laydate.render({
+            elem: '#warningTime',
+            type: 'datetime',
+            format: 'yyyy/MM/dd HH:mm:ss',
+            range: true
+        });
+
+        // 渲染表格
+        table.render({
+            elem: '#disconnectionalarm-table',
+            url: config.base_server + 'alarm-management/disconnectionalarm/findPage',
+            method: 'GET',
+            headers:{'Authorization': 'Bearer ' + config.getToken().access_token},
+            page: true,
+            cols: [[
+                { type: 'numbers' },
+                { field:'shoreName', title: '告警设备' },
+                { field: 'connectionMark', title: '告警状态',templet:function(e){
+                        return e.connectionMark==0?"连接":"断开";
+                    }},
+                { field: 'alarmTime', title: '告警时间',templet:function(e){
+                        return layui.util.toDateString(e.alarmTime, "yyyy-MM-dd HH:mm:ss")
+                    }},
+                { field: 'connectTime', title: '连接时间',templet:function(e){
+                        return layui.util.toDateString(e.connectTime, "yyyy-MM-dd HH:mm:ss")
+                    }}
+            ]],
+
+        });
+
+//获取当前时间
+        function getNowTime() {
+            var date = new Date();//年 getFullYear()：四位数字返回年份
+            var year = date.getFullYear();  //getFullYear()代替getYear()
+            var month = date.getMonth() + 1;//月 getMonth()：0 ~ 11
+            var day = date.getDate();//日 getDate()：(1 ~ 31)
+            var hour = date.getHours(); //时 getHours()：(0 ~ 23)
+            var minute = date.getMinutes(); //分 getMinutes()： (0 ~ 59)
+            var second = date.getSeconds();//秒 getSeconds()：(0 ~ 59)
+            var time = '当前时间是：' + year + '-' + addZero(month) + '-' + addZero(day) + ' ' + addZero(hour) + ':' + addZero(minute) + ':' + addZero(second);
+            return time;
+        }
+        function getTodayStartTime() {
+            var date = new Date();//年 getFullYear()：四位数字返回年份
+            var year = date.getFullYear();  //getFullYear()代替getYear()
+            var month = date.getMonth() + 1;//月 getMonth()：0 ~ 11
+            var day = date.getDate();//日 getDate()：(1 ~ 31)
+            var time = '当前时间是：' + year + '-' + addZero(month) + '-' + addZero(day) + ' ' + '00:00:00';
+            return time;
+        }
+       //小于10的拼接上0字符串
+        function addZero(s) {
+            return s < 10 ? ('0' + s) : s;
+        }
+        // 搜索按钮点击事件
+        $('#disconnectionalarm-btn-search').click(function () {
+            var shoreName = $('#shoreName').val();
+            var warningTime = $('#warningTime').val();
+            var startTime="";
+            var endTime="";
+            if(shoreName.trim()!=undefined&&shoreName.trim()!=""){
+                if(warningTime.trim()==undefined||warningTime.trim()==""){
+                    layer.msg("请选择告警时间",{icon:2,time: config.msgTime})
+                    return false;
+                }
+            }
+            if(warningTime.trim()!=undefined&&warningTime.trim()!="") {
+                var time = warningTime.trim().split("-");
+                startTime = time[0];
+                endTime = time[1];
+            }
+            // if(shoreName==null && startTime == null && endTime == null){
+            //     startTime = getTodayStartTime();
+            //     endTime = getNowTime();
+            // }
+            table.reload('disconnectionalarm-table', {where: {shoreName: shoreName, startTime: startTime,endTime:endTime}});
+        });
+    });
+</script>

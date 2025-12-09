@@ -1,0 +1,243 @@
+<html lang="en" xmlns="">
+<head>
+    <title></title>
+    <style>
+        .layui-table-view .layui-table td {
+            border: 0px;
+            cursor: default;
+        }
+    </style>
+</head>
+<div class="layui-card" style="background-color: #9F9F9F;">
+    <div class="layui-card-header" style="background-color: white ;margin-top:-10px;;">
+        <h2 class="header-title" style="font-weight: bold; font-size: 30px ;margin-top: -20px;"><font color="#9F9F9F">助航设备（AtoN）监测结果</font></h2>
+    </div>
+
+    <div style=" margin-top: 20px ;margin-left: 10px;">
+
+        <div style="width: 100% ; height: 30px;background-color: white;">
+            <p style="font-weight: bold; font-size: 20px ;background-color: white;padding: 10px">AtoN基本信息：</p>
+        </div>
+
+        <div class="layui-card-body  " style="margin-top: 20px;background-color: white; ">
+            <table class=layui-table" style="font-size: 14px">
+                <tr>
+                    <td >MMSI：</td>
+                    <td><input style='border: 0px;' id='atonmmsi' readonly /></td>
+                    <td >航标名称：</td>
+                    <td><input style='border: 0px;' id='atonname' readonly /></td>
+                    <td >航标类型：</td>
+                    <td><input style='border: 0px;' id='aisType' readonly /></td>
+                    <td >尺寸(长X宽)：</td>
+                    <td><input style='border: 0px;' id='shipCall' readonly /></td>
+
+                </tr>
+                <tr>
+                    <td >最近更新时间：</td>
+                    <td><input style='border: 0px;' id='updatetime' readonly /></td>
+                    <td ><font color="blue">当前位置：</font></td>
+                    <td><input style='border: 0px; ' id='rrr' readonly /><p style="color:blue;">(经度)</p></td>
+                    <td><input style='border: 0px; ' id='ttt' readonly /><p style="color:blue;">(纬度)</p></td>
+                </tr>
+            </table>
+        </div>
+
+
+        <div style="width: 100% ; height: 30px;background-color: white;margin-top: 20px;">
+            <p style="font-weight: bold; font-size: 20px ;background-color: white;padding: 10px">船舶异常信息：</p>
+        </div>
+
+        <div class="layui-card-body  " style="margin-top: 20px;background-color: white; ">
+<!--            <table class=layui-table" lay-skin="line" style="font-size: 14px" onLoad="HideWeekMonth()">-->
+            <table class=layui-table" lay-skin="line" style="font-size: 14px" id="qqqq">
+                <tr>
+                    <td >异常确定时间：</td>
+                    <td><input style='border: 0px;' id='receiveTime' readonly /></td>
+                    <td >异常类型：</td>
+                    <td><input style='border: 0px;' id='atonresultType' readonly /></td>
+<!--                    <div id="hidden" >-->
+                    <td id='infotd'>异常信息 ：</td>
+                    <td><input style='border: 0px;' id='resultInfoClassify' readonly /></td>
+                    <td id="notetd">异常说明：</td>
+                    <td><input style='border: 0px;' id='note' readonly /></td>
+<!--                    </div>-->
+                </tr>
+            </table>
+        </div>
+
+
+        <div class="layui-card-body  " style="margin-top: 20px;background-color: white; ">
+            <table class="layui-table" id="atonDetail-table" lay-filter="atonDetail-table"></table>
+
+        </div>
+
+        <script type="text/html" id="expandAll">
+            <div class="detailView">
+                <div class="detailTitle">报文类型：{{d.msgContent.messageId}}转发指示符：{{d.msgContent.data.aisMessage.repeat}}用户ID：{{d.msgContent.data.aisMessage.userId}} 航标类型：{{d.msgContent.data.aisMessage.atonType}}航标名称：{{d.msgContent.data.aisMessage.name}}</div>
+                <div class="detailAuthor">位置准确度：{{d.msgContent.data.aisMessage.posAcc}} 经度： 纬度： 航标名称扩展：{{d.msgContent.data.aisMessage.nameExt}} 备用1：{{d.msgContent.data.aisMessage.spare1}}</div>
+                <div class="detailContent">电子定位装置的类型：{{d.msgContent.data.aisMessage.posType}} 航标移位指示符：{{d.msgContent.data.aisMessage.offPosition}}
+                    时戳：{{d.msgContent.data.aisMessage.utcSec}} RAIM标志：{{d.msgContent.data.aisMessage.raim}}
+                    航标状态：{{d.msgContent.data.aisMessage.virtual}} 指配模式标志：{{d.msgContent.data.aisMessage.assigned}}备用2:{{d.msgContent.data.aisMessage.spare2}}</div>
+                <div class="detailAuthor">尺寸A：{{d.msgContent.data.aisMessage.dimBow}} 尺寸B：{{d.msgContent.data.aisMessage.dimStern}} 尺寸C： {{d.msgContent.data.aisMessage.dimPort}}尺寸D： {{d.msgContent.data.aisMessage.dimStarboard}}</div>
+                <div class="detailAuthor">原始报文:{{d.msgContent.message}} </div>
+            </div>
+
+
+        </script>
+
+
+        <div style="width: 100% ; height: 30px;background-color: white;margin-top:20px ; ">
+            <p style="font-weight: bold; font-size: 20px ;background-color: white;padding: 10px">异常处理：</p>
+        </div>
+
+        <div class="layui-card-body  " style="margin-top: 20px;background-color: white; height: 150px; ">
+
+           <!-- <div class="layui-form">
+
+                <input name="type" title="误判" type="radio"><div class="layui-unselect layui-form-radio layui-form-radioed"><i class="layui-anim layui-icon"></i><div>误判</div></div>
+                <input name="type" title="已确认" type="radio" checked><div class="layui-unselect layui-form-radio layui-form-radioed"><i class="layui-anim layui-icon layui-anim-scaleSpring"></i><div>已确认</div></div>
+                <input name="type" title="其他特殊情况"  type="radio" checked><div class="layui-unselect layui-form-radio layui-form-radioed"><i class="layui-anim layui-icon"></i><div>其他特殊情况</div></div>
+            </div>-->
+            <label class="layui-form-label">处理结果：</label>
+            <div class="layui-input-block">
+                <input type="radio" name="dealResult" value="MISJUDGED" title="误判" lay-filter="dealResult"
+                       checked/><span>误判</span>
+                <input type="radio" name="dealResult" value="RECTIFIED" title="已整改" lay-filter="dealResult"/><span>已整改</span>
+                <input type="radio" name="dealResult" value="SPECIAL" title="其他特殊情况"
+                       lay-filter="dealResult"/><span>其他特殊情况</span>
+            </div>
+
+
+            <div class="layui-form-item" style="margin-top: 10px;">
+                <label class="layui-form-label">情况说明：</label>
+                <div class="layui-input-block">
+                    <input name="title" id="description" class="layui-input layui-form-danger" required="" type="text"
+                           placeholder="请输入情况说明" autocomplete="off" lay-verify="required">
+                </div>
+            </div>
+            <div style=" margin-top: 10px; margin-left: 50px;">
+                    <button class="layui-btn layui-btn-normal" style="float: left;" lay-filter="deal-submit" lay-submit>保存</button>
+                    <a class="layui-btn layui-btn-normal "  onclick="window.location.href='\#!atonMonitor'" style="margin-left: 20px;" id="return" lay-event="return" >
+                        返回
+                    </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<script>
+
+    // 自定义模块，这里只需要开放soulTable即可
+    layui.config({
+        base: 'module/',   // 第三方模块所在目录
+        version: 'v1.6.4' // 插件版本号
+    }).extend({
+        soulTable: 'soulTable/soulTable',
+        tableChild: 'soulTable/tableChild',
+        tableMerge: 'soulTable/tableMerge',
+        tableFilter: 'soulTable/tableFilter',
+        excel: 'soulTable/excel',
+    });
+
+    layui.use(['form', 'table', 'util', 'common','soulTable' ,'admin','laydate','jquery', 'layer', 'table','layedit','upload', 'element', 'carousel'], function () {
+        var form = layui.form;
+        var table = layui.table;
+        var config = layui.common;
+        var layer = layui.layer;
+        var util = layui.util;
+        var admin = layui.admin;
+        var laydate = layui.laydate;
+        var soulTable = layui.soulTable;
+        var $ = layui.jquery;
+        var element = layui.element;
+        carousel = layui.carousel;
+        // echarts = layui.echarts;
+        var table = layui.table;
+        var layedit = layui.layedit;
+        var upload = layui.upload;
+        var id = admin.getTempData('id');
+        // let aton = admin.getTempData('aton');
+
+        // 渲染表格
+        table.render({
+
+            elem: '#atonDetail-table',
+            url: config.base_server + 'atonStationRecognition-api/aton/findchangelist',
+            method: 'GET',
+            headers: {'Authorization': 'Bearer ' + config.getToken().access_token},
+            page: true,
+            where:{id:id},
+            parseData : function(data) {
+                if (data.infoAton != null){
+
+                    $("#atonmmsi").val(data.infoAton.mmsi)
+                    $("#atonname").val(data.infoAton.name)
+                    $("#updatetime").val(data.infoAton.updatetime)
+                    $("#aisType").val(data.infoAton.atonType)
+                    // $("#shipCall").val(data.infoAton.name)
+                    $("#lng").val(data.infoAton.longitude)
+                    $("#lat").val(data.infoAton.latitude)
+                    // $("#position").val(data.infoAton.callSign)
+                    // latitude longitude
+                }
+                if (data.errorDetailShipStaticDto != null){
+
+                    $("#receiveTime").val(data.errorDetailShipStaticDto.receiveTime)
+                    $("#atonresultType").val(data.errorDetailShipStaticDto.resultType)
+                    $("#resultInfoClassify").val(data.errorDetailShipStaticDto.resultInfoNote)
+                    $("#note").val(data.errorDetailShipStaticDto.errorContent)
+                }
+
+
+                return {
+                    "code" : data.code,
+                    "msg" : data.msg,
+                    "count": data.total,
+                    "data" : data.errorInfoAton
+
+                }
+
+            },
+            cols: [[
+                {
+                    field: 'receiveTime', title: '接收时间', collapse: true, children: '#expandAll', childWidth: 'full',templet: function (e) {
+                        return  layui.util.toDateString(e.receiveTime, "yyyy-MM-dd HH:mm:ss");
+
+                    }
+                },
+                {field: 'msgId', title: '报文类型', templet: function (e) {
+                        return e.msgId + '号';
+                    }},
+                {field: 'mmsi', title: 'MMSI'},
+                {field: 'resultInfo', title: '异常信息'},
+                {field: '', title: '异常说明'},
+            ]],done: function () {
+                soulTable.render(this)
+            }});
+
+
+        // let aton = admin.getTempData('aton');
+        //表单提交事件
+        form.on('submit(deal-submit)', function () {
+            var data ={
+                id:id,
+                errorStatus : $("input[name='dealResult']:checked").val(),
+                errorContent : $('#description').val(),
+            }
+            admin.req('atonStationRecognition-api/aton/saveDeal', JSON.stringify(data), function (data) {
+                layer.closeAll('loading');
+                if (data.resp_code === 0) {
+                    layer.msg(data.resp_msg, {icon: 1, time: config.msgTime});
+                    table.reload('atonDetail-table')
+                } else {
+                    layer.msg(data.resp_msg, {icon: 2, time: config.msgTime});
+                }
+            }, "POST");
+            table.reload('atonDetail-table')
+        });
+    });
+
+</script>
+</html>

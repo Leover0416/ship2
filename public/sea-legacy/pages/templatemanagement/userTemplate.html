@@ -1,0 +1,237 @@
+<div class="layui-card">
+    <div class="layui-card-header">
+        <h2 class="header-title">智能数据管理</h2>
+    </div>
+    <div class="layui-card-body">
+        <div id="authTenantId" class="layui-form toolbar">
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+            <button id="template-btn-search" class="layui-btn icon-btn"><i class="layui-icon">&#xe615;</i>搜索</button>
+            <button id="template-btn-add" class="layui-btn icon-btn"><i class="layui-icon">&#xe654;</i>添加</button>
+
+        </div>
+
+        <table class="layui-table" id="template-table" lay-filter="template-table"></table>
+    </div>
+</div>
+
+
+<!-- 表格操作列 -->
+<script type="text/html" id="template-table-bar">
+    {{#if (d.isCustom == 0 ) { }}
+    <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="view">查看</a>
+    {{# }else{ }}
+    <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="view">查看</a>
+    <a class="layui-btn  layui-btn-xs" lay-event="edit">修改</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" >删除</a>
+    {{# } }}
+</script>
+
+<!-- 表格状态列 -->
+<script type="text/html" id="template-tpl-state">
+    <input type="checkbox" lay-filter="template-tpl-state" value="{{d.id}}" lay-skin="switch" lay-text="启用|停用"
+           {{d.status==true?'checked':''}}/>
+</script>
+
+<script>
+    layui.use(['form', 'table', 'common', 'admin'], function () {
+        var form = layui.form;
+        var table = layui.table;
+        var config = layui.common;
+        var layer = layui.layer;
+        var admin = layui.admin;
+        var ten="";
+        function initTable(){
+            // 渲染表格
+            table.render({
+                elem: '#template-table',
+                url: config.base_server + 'api-user/intelligentData/findPage',
+                // data:tableData,
+                method: 'GET',
+                headers:{'Authorization': 'Bearer ' + config.getToken().access_token},
+                page: true,
+                where:{tenantCode:ten},
+                cols: [[
+                    {type: 'numbers'},
+                    {field: 'name',  title: '策略名称'},
+                    { title: '策略类型',templet:function (d) {
+                            return d.clType==0?"报文策略":d.clType==1?"船舶策略":"船舶参数"
+                        }},
+                    {field: 'status', title: '状态',templet: function (d) {
+                        var str="<input type='checkbox' lay-filter='template-tpl-state' value='"+d.id+"' lay-skin='switch' lay-text='启用|停用'";
+                            if(d.isCustom==1||authId=="webapp"){
+                                if(d.status==true){
+                                    str+="checked  />";
+                                }else {
+                                    str+="/>";
+                                }
+                            }else {
+                                if(d.status==true){
+                                    str+="disabled checked  />";
+                                }else {
+                                    str+="disabled />";
+                                }
+                            }
+                            return str;
+                        }},
+                    {fixed: 'right', align: 'center',  title: '操作', width: 175,templet:function (d) {
+                            var t="<a class='layui-btn layui-btn-warm layui-btn-xs' lay-event='view'>查看</a>"
+                            if(d.isCustom==1||authId=="webapp"){
+                                t+="<a class='layui-btn  layui-btn-xs' lay-event='edit'>修改</a>" +
+                                    " <a class='layui-btn layui-btn-danger layui-btn-xs' lay-event='del' >删除</a>"
+                            }
+                        return t
+                     }}
+                ]]
+            });
+        }
+
+        function queryTenant(){
+            admin.reqSync('api-user/tenant/selectList', {}, function (result) {
+                if(result!=undefined&&result.length>0){
+                    for(var i=0;i<result.length;i++){
+                        $('#tenantId').append(new Option(result[i].tenantName,result[i].tenantCode));
+                    }
+                }
+                form.render();
+            }, 'get');
+        }
+console.log(config.getUser())
+        var authId=config.getUser().tenantCode;
+        initTempList();
+    function initTempList(){
+
+        var seachHtml="<div class='layui-input-inline'>" +
+            "                <label class='layui-form-label'>策略名称</label>" +
+            "                <div class='layui-input-inline'>" +
+            "                    <input id='name' class='layui-input search-input' type='text' placeholder='输入关键字'/>&emsp;" +
+            "                </div>" +
+            "            </div>";
+
+        if(authId=="webapp"){
+            seachHtml+="<div class='layui-input-inline'>" +
+            "                    <label class='layui-form-label'>策略类型</label>" +
+            "                    <div class='layui-input-inline'>" +
+            "                        <select  id='type'  >" +
+            "                            <option selected='selected' value=''></option>" +
+            "                            <option  value='0'>报文策略</option>" +
+            "                            <option  value='1'>船舶策略</option>" +
+            "                            <option  value='2'>船舶参数</option>" +
+            "                        </select>" +
+            "                    </div>" +
+            "                </div>" +
+            "                <div class='layui-input-inline'>" +
+            "                    <label class='layui-form-label'>租户</label>" +
+            "                    <div class='layui-input-inline'>" +
+            "                        <select  id='tenantId'  lay-filter='tChange'>" +
+            "                            <option selected='selected' value=''></option>" +
+            "                        </select>" +
+            "                    </div>" +
+            "                </div>"
+            $("#authTenantId").prepend(seachHtml);
+            form.render();
+            queryTenant();
+        }else {
+            ten=authId;
+            $("#authTenantId").prepend(seachHtml);
+            form.render();
+        }
+        initTable();
+    }
+        form.on('select(tChange)', function (data) {
+            ten=data.value;
+        });
+
+        // 添加按钮点击事件
+        $('#template-btn-add').click(function () {
+            showEditModel();
+        });
+
+        // 工具条点击事件
+        table.on('tool(template-table)', function (obj) {
+            var data = obj.data;
+            var layEvent = obj.event;
+
+            if (layEvent === 'edit') { // 修改
+                showEditModel(data);
+            }else if (layEvent === 'view') { // 修改
+                showViewModel(data);
+            } else if (layEvent === 'del') { // 删除
+                layer.confirm('确定删除此策略吗？', function (i) {
+                    layer.close(i);
+                    layer.load(2);
+                    admin.req('api-user/intelligentData/'+obj.data.id, {}, function (data) {
+                        layer.closeAll('loading');
+                        if (data.resp_code == 0) {
+                            layer.msg(data.resp_msg, {icon: 1, time: config.msgTime});
+                            table.reload('template-table', {});
+                        } else {
+                            layer.msg(data.resp_msg, {icon: 2, time: config.msgTime});
+                        }
+                    }, 'delete');
+                });
+            }
+        });
+
+        //显示表单弹窗
+        var showEditModel = function (data) {
+
+            admin.putTempData('t_template', data);
+            var title = data ? '修改策略' : '添加策略';
+            admin.popupCenter({
+                title: title,
+                path: 'pages/templatemanagement/template_form.html',
+                area:['1000px','800px'],
+                offset:'30px',
+                finish: function () {
+                    table.reload('template-table', {});
+                }
+            });
+        };
+
+        var showViewModel = function (data) {
+
+            admin.putTempData('t_template_view', data);
+            admin.popupCenter({
+                title: '查看策略',
+                path: 'pages/templatemanagement/template_view.html',
+                area:['1000px','800px'],
+                offset:'30px',
+                finish: function () {
+                    table.reload('template-table', {});
+                }
+            });
+        };
+
+        // 搜索按钮点击事件
+        $('#template-btn-search').click(function () {
+
+            table.reload('template-table', {where: {name: $('#name').val(), clType: $('#type').val(),tenantCode: ten}});
+        });
+
+
+
+        // 修改策略状态
+        form.on('switch(template-tpl-state)', function (obj) {
+            layer.load(2);
+            admin.req('api-user/intelligentData/updateStatus', {
+                id: obj.elem.value,
+                status: obj.elem.checked ? true : false
+            }, function (data) {
+                layer.closeAll('loading');
+                if (data.resp_code == 0) {
+                    layer.msg(data.resp_msg, {icon: 1, time: config.msgTime});
+                    //table.reload('table-template', {});
+                } else {
+                    layer.msg(data.resp_msg, {icon: 2, time: config.msgTime});
+                    $(obj.elem).prop('checked', !obj.elem.checked);
+                    form.render('checkbox');
+                }
+            }, 'GET');
+        });
+
+
+    });
+</script>

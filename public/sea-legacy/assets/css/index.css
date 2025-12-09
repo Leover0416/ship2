@@ -1,0 +1,557 @@
+/*.layui-layer-ico{*/
+/*    background:url(/static/assets/libs/layui/css/modules/layer/default/icon1old.png) no-repeat !important;*/
+/*    background-position:2px -39px !important;}*/
+.layui-layer-ico {
+    background: url(/assets/libs/layui/css/modules/layer/default/icon1.png) no-repeat !important;
+}
+
+.layui-layer-ico6, .layui-layer-ico5, .layui-layer-ico4, .layui-layer-ico3, .layui-layer-ico2, .layui-layer-ico1 {
+    height: 31px !important;
+}
+
+.layui-layer-setwin .layui-layer-close1 {
+    background-position: 1px -41px !important;
+}
+
+.commonShow {
+    z-index: 99999;
+    position: absolute;
+    font-size: 13px;
+    border: 0 !important;
+    margin-right: 3px;
+    background-color: rgba(0, 0, 0, 0) !important;
+}
+
+.no-hover-table tbody tr:hover {
+    background-color: rgb(255, 255, 255)
+}
+
+.autocomplete-suggestions {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px solid #000;
+    background-color: rgba(36, 36, 36, 0.6) !important;
+    cursor: default;
+    overflow: auto;
+    -webkit-box-shadow: 1px 4px 3px rgba(50, 50, 50, 0.64);
+    -moz-box-shadow: 1px 4px 3px rgba(50, 50, 50, 0.64);
+    box-shadow: 1px 4px 3px rgba(50, 50, 50, 0.64);
+    z-index: 999999999 !important;
+}
+
+.leaflet-control-attribution {
+    display: none
+}
+
+.leaflet-touch .leaflet-bar a {
+    width: 42px;
+    height: 42px;
+    line-height: 42px;
+    font-size: 20px;
+}
+
+.leaflet-bar a, .leaflet-bar a:hover {
+    background-color: rgba(36, 36, 36, 0.6) !important;
+    border: 1px solid #000 !important;
+}
+
+
+.infoContainer {
+    color: #DBD9D1;
+}
+
+.layui-input {
+    color: #DBD9D1;
+    border: 1px solid #000 !important;
+    background-color: rgba(36, 36, 36, 0.6) !important;
+    text-align: left;
+}
+
+.layui-btn {
+    height: 38px;
+    line-height: 38px;
+    border: 1px solid #000 !important;
+    padding: 0 18px;
+    background-color: rgba(36, 36, 36, 0.6) !important;
+    color: #DBD9D1;
+    white-space: nowrap;
+    text-align: center;
+    font-size: 14px;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.layui-btn:hover {
+    background-color: rgba(36, 36, 36, 0.7) !important;
+}
+
+/*中心*/
+.layui-icon-location {
+    border: 1px solid #000;
+    background-color: rgba(36, 36, 36, 0.6);
+    color: #DBD9D1;
+}
+
+.layui-icon-util {
+    border: 1px solid #000;
+    background-color: rgba(36, 36, 36, 0.6);
+    color: #DBD9D1;
+}
+
+.layui-icon-picture-fine {
+    border: 1px solid #000;
+    background-color: rgba(36, 36, 36, 0.6);
+    color: #DBD9D1;
+}
+
+.leaflet-touch .leaflet-bar a {
+    width: 31px;
+    height: 31px;
+    line-height: 31px;
+    font-size: 20px;
+}
+
+.leaflet-touch .leaflet-control-layers, .leaflet-touch .leaflet-bar {
+    border: none !important;
+}
+
+#search_box input {
+    border: 1px solid #000;
+    color: #DBD9D1;
+    background-color: rgba(36, 36, 36, 0.6) !important;
+}
+
+#search_box input:hover {
+    border: 1px solid #000 !important;
+
+}
+
+#search_box ul {
+    /*border: 1px solid #000;*/
+    color: #DBD9D1;
+    overflow: auto;
+    max-height: 500px;
+    background-color: rgba(36, 36, 36, 0.6);
+}
+
+#search_box ul li {
+    border: 1px solid #000;
+    color: #DBD9D1;
+    background-color: rgba(36, 36, 36, 0.1);
+}
+
+.layui-tab {
+    border: 1px solid #000;
+    color: #DBD9D1;
+    background-color: rgba(36, 36, 36, 0.6);
+}
+
+.layui-tab-title .layui-this {
+    background-color: rgba(36, 36, 36, 0.6);
+    color: #DBD9D1;
+}
+
+#allList_left_middle .layui-tab-title li {
+    padding: 0 !important;
+}
+
+.layui-bg-cyan {
+    background-color: rgba(36, 36, 36, 0.6) !important;
+}
+
+.layui-nav-tree .layui-nav-item {
+    color: #DBD9D1 !important;
+}
+
+.layui-badge-rim, .layui-border, .layui-colla-content, .layui-colla-item, .layui-collapse, .layui-elem-field, .layui-form-pane .layui-form-item[pane], .layui-form-pane .layui-form-label, .layui-input, .layui-layedit, .layui-layedit-tool, .layui-panel, .layui-quote-nm, .layui-select, .layui-tab-bar, .layui-tab-card, .layui-tab-title, .layui-tab-title .layui-this:after, .layui-textarea {
+    border: 1px solid #000 !important;
+}
+
+.layui-colla-title {
+    border: 1px solid #000;
+    color: #DBD9D1;
+    background-color: rgba(36, 36, 36, 0.6);
+}
+
+.layui-table td, .layui-table th, .layui-table-col-set, .layui-table-fixed-r, .layui-table-grid-down, .layui-table-header, .layui-table-page, .layui-table-tips-main, .layui-table-tool, .layui-table-total, .layui-table-view, .layui-table[lay-skin=line], .layui-table[lay-skin=row] {
+    border: none;
+    background-color: rgba(36, 36, 36, 0) !important;
+}
+
+.layui-table-hover {
+    background-color: rgba(36, 36, 36, 1) !important;
+}
+
+tr {
+    height: 30px;
+}
+
+.layui-table-view .layui-table {
+    width: 100%;
+    margin: 0;
+}
+
+table {
+    width: 100%;
+    background-color: rgba(36, 36, 36, 0) !important;
+}
+
+#shipDetailLayer table {
+    border: none;
+    background-color: transparent !important;
+}
+
+#shipDetailLayer td {
+    text-align: right !important;
+    background-color: transparent !important;
+}
+
+tr:hover {
+    background-color: rgb(36, 36, 36) !important;
+}
+
+#stationDetail_id table {
+    border: none;
+}
+
+#stationDetail_id .layui-table td, .layui-table th {
+    padding: 0 !important;
+}
+
+#stationDetail_id td {
+    text-align: right !important;
+    background-color: transparent !important;
+}
+
+thead {
+    border: 1px solid #000;
+    background-color: rgba(36, 36, 36, 0) !important;
+}
+
+thead tr {
+    height: 30px;
+    background-color: rgba(36, 36, 36, 0) !important;
+}
+
+thead tr th {
+    background-color: rgba(36, 36, 36, 0);
+}
+
+th {
+    font-size: 12px;
+    font-weight: 600;
+    color: #DBD9D1;
+    text-align: center;
+}
+
+th:nth-child(1) {
+
+}
+
+th:nth-child(2) {
+
+}
+
+td {
+    color: #DBD9D1;
+    font-size: 10px;
+    text-align: center;
+}
+
+#allList_left_middle tbody tr:nth-child(odd) {
+    background-color: rgba(36, 36, 36, 0.6);
+    /*box-shadow:-10px 0px 15px #61d2f7 inset,   !*左边阴影*!*/
+    /*10px 0px 15px #61d2f7 inset;  !*右边阴影*!*/
+}
+
+.layui-table-sort .layui-table-sort-asc {
+    top: 3px;
+    border-top: none;
+    border-bottom-style: solid;
+    border-bottom-color: #DBD9D1;
+}
+
+.layui-table-sort[lay-sort=asc] .layui-table-sort-asc {
+    border-bottom-color: #DBD9D1 !important;
+}
+
+.layui-table-sort .layui-table-sort-desc {
+    bottom: 5px;
+    border-bottom: none;
+    border-top-style: solid;
+    border-top-color: #DBD9D1;
+}
+
+.layui-table-sort[lay-sort=desc] .layui-table-sort-desc {
+    border-top-color: #DBD9D1 !important;
+}
+
+.layui-table-body .layui-none {
+    color: #DBD9D1 !important;
+}
+
+/*tbody tr:nth-child(even) {*/
+/*	background-color: rgba(36,36,36,0.4);*/
+/*	box-shadow:-10px 0px 15px #61d2f7 inset,   !*左边阴影*!*/
+/*	10px 0px 15px #61d2f7 inset;  !*右边阴影*!*/
+/*}*/
+::-webkit-scrollbar {
+    background-color: rgba(36, 36, 36, 0.6) !important;
+}
+
+::-webkit-scrollbar-track {
+    color: #DBD9D1 !important;
+}
+
+::-webkit-scrollbar-thumb {
+    width: 24px;
+    height: 143px;
+    background-color: rgba(36, 36, 36, 0.6)
+}
+
+/*比例尺*/
+.leaflet-control-scale-line {
+    font-size: 20px !important;
+    border: 1px solid #000 !important;
+    color: #DBD9D1 !important;
+    background-color: rgba(36, 36, 36, 0.6) !important;
+    /*width: 100px !important;*/
+}
+
+/*经纬度*/
+.leaflet-container .leaflet-control-mouseposition {
+    border: 1px solid #000;
+    background-color: rgba(36, 36, 36, 0.6) !important;
+    /*box-shadow: 0 0 5px #000;*/
+    color: #DBD9D1 !important;
+    width: 250px;
+    margin-right: 10px;
+}
+
+.leaflet-bar a, .leaflet-bar a:hover {
+    color: #DBD9D1 !important;
+}
+
+.leaflet-right .leaflet-control {
+    margin-right: 11px !important;
+}
+
+/*.leaflet-right .leaflet-bottom .leaflet-control {*/
+/*    margin-bottom: 80px!important;*/
+/*}*/
+
+.leaflet-control-zoom-in {
+    color: #DBD9D1;
+}
+
+.leaflet-control-zoom-out {
+    margin-bottom: 70px !important;
+}
+
+/*弹出层*/
+.layui-layer {
+    background-color: rgba(36, 36, 36, 0.6) !important;
+    border: 1px solid #000;
+}
+
+
+/*弹出head*/
+.layui-layer-lan .layui-layer-title {
+    background-color: rgba(36, 36, 36, 0.6) !important;
+    border: 1px solid #000 !important;
+    color: #DBD9D1 !important;
+}
+
+.layui-layer-title {
+    background-color: rgba(36, 36, 36, 0.6) !important;
+    border: 1px solid #000 !important;
+    color: #DBD9D1 !important;
+}
+
+input {
+    background-color: transparent !important;
+    color: #DBD9D1;
+}
+
+.layui-input, .layui-select, .layui-textarea {
+    background-color: rgba(36, 36, 36, 0.6) !important;
+}
+
+::-webkit-input-placeholder {
+    color: #DBD9D1;
+    font-size: 16px;
+}
+
+.layui-nav-tree .layui-nav-child dd.layui-this, .layui-nav-tree .layui-nav-child dd.layui-this a, .layui-nav-tree .layui-this, .layui-nav-tree .layui-this > a, .layui-nav-tree .layui-this > a:hover {
+    background-color: rgba(36, 36, 36, 0.6) !important;
+    color: #DBD9D1;
+}
+
+.layui-input, .layui-select, .layui-textarea {
+    color: #DBD9D1 !important;
+}
+
+.layui-form-item .layui-input-inline {
+    width: 60px !important;
+    margin-left: 50px;
+}
+
+.layui-form-switch {
+    background-color: rgba(36, 36, 36, 0.6) !important;
+    border: 1px solid #000 !important;
+    color: #000 !important;
+}
+
+.layui-form-switch em {
+    color: #DBD9D1 !important;
+}
+
+.layui-form-switch i {
+    background-color: #DBD9D1;
+}
+
+.layui-form-onswitch i {
+    left: 100%;
+    margin-left: -21px;
+    background-color: #fff;
+}
+
+#myFleetLayer .layui-form-item {
+    margin-bottom: 0px !important;
+}
+
+#myFleetLayer thead tr {
+    height: 0px !important;
+    display: none !important;
+}
+
+#myFleetLayer tbody tr:nth-child(odd) {
+    background-color: rgba(0, 104, 183, 0.2);
+    /*box-shadow:-10px 0px 15px #61d2f7 inset,   !*左边阴影*!*/
+    /*10px 0px 15px #61d2f7 inset;  !*右边阴影*!*/
+}
+
+.layui-form-label {
+    color: #DBD9D1 !important;
+}
+
+#myFleetSendMessageLayer .layui-tab {
+    height: 583px !important;
+    margin: 0 !important;
+    margin-top: 20px !important;
+    background-color: rgba(0, 104, 183, 0) !important;
+    border: none !important;
+    border-top: 1px solid #000 !important
+}
+
+#myFleetSendMessageLayer .layui-tab-content .layui-tab {
+    margin-top: 0 !important;
+}
+
+#myFleetSendMessageLayer .layui-bg-cyan {
+    background-color: rgba(36, 36, 36, 0.2) !important;
+}
+
+.aColor {
+    border: 1px solid #fff !important;
+}
+
+.layui-table tbody tr:hover, .layui-table thead tr, .layui-table-click, .layui-table-header, .layui-table-hover, .layui-table-mend, .layui-table-patch, .layui-table-tool, .layui-table-total, .layui-table-total tr, .layui-table[lay-even] tr:nth-child(even) {
+    background-color: rgba(36, 36, 36, 0.2) !important;
+}
+
+.layui-layer-btn .layui-layer-btn0 {
+    border: 1px solid #000 !important;
+    background-color: rgba(36, 36, 36, 0.6) !important;
+    color: #DBD9D1 !important;
+}
+
+.layui-layer-btn a {
+
+    border: 1px solid #000 !important;
+    background-color: rgba(36, 36, 36, 0.6) !important;
+    color: #DBD9D1 !important;
+
+}
+
+.layui-layer-dialog .layui-layer-content {
+    color: #DBD9D1 !important;
+}
+
+/*船舶鼠标悬浮*/
+.leaflet-tooltip-left:before {
+    border-left-color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.leaflet-tooltip-right:before {
+    border-right-color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.leaflet-tooltip-top:before {
+    border-top-color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.leaflet-tooltip-bottom:before {
+    border-bottom-color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.layui-table-tips-main {
+    color: #fff !important;
+}
+
+.layui-laypage .layui-laypage-curr .layui-laypage-em {
+
+    background-color: rgba(36, 36, 36, 0.6);
+}
+
+.layui-laypage a:hover {
+    color: #ffffff;
+}
+
+.layui-laypage-btn {
+    background-color: rgba(36, 36, 36, 0.6) !important;
+    color: #d2d2d2;
+    border-color: #2a2a2a !important;
+}
+
+.layui-laypage-btn:hover, .layui-laypage-btn:active {
+    background-color: rgba(36, 36, 36, 0.5) !important;
+    color: #fff;
+    border-color: #000 !important;
+}
+
+.layui-form-select dl dd.layui-this {
+    background-color: #000000;
+}
+
+.layui-form-select dl dd:hover {
+    background-color: #0c0c0c94;
+    color: #fff;
+}
+
+.layui-form-switch i {
+    top: 5px;
+}
+
+.layui-table-page {
+    text-align: right;
+    bottom: 1px;
+    position: absolute;
+}
+
+.required-start:before {
+    content: "*";
+    color: #F00;
+    font-family: serif;
+    font-style: normal;
+    float: left;
+}
+
+.layui-form-radio:hover *, .layui-form-radioed, .layui-form-radioed > i {
+    color: rgba(39, 112, 212, 0.8);
+}
+
+.layui-laypage input:focus, .layui-laypage select:focus {
+    border-color: #0c0c0c94 !important;
+}

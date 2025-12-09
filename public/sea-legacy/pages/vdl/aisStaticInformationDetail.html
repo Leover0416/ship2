@@ -1,0 +1,183 @@
+<html lang="en" xmlns="">
+<head></head>
+<style>
+    .layui-layer-title {
+        display: none;
+    }
+
+    .layui-layer-setwin .layui-layer-close1 {
+        display: none;
+    }
+</style>
+<div class="layui-card" style="width:1695px; height: 1000px;background-color: #9F9F9F;">
+    <div class="layui-card-header" style="background-color: white ;margin-top:-10px;;">
+        <h2 class="header-title" style="font-weight: bold; font-size: 30px ;margin-top: -20px;"><font color="#9F9F9F">AIS信息填写错误结果</font></h2>
+    </div>
+    <div style=" margin-top: 20px ;margin-left: 10px;">
+        <div style="width: 100% ; height: 20px;background-color: white;">
+            <p style="font-weight: bold; font-size: 20px ;background-color: white;padding: 10px">船舶基本信息：</p>
+        </div>
+        <div class="layui-card-body  " style="margin-top: 20px;background-color: white; ">
+            <table class=layui-table" lay-skin="line" style="font-size: 14px">
+                <tr>
+                    <td>MMSI：</td>
+                    <td><input style='border: 0px;' id='staticShipMmsi' readonly/></td>
+                </tr>
+            </table>
+        </div>
+        <div style="width: 100% ; height: 30px;background-color: white;margin-top: 15px;">
+            <p style="font-weight: bold; font-size: 20px ;background-color: white;padding: 10px">船舶异常信息：</p>
+        </div>
+        <div class="layui-card-body  " style="margin-top: 20px;background-color: white; ">
+            <table class="layui-table" id="aisStaticInformationDetail-table" name="dealTable"
+                   lay-filter="dealTable"></table>
+        </div>
+        <div style="width: 100% ; height: 30px;background-color: white;margin-top: 15px;">
+            <p style="font-weight: bold; font-size: 20px ;background-color: white;padding: 10px">报文信息：</p>
+        </div>
+        <div style="margin-top: 20px;width: 100% ; height: 30px;background-color: white;">
+            <table class="layui-table" lay-skin="line">
+                <tr>
+                    <td>报文类型：</td>
+                    <td><input style='border: 0px;' id='msgId' readonly/></td>
+                    <td>转发指示符：</td>
+                    <td><input style='border: 0px;' id='repeat' readonly/></td>
+                    <td>MMSI：</td>
+                    <td><input style='border: 0px;' id='mmsi' readonly/></td>
+                    <td>部分编号：</td>
+                    <td><input style='border: 0px;' id='partNumber' readonly/></td>
+                </tr>
+                <tr>
+                    <td>名称：</td>
+                    <td><input style='border: 0px;' id='msgShipName' readonly/></td>
+                </tr>
+                <tr>
+                    <td>原始报文：</td>
+                    <td><input style='border: 0px;width: 600px' id='message' readonly/></td>
+                </tr>
+            </table>
+        </div>
+        <div style="width: 100% ; height: 30px;background-color: white;margin-top:100px ; ">
+            <p style="font-weight: bold; font-size: 20px ;background-color: white;padding: 10px">异常处理：</p>
+        </div>
+        <div class="layui-card-body" style="margin-top: 20px;background-color: white; height: 150px; ">
+            <label class="layui-form-label">处理结果：</label>
+            <div class="layui-input-block" style="margin-top: 7px;">
+                <input type="radio" name="dealResult" value="MISJUDGED" title="误判" lay-filter="dealResult"
+                       checked/><span>误判</span>
+                <input type="radio" name="dealResult" value="RECTIFIED" title="已整改" lay-filter="dealResult"/><span>已整改</span>
+                <input type="radio" name="dealResult" value="SPECIAL" title="其他特殊情况"
+                       lay-filter="dealResult"/><span>其他特殊情况</span>
+            </div>
+            <div class="layui-form-item" style="margin-top: 10px;">
+                <label class="layui-form-label">情况说明：</label>
+                <div class="layui-input-block">
+                    <input name="title" id="description" class="layui-input layui-form-danger" required="" type="text"
+                           placeholder="请输入情况说明" autocomplete="off" lay-verify="required">
+                </div>
+            </div>
+            <div style=" margin-top: 10px; margin-left: 50px;">
+                <button class="layui-btn layui-btn-normal" style="float: left;" lay-filter="deal-submit" lay-submit>保存
+                </button>
+                <a class="layui-btn layui-btn-normal "
+                   style="margin-left: 20px;" id="return" lay-event="return">
+                    返回
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['form', 'table', 'util', 'common', 'admin', 'laydate', 'jquery', 'layer', 'table', 'layedit', 'upload', 'element', 'carousel'], function () {
+        var form = layui.form;
+        var table = layui.table;
+        var config = layui.common;
+        var layer = layui.layer;
+        var admin = layui.admin;
+        var $ = layui.jquery;
+        carousel = layui.carousel;
+        var table = layui.table;
+        let aisStaticDetail = admin.getTempData('aisStatic');
+
+        $('#staticShipMmsi').val(aisStaticDetail.mmsi);
+        $('#mmsi').val(aisStaticDetail.mmsi);
+        $('#msgId').val(aisStaticDetail.msgId + "号");
+        $('#msgShipName').val(aisStaticDetail.msgShipName);
+        $('#message').val(aisStaticDetail.originalMesage);
+        $('#repeat').val(aisStaticDetail.repeat);
+        if(aisStaticDetail.partNumber==0){
+            $('#partNumber').val("A部分");
+        }else if(aisStaticDetail.partNumber==1){
+            $('#partNumber').val("B部分");
+        }
+        $("#return").click(function () {
+            admin.closePopupCenter();
+        })
+        // 渲染表格
+        table.render({
+            elem: '#aisStaticInformationDetail-table',
+            url: config.base_server + 'AISStaticInfo-Api/errorStaticInfo/findPage?mmsi=' + aisStaticDetail.mmsi,
+            method: 'GET',
+            headers: {'Authorization': 'Bearer ' + config.getToken().access_token},
+            page: true,
+            cols: [[
+                {type: 'checkbox'},
+                {
+                    field: 'receiveTime', title: '异常确定时间', templet: function (e) {
+                        return layui.util.toDateString(e.receiveTime, "yyyy-MM-dd HH:mm:ss")
+                    }
+                },
+                {
+                    field: 'resultTypeString', title: '异常类型', templet: function (e) {
+                        return e.resultTypeString == '' ? "" : e.resultTypeString + "异常";
+                    }
+                },
+                {field: 'resultInfoName', title: '异常信息'},
+                {field: 'note', title: '异常说明',width:'25%'},
+                {field: 'dealWithBy', title: '处理人'},
+                {
+                    field: 'dealWithTime', title: '处理时间', templet: function (e) {
+                        if(e.dealWithTime=='' || e.dealWithTime==undefined){
+                            return "";
+                        }else
+                            return layui.util.toDateString(e.dealWithTime, "yyyy-MM-dd HH:mm:ss")
+                        }
+
+                },
+                {field: 'errorContent', title: '情况说明'},
+                {field: 'errorStatusNameList', title: '异常处理'},
+            ]]
+        });
+
+        // 头工具栏事件
+        var shipData;
+        table.on('checkbox(dealTable)', function (obj) {
+            shipData = obj.data;
+        });
+
+        // 表单提交事件
+        form.on('submit(deal-submit)', function () {
+            if (shipData == null) {
+                layer.msg("至少选择一条船舶异常信息");
+                return;
+            }
+            var data ={
+                id:shipData.id,
+                errorStatus : $("input[name='dealResult']:checked").val(),
+                errorContent : $('#description').val(),
+            }
+            admin.req('AISStaticInfo-Api/errorStaticInfo/saveDeal', JSON.stringify(data), function (data) {
+                layer.closeAll('loading');
+                if (data.resp_code === 0) {
+                    layer.msg(data.resp_msg, {icon: 1, time: config.msgTime});
+                    table.reload('aisStaticInformationDetail-table')
+                } else {
+                    layer.msg(data.resp_msg, {icon: 2, time: config.msgTime});
+                }
+            }, "POST");
+            table.reload('aisStaticInformationDetail-table')
+        });
+    });
+</script>
+</html>

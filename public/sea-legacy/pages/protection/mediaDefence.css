@@ -1,0 +1,444 @@
+@media screen and (max-width: 600px) {
+    html {
+        padding-right: calc(100vw - 100%);
+        overflow: hidden;
+        /*background-color: blue;*/
+    }
+
+    #allCount {
+        /*width: 100vw;*/
+        /*position: relative;*/
+        position: absolute;
+        left: 0;
+        transform: translate(0);
+        width: calc(100vw * 0.75);
+
+    }
+
+    .layui-btn {
+        padding: 0 5px;
+    }
+
+    .portal {
+        /*padding: 0 10px;*/
+        margin-top: 62px;
+        padding: 0!important;
+        margin-right: 0 !important;
+        width: calc(100vw * 0.15) !important;
+    }
+
+    .navigation_box {
+        position: absolute;
+        top: 37px;
+        left: 5px;
+    }
+
+    #navigation_box {
+        z-index: 9999999999999!important;
+    }
+
+    .navigation_box-layui-nav {
+        position: absolute;
+        right: 0;
+        top: -5px;
+        margin-right: 10px;
+    }
+
+    .showTabBtn {
+        position: absolute;
+        top: 85px;
+        left: 0;
+    }
+
+    #showTabBtn {
+        margin-left: 0 !important;
+    }
+
+    #search {
+        margin-left: 5px !important;
+    }
+
+    .navigation_box-layui-nav-child {
+        z-index: 999999;
+    }
+
+    .search-box {
+        position: absolute;
+        top: 110px;
+        width: 100vw;
+    }
+
+    .layui-btn-group {
+        position: absolute;
+        top: 160px;
+        transform-origin: left!important;
+        transform: scaleX(1)!important;
+    }
+
+    .showTabBtn-container {
+        width: 67vw !important;
+        height: 36px;
+    }
+
+    .stationDetail_id {
+        width: 640px!important;
+    }
+
+    .atonDetail_id {
+        width: 640px!important;
+    }
+
+    .search-center-wrapper {
+        width: 100%;
+    }
+
+    .search-center {
+        top: 62px!important;
+    }
+
+    .layui-nav {
+        padding: 0 10px;
+    }
+
+    .layui-layer {
+        z-index: 999999999!important;
+        transform: scale(0.5);
+        transform-origin: left top;
+        top: 247px !important;
+        left: 5px !important;
+        margin-left: 0 !important;
+        margin-top: 0 !important;
+    }
+
+    .messageBoxSend {
+        width: 160vw !important;
+    }
+
+    #allList_left_middle {
+        margin-top: 113px !important;
+    }
+
+    #control {
+        float: left !important;
+        padding: 0 8px!important;
+    }
+
+    .leaflet-left {
+        transform-origin: left bottom;
+        transform: scale(0.7);
+    }
+
+    /*.layui-layer-lan {*/
+    /*    transform: scale(0.46);*/
+    /*    transform-origin: left top;*/
+    /*    top: 135px !important;*/
+    /*    left: 5px !important;*/
+    /*    margin-left: 0 !important;*/
+    /*    margin-top: 0 !important;*/
+    /*}*/
+    .messageReplyLayerId {
+        transform: scale(0.44);
+    }
+
+    .FleetInfoDetailLayer {
+        z-index: 9999999999 !important;
+        transform-origin: left top;
+        /*transform: scale(0.35);*/
+        width: 160vw !important;
+        top: 160px !important;
+    }
+
+    .fleetShipInfoLayer {
+        z-index: 9999999999 !important;
+    }
+
+    .myFleetSendMessageLayer {
+        z-index: 9999999999 !important;
+        top: 160px !important;
+        transform: scale(0.45);
+    }
+
+    .search-btn-wrapper {
+        width: 66px;
+        height: 36px;
+        padding-left: 0px;
+    }
+
+    #saerchMMSIorName {
+        width: 65vw;
+    }
+
+    .show-tab-btn-style {
+        height: 48px !important;
+    }
+
+    .ul-custom {
+        position: absolute;
+    }
+
+    .layui-tab-content-custom {
+        width: 400px!important;
+    }
+
+    .select-custom {
+        display: inline-block!important;
+    }
+
+    .select-custom > .layui-form-select {
+        display: inline-block;
+
+        width: 300px!important;
+    }
+
+    #sendSafeMsgControlLayer .custom-top-ais-msg-btn {
+        width: 300px!important;
+    }
+
+    .layui-input-block-custom {
+        width: 185px!important;
+    }
+
+    #sendSafeMsgControlLayer #waypoints .layui-input-block input {
+        width: 185px !important;
+    }
+
+    #sendSafeMsgControlLayer .custom-top-asm-water-msg-btn {
+        width: 39% !important;
+        margin-top: 0 !important;
+        margin-left: 168px !important;
+    }
+
+    #sendSafeMsgControlLayer .custom-top-asm-text-msg-btn {
+        width: 60% !important;
+        margin-top: 0 !important;
+        margin-left: 66px !important;
+    }
+
+    #sendSafeMsgControlLayer .custom-top-asm-sea-msg-btn {
+        width: 30.5% !important;
+        margin-top: 0 !important;
+        margin-left: 215px !important;
+    }
+
+    #sendSafeMsgControlLayer .custom-top-asm-area-msg-btn {
+        width: 37% !important;
+        margin-top: 0 !important;
+        margin-left: 185px !important;
+    }
+
+    #sendSafeMsgControlLayer .custom-top-asm-area-add-btn {
+        width: 35% !important;
+        margin-top: 0 !important;
+        margin-left: 83px !important;
+    }
+
+    #sendSafeMsgControlLayer .custom-top-asm-target-msg-btn {
+        width: 36.5% !important;
+        margin-top: 0px !important;
+        margin-left: 168px !important;
+        transform: translateY(50px);
+    }
+    .layui-form-label-transform {
+        transform: translate(-207px, 47px);
+    }
+
+    .layui-input-block-transform {
+        transform: translate(-205px, 48px);
+    }
+
+
+    #sendSafeMsgControlLayer .cus#sendSafeMsgControlLayer .custom-top-ais-msg-btntom-top-asm-text-msg-btn {
+        margin-top: 10px;
+    }
+
+    .layui-input-block-custom-150 {
+        width: 150px!important;
+    }
+
+    .layui-input-block-custom-300 {
+        width: 300px!important;
+    }
+
+    .layui-input-block-custom-vde {
+        width: 420px!important;
+    }
+
+    #sendSafeMsgControlLayer #textMsg5 {
+        width: 315px !important;
+    }
+
+    #sendSafeMsgControlLayer .custom-top-vde-msg-btn {
+        width: 317px !important;
+        margin-top: 10px !important;
+        margin-left: 100px !important;
+    }
+
+    #sendSafeMsgControlLayer #textMsg3, #textMsg4 {
+        width: 300px!important;
+    }
+
+    .custom-top-all-msg-btn {
+        width: 38% !important;
+        margin-top: 0 !important;
+        margin-left: 97px !important;
+    }
+
+    #sendSafeMsgControlLayer .layui-tab-content.custom-unset-width {
+        overflow-x: hidden;
+    }
+
+    .layui-nav .layui-nav-item a {
+        padding: 0px;
+    }
+
+    .layui-nav-child-mobile {
+        left: -55px!important;
+    }
+
+    .layui-form-item .layui-inline {
+        display: inline-block;
+    }
+
+    #targetShipSendMessageLayer .layui-unselect.layui-form-checkbox {
+        width: 47%;
+    }
+
+    .check-box-group .layui-form-checkbox {
+        width: 47%;
+    }
+
+    .layui-form-checkbox[lay-skin=primary] span {
+        color: white!important;
+    }
+
+    .data-view {
+        width: calc(100% - 45px);
+        min-width: 50px;
+        font-family: ledCustom;
+        color: #fff;
+        text-align: right;
+        font-size: 40px;
+        margin-right: 45px;
+    }
+
+    .banner {
+        transform-origin: center;
+        transform: scaleX(3);
+    }
+}
+
+
+@media screen and (min-width: 600px) and (max-width: 1200px) {
+    #search_box {
+        top: 50px;
+    }
+
+    .search-center {
+        left: 0;
+        transform: translate(0);
+        top: 2px;
+    }
+
+    .portal {
+        margin-right: 2px !important;
+    }
+
+    #showTabBtn {
+        margin-left: 0 !important;
+    }
+
+    #search {
+        margin-left: 5px;
+    }
+
+    .showTabBtn-container {
+        width: 205px !important;
+    }
+
+    .layui-nav {
+        padding: 0 10px;
+    }
+
+    .layui-btn-group .layui-btn {
+        padding: 0 10px;
+    }
+
+    .messageReplyLayerId {
+        transform: scale(0.46);
+    }
+
+    .layui-layer {
+        transform: scaleY(0.42) scaleX(0.42);
+        transform-origin: left top;
+        top: 94px !important;
+        left: 240px !important;
+        margin-left: 0 !important;
+        margin-top: 0 !important;
+    }
+
+    .legend_id {
+        transform: scaleY(0.7) scaleX(0.7) !important;
+    }
+
+    .leaflet-left {
+        transform-origin: left bottom;
+        transform: scale(0.7);
+    }
+
+    .FleetInfoDetailLayer {
+        z-index: 9999999999 !important;
+        left: 200px !important;
+        top: 130px !important;
+    }
+
+    .fleetShipInfoLayer {
+        z-index: 9999999999 !important;
+    }
+
+    .myFleetSendMessageLayer {
+        z-index: 9999999999 !important;
+
+    }
+
+    #saerchMMSIorName {
+        width: 211px;
+    }
+
+    .show-tab-btn-style {
+        height: 38px!important;
+    }
+
+    .search-center-wrapper {
+        width: 350px;
+    }
+
+    #allList_left_middle {
+        margin-top: 74px !important;
+        transform: scaleY(0.80);
+        transform-origin: left top;
+    }
+
+    #allList_left {
+        z-index: 9999999999!important;
+    }
+
+    .stationDetail_id {
+        width: 640px!important;
+    }
+
+    .atonDetail_id {
+        width: 640px!important;
+    }
+
+    .layui-nav-child-mobile {
+        left: -54px!important;
+    }
+}
+
+
+@media screen and (device-aspect-ratio: 3000/2000) {
+    .search-center-wrapper {
+        transform-origin: left;
+        transform: scale(0.9);
+    }
+}

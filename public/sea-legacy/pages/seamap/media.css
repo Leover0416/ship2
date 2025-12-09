@@ -1,0 +1,633 @@
+/*手机竖版*/
+@media screen and (min-width: 300px) and (max-width: 500px) {
+    body {
+        height: 100% !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+        min-width: 300px !important;
+        overflow-x: auto !important;
+        position: relative;
+    }
+
+    .banner {
+        margin-left: 50% !important;
+        transform: translateX(-50%) scale(0.6) !important;
+        transform-origin: top;
+    }
+
+    #allCount {
+        /*left: 118%!important;*/
+        /*transform: translate(0) scale(0.7)!important;*/
+        transform-origin: top;
+        left: 50% !important;
+        transform: translateX(-50%) scale(0.6) !important;
+        top: -15px;
+    }
+
+    #count_box {
+        width: 100% !important;
+        top: 50px;
+        transform: scale(0.9);
+        transform-origin: center;
+    }
+
+    /*?????*/
+    #search_box {
+        width: 110% !important;
+        top: 50px;
+        transform: scale(0.8);
+        transform-origin: left;
+        margin-top: 3px;
+    }
+
+    #showTabBtn {
+        margin-left: 0 !important;
+        margin-top: 20px !important;
+    }
+
+    .showTabBtn-container {
+        width: 60% !important;
+        margin-top: 20px !important;
+    }
+
+    .search-btn-wrapper {
+        margin-top: 20px !important;
+    }
+
+    #saerchMMSIorName {
+        width: 100%;
+    }
+
+    .commonShow-else {
+        float: left !important;
+        width: 110%;
+        margin-top: -40px;
+        transform-origin: left;
+        transform: scale(0.8);
+    }
+
+    .commonShow-portal {
+        margin-right: 0 !important;
+        margin-top: 105px;
+        transform-origin: right;
+        transform: scale(0.8);
+    }
+
+    .search-center {
+        left: 0;
+        transform: translate(0);
+        top: 2px;
+    }
+
+    .portal {
+        transform: scale(0.8, 1);
+        margin-right: 2px !important;
+        transform-origin: right;
+        margin-top: -45px !important;
+    }
+
+    #search {
+        margin-left: 5px;
+    }
+
+    .layui-info {
+        width: 120%;
+        margin-top: 142px !important;
+        transform: scale(0.8);
+        transform-origin: left top;
+    }
+
+    .layui-nav {
+        padding: 0 10px;
+    }
+
+    .layui-btn-group .layui-btn {
+        padding: 0 10px;
+    }
+
+    #allList_left {
+        z-index: 9999999999 !important;
+        width: 100% !important;
+        min-width: 0px !important;
+        margin-left: 0px !important;
+    }
+
+    .layui-layer-lan {
+        transform: scale(0.58);
+        margin-top: -64px !important;
+        margin-left: -125px !important;
+    }
+
+    .layerControl {
+        margin-top: 44px !important;
+        margin-left: -96px !important;
+    }
+    .hymeControl {
+        margin-top: 44px !important;
+        margin-left: -96px !important;
+    }
+
+    .myFleet {
+        margin-top: 63px !important;
+        margin-left: 57px !important;
+    }
+
+    .careShip {
+        margin-top: 63px !important;
+        margin-left: 57px !important;
+    }
+
+    .sendSafeMsgControl {
+        margin-top: -52px !important;
+        margin-left: 226px !important;
+        transform: scale(0.43);
+    }
+
+    /*!*消息播发内容*********!*/
+    /*.layui-tab-content-custom{*/
+    /*    margin-top: -619px;*/
+    /*}*/
+    /*.custom-unset-width{*/
+    /*    margin-top: -587px;*/
+    /*}*/
+    /*.layui-input-block-custom-vde{*/
+    /*    margin-top: -637px;*/
+    /*}*/
+    /*.layui-form-select .layui-input {*/
+    /*    padding-right: 30px;*/
+    /*    cursor: pointer;*/
+    /*    width: 79%;*/
+    /*}*/
+    /*.layui-form-item .layui-inline {*/
+    /*    display: block;*/
+    /*    margin-right: 0;*/
+    /*    margin-bottom: 20px;*/
+    /*     clear: initial;*/
+    /*}*/
+    /*#sendSafeMsgControlLayer #channel4 +.layui-unselect.layui-form-select {*/
+    /*    width: 102%;*/
+    /*    margin-left: 3px;*/
+    /*}*/
+    /*.layui-form-select .layui-edge {*/
+    /*    position: absolute;*/
+    /*    right: 10px;*/
+    /*    top: 50%;*/
+    /*    margin-top: -3px;*/
+    /*    margin-right: 27px;*/
+    /*    cursor: pointer;*/
+    /*    border-width: 6px;*/
+    /*    border-top-color: #c2c2c2;*/
+    /*    border-top-style: solid;*/
+    /*    transition: all .3s;*/
+    /*    -webkit-transition: all .3s;*/
+    /*}*/
+    .layui-form-item .layui-inline {
+        display: inline-block;
+        margin-right: 0;
+        margin-bottom: 20px;
+        clear: both;
+    }
+
+    /*!*消息播发内容*********!*/
+    .receiveMessageControl {
+        margin-top: -52px !important;
+        margin-left: 222px !important;
+        transform: scale(0.43);
+    }
+
+    .playbackTrackControl {
+        margin-top: 96px !important;
+        margin-left: -24px !important;
+    }
+
+    .messageBoxSend {
+        margin-top: 18px !important;
+        margin-left: 108px !important;
+        transform: scale(0.5);
+    }
+
+    .markerTableLayer {
+        margin-top: 45px !important;
+        margin-left: 57px !important;
+    }
+
+    .userInfo {
+        margin-top: 86px !important;
+        margin-left: -23px !important;
+    }
+
+    .userPassword {
+        margin-top: 96px !important;
+        margin-left: -23px !important;
+    }
+
+    .setCenter_id {
+        margin-bottom: -160px !important;
+        margin-left: -23px !important;
+    }
+
+    .legend_id {
+        transform: scale(0.6);
+        margin-top: -52px !important;
+        margin-left: -45px !important;
+    }
+
+    .trackId {
+        margin-top: 358px !important;
+        margin-left: -31px !important;
+    }
+
+    .messageSendLayerId {
+        transform: scale(0.35);
+        /*margin-top: 203px !important;*/
+        margin-left: 225px !important;
+        transform-origin: bottom;
+    }
+
+    .fleetShipInfoLayer {
+        margin-left: 34px !important;
+        margin-top: 287px !important;
+    }
+
+    .editFleetInfoLayer {
+        margin-left: -100px !important;
+        margin-top: 312px !important;
+    }
+
+    .fleetSendMessageLayer {
+        margin-left: 206px !important;
+        margin-top: 164px !important;
+        transform: scale(0.38);
+    }
+
+    .FleetInfoDetailLayer {
+        margin-left: 325px !important;
+        margin-top: 217px !important;
+        transform: scale(0.34);
+    }
+
+    .careshipinfoLayer {
+        margin-top: 303px !important;
+        margin-left: -21px !important;
+    }
+
+    /*.virtualAtoNEditLayerId{*/
+    /*    margin-top: 303px !important;*/
+    /*    margin-left: -21px !important;*/
+    /*}*/
+    .virtualAtoNEditLayerId {
+        margin-top: 227px !important;
+        margin-left: 186px !important;
+        transform: scale(0.4);
+    }
+
+    .mess {
+        margin-top: 377px !important;
+        margin-left: -100px !important;
+    }
+
+    .joinLayer {
+        margin-top: 157px !important;
+        margin-left: -707px !important;
+    }
+
+    .CareShipInfoLayer {
+        margin-top: 184px !important;
+        margin-left: -692px !important;
+    }
+
+    #sendSafeMsgControl {
+        /*display: none !important;*/
+    }
+
+    #dataCount {
+        margin-left: -4% !important;
+    }
+
+
+    .show-tab-btn-style {
+        height: 38px !important;
+    }
+
+    .search-center-wrapper {
+        width: 350px;
+    }
+
+    #allList_left_middle {
+        margin-top: 74px !important;
+        transform-origin: left top;
+    }
+
+    .stationDetail_id {
+        width: 640px !important;
+    }
+
+    .atonDetail_id {
+        width: 640px !important;
+    }
+    .hymeDetail_id {
+        width: 640px !important;
+    }
+    .layui-nav-child-mobile {
+        left: -54px !important;
+    }
+
+    .commonShow {
+        position: absolute !important;
+    }
+
+    #navigation_box {
+        margin-top: 37px !important;
+    }
+
+    .stationDetail_id {
+        transform-origin: left;
+        margin-top: 132px !important;
+        width: 640px !important;
+        margin-left: 9px !important;
+        transform: scale(0.5);
+    }
+
+    .atonDetail_id {
+        transform-origin: left;
+        transform: scale(0.5);
+        width: 640px !important;
+        margin-top: 118px !important;
+        margin-left: 9px !important;
+    }
+    .layui-input-hyme{
+        width:110px;
+        padding:8px 15px;
+        height:38px;
+        line-height:20px;
+        border-width:1px;
+        border-style:solid;
+        border-radius:2px 0 0 2px;
+        text-align:center;
+        background-color:#FAFAFA;
+        overflow:hidden;
+        white-space:nowrap;
+        text-overflow:ellipsis;
+        box-sizing:border-box
+    }
+    .hymeDetail_id{
+        transform-origin: left;
+        transform: scale(0.5);
+        width: 640px !important;
+        margin-top: 118px !important;
+        margin-left: 9px !important;
+    }
+    .fishingNetDetail_id {
+        transform-origin: left;
+        transform: scale(0.5);
+        width: 640px !important;
+        margin-top: 118px !important;
+        margin-left: 9px !important;
+    }
+
+    .trackList_id {
+        top: 185px !important;
+        left: 56px !important;
+    }
+    .shipTimeLayerId {
+        margin-top: 248px !important;
+        margin-left: 216px !important;
+        transform: scale(0.4);
+    }
+    .shipTimeDetailLayerId {
+        margin-top: 451px !important;
+        margin-left: 113px !important;
+        transform: scale(.3);
+    }
+    #playbackTrackControl{
+        border-right: 1px solid #000!important;
+    }
+}
+
+/*手机横版*/
+@media screen and (min-width: 700px) and (max-width: 1000px) {
+    html {
+        zoom: 1;
+    }
+
+    .search-box {
+        transform: scale(0.8);
+        transform-origin: left;
+    }
+
+    .banner {
+        transform: translateX(-40%) scale(0.7);
+        transform-origin: left top;
+    }
+
+    #allCount {
+        transform-origin: left top;
+        transform: translateX(-45%) translateY(-32%) scale(0.7) !important;
+    }
+
+    #navigation_box {
+        transform-origin: right top;
+        transform: scale(0.8);
+    }
+
+    .commonShow-else {
+        /*right: -5px;*/
+        /*position: absolute;*/
+        /*float: none;*/
+    }
+
+    .commonShow-portal {
+        /*right: -57px;*/
+        /*position: absolute;*/
+        /*float: none;*/
+    }
+
+    /*.messageBoxSend {*/
+    /*    right: 25px!important;*/
+    /*    left: auto!important;*/
+    /*    margin-top: 130px!important;*/
+    /*}*/
+    body {
+        height: 185%;
+        /*height: 100%;*/
+        margin: 0;
+        overflow-y: hidden;
+        padding: 0;
+        /*min-width: 1250px!important;*/
+        min-width: 185% ! important;
+        overflow-x: auto !important;
+        position: relative;
+    }
+
+    /*    FSS*/
+    .layui-info {
+        transform-origin: left;
+        transform: scale(0.8);
+        margin: 10px 0;
+        text-align: left !important;
+        margin-top: -10px !important;
+    }
+
+    .joinLayer {
+        left: 500px !important;
+        margin-top: 29px !important;
+        transform: scale(0.7) !important;
+    }
+
+    .layui-layer-lan {
+        transform-origin: left top;
+        transform: scale(0.8);
+        top: 50px !important;
+        margin-top: -40px;
+        left: 0px;
+        margin-left: 5px;
+    }
+
+    .playbackTrackControl {
+        margin-top: 10px !important;
+        margin-left: 48% !important;
+    }
+
+    .layerControl {
+        transform: scale(0.6);
+        margin-top: 10px !important;
+        margin-left: 48% !important;
+    }
+    .hymeControl {
+        transform: scale(0.6);
+        margin-top: 10px !important;
+        margin-left: 48% !important;
+    }
+
+    .myFleet {
+        margin-top: 10px !important;
+        margin-left: 48% !important;
+    }
+
+    .careShip {
+        margin-top: 10px !important;
+        margin-left: 48% !important;
+        /*transform-origin: right;*/
+        /*margin-top: 1px !important;*/
+    }
+
+    .sendSafeMsgControl {
+        transform: scale(0.4);
+        margin-top: 10px !important;
+        margin-left: 77% !important;
+    }
+
+    .receiveMessageControl {
+        transform: scale(0.4);
+        margin-top: 10px !important;
+        margin-left: 77% !important;
+    }
+
+    .messageBoxSend {
+        margin-top: 10px !important;
+        margin-left: 51% !important;
+    }
+
+    .markerTableLayer {
+        margin-top: 10px !important;
+        margin-left: 48% !important;
+    }
+
+    .userInfo {
+        margin-top: 10px !important;
+        margin-left: 48% !important;
+    }
+
+    .userPassword {
+        margin-top: 10px !important;
+        margin-left: 48% !important;
+    }
+
+    .fleetShipInfoLayer {
+        margin-left: -380px !important;
+    }
+
+    .editFleetInfoLayer {
+        transform-origin: right;
+        margin-left: 95px !important;
+        margin-top: 9px !important;
+    }
+
+    .fleetSendMessageLayer {
+        transform: scale(0.5);
+        margin-left: 501px !important;
+        margin-top: 28px !important;
+    }
+
+    .FleetInfoDetailLayer {
+        transform: scale(0.7);
+        margin-left: 402px !important;
+        margin-top: 33px !important;
+    }
+
+    .careshipinfoLayer {
+        margin-top: 34px !important;
+        margin-left: 188px !important;
+    }
+
+    .virtualAtoNEditLayerId {
+        transform: scale(0.6);
+        margin-left: 339px !important;
+        margin-top: 31px !important;
+    }
+
+    .mess {
+        margin-top: 35px !important;
+        margin-left: 167px !important;
+    }
+
+    .messageReplyLayerId {
+        margin-left: -550px !important;
+        margin-top: 5px !important;
+    }
+
+    .trackList_id {
+        margin-left: -329px !important;
+        margin-top: 20px !important;
+    }
+
+    .setCenter_id {
+        top: 350px !important;
+    }
+
+    .messageSendLayerId {
+        transform: scale(0.5);
+        top: -50px !important;
+        left: 550px !important;
+    }
+
+    .trackId {
+        margin-top: 40px !important;
+        margin-left: 201px !important;
+    }
+
+    .fleetShipInfoLayer {
+        margin-left: 107px !important;
+        transform-origin: right;
+        margin-top: -11px !important;
+    }
+    .CareShipInfoLayer {
+        margin-top: 33px !important;
+        margin-left: -82px !important;
+    }
+    .shipTimeLayerId {
+        width: 500px !important;
+        margin-left: 310px !important;
+        margin-top: 29px !important;
+        transform: scale(.6);
+    }
+
+    #addShipTimeInfo{
+        margin-left:calc((100% - 200px)/2) !important;
+    }
+    .shipTimeDetailLayerId {
+        margin-left: 10px !important;
+        margin-top: 35px !important;
+        transform: scale(.7);
+    }
+}

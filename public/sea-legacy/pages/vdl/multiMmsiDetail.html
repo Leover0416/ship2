@@ -1,0 +1,79 @@
+<html lang="en" xmlns="">
+<head></head>
+<style>
+    .layui-layer-title {
+        display: none;
+    }
+
+    .layui-layer-setwin .layui-layer-close1 {
+        display: none;
+    }
+</style>
+<div class="layui-card" style="width:1695px; height: 950px;margin-left:-12px; padding: 0px ;background-color: #9F9F9F;">
+    <div class="layui-card-header" style="background-color: white ;margin-top:-10px;;">
+        <h2 class="header-title" style="font-weight: bold; font-size: 30px ;margin-top: -20px;"><font color="#9F9F9F">一船多码结果</font>
+        </h2>
+    </div>
+    <div style=" margin-top: 20px ;margin-left: 10px;">
+        <div style="width: 100% ; height: 30px;background-color: white;margin-top: 20px;">
+            <p style="font-weight: bold; font-size: 20px ;background-color: white;padding: 10px">船舶异常信息：</p>
+        </div>
+        <div class="layui-card-body  " style="margin-top: 20px;background-color: white; ">
+            <table class=layui-table" lay-skin="line" style="font-size: 14px">
+                <tr>
+                    <td>船舶名称：</td>
+                    <td><input style='border: 0px;width:400px' id='multiShipName' readonly/></td>
+                    <td>异常类型：</td>
+                    <td><input style='border: 0px;width:200px' id='multiResultType' readonly/></td>
+                    <td style="margin-left: 30px">重复次数：</td>
+                    <td><input style='border: 0px;' id='multiMmsiCnt' readonly/></td>
+                </tr>
+
+            </table>
+        </div>
+        <div style="margin-top: 20px;width: 100% ; height: 30px;background-color: white;">
+            <table class="layui-table" id="multipleAisRecognitionDetail-table" lay-filter="multipleAisRecognitionDetail-table"></table>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['form', 'table', 'util', 'common', 'admin', 'laydate', 'jquery', 'layer', 'table', 'layedit', 'upload', 'element'], function () {
+        var form = layui.form;
+        var config = layui.common;
+        var layer = layui.layer;
+        var admin = layui.admin;
+        var $ = layui.jquery;
+        var table = layui.table;
+        let multipleAisDetail = admin.getTempData('multipleAis');
+        $('#multiShipName').val(multipleAisDetail.name);
+        $('#multiResultType').val(multipleAisDetail.resultType);
+        $('#multiMmsiCnt').val(multipleAisDetail.mmsiCnt)
+        // 渲染表格
+        table.render({
+            elem: '#multipleAisRecognitionDetail-table',
+            url: config.base_server + 'multipleAisRecognition/findMultipleDetail',
+            method: 'GET',
+            headers: {'Authorization': 'Bearer ' + config.getToken().access_token},
+            page: false,
+            where: {id: multipleAisDetail.id},
+            cols: [[
+                {field: 'mmsi', title: '船舶MMSI号'},
+                {title: '呼号',templet: function () {return multipleAisDetail.callsign}},
+                {title: '船长',templet: function () {return multipleAisDetail.shipLength}},
+                {title: '船宽',templet: function () {return multipleAisDetail.shipBreadth}},
+                {field: 'receiveTimeStartYMD', title: '开始时间'},
+                {field: 'receiveTimeEndYMD', title: '结束时间'},
+                {field: 'cnt', title: '记录次数'},
+                {title: '船舶位置',templet: function (e) {
+                        if (e.shipPositionLat == null || e.shipPositionLng == null) {
+                            return "";
+                        } else {
+                            return "经度 " + e.shipPositionLat.toFixed(3) + "，纬度 " + e.shipPositionLng.toFixed(3)
+                        }
+                    }}
+            ]]
+        })
+    });
+</script>
+</html>

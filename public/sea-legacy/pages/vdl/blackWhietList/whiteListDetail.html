@@ -1,0 +1,125 @@
+<div class="layui-card">
+
+    <div class="layui-card-header" style="width: 95% ; height: 30px;background-color: white;">
+        <p style="font-weight: bold; font-size: 20px ;background-color: white;padding: 10px;white-space:nowrap;display: inline-block ">船舶基本信息</p>
+        <a class="layui-btn layui-btn-normal "  onclick="window.location.href='\#!whiteList'" style="margin-right: 10px;margin-top: 10px; float: right;white-space:nowrap; display: inline-block "  >
+            返回列表
+        </a>
+    </div>
+    <div class="layui-card-body " style="margin-top: 20px;margin-left: 20px;">
+        <table class=layui-table" lay-skin="line" style="font-size: 14px">
+            <tr>
+            <td >MMSI：</td>
+            <td><input style='border: 0px;' id='shipMMSI' readonly /></td>
+            <td >设备名称：</td>
+            <td><input style='border: 0px;' id='shipName' readonly /></td>
+            <td >船舶类型：</td>
+            <td><input style='border: 0px;' id='shipType' readonly /></td>
+            <td >呼号：</td>
+            <td><input style='border: 0px;' id='shipCall' readonly /></td>
+            <td >IMO：</td>
+            <td><input style='border: 0px;' id='shipImo' readonly /></td>
+            </tr>
+            <tr>
+            <td >AIS类型：</td>
+            <td><input style='border: 0px;' id='shipAisType' readonly /></td>
+            <td >船长：</td>
+            <td><input style='border: 0px;' id='shipLength' readonly /></td>
+            <td >船宽：</td>
+            <td><input style='border: 0px;' id='shipWidth' readonly /></td>
+            </tr>
+        </table>
+    </div>
+
+
+    <div class="layui-card-header">
+        <p style="font-weight: bold; font-size: 20px ;background-color: white;padding: 10px">正常目标详细(检查历史)</p>
+    </div>
+    <div class="layui-card-body ">
+        <table class="layui-table" lay-even lay-skin="line" id="normalTarget-table" lay-filter="normalTarget-table" style="width: 100%"></table>
+    </div>
+</div>
+
+<!-- 表格操作列 -->
+
+<script>
+    layui.use(['form', 'table', 'util', 'common', 'admin', 'laydate', 'jquery', 'layer', 'table', 'layedit', 'upload', 'element', 'carousel'], function () {
+        var form = layui.form;
+        var table = layui.table;
+        var config = layui.common;
+        var layer = layui.layer;
+        var util = layui.util;
+        var admin = layui.admin;
+        var laydate = layui.laydate;
+
+        var $ = layui.jquery;
+        var element = layui.element;
+        carousel = layui.carousel;
+        // echarts = layui.echarts;
+        var table = layui.table;
+        var layedit = layui.layedit;
+        var upload = layui.upload;
+        // var dtree = layui.dtree;
+
+        // 回显menu数据
+        var mmsi = admin.getTempData('mmsi');
+        if(mmsi == undefined){
+            mmsi = 0
+        }
+
+        // 渲染表格
+        table.render({
+            elem: '#normalTarget-table',
+            url: config.base_server + 'whiteList-api/whitelist/findByMmsi',
+            method: 'GET',
+            headers: {'Authorization': 'Bearer ' + config.getToken().access_token},
+            page: true,
+            where:{mmsi:mmsi},
+            parseData : function(data) {
+                if (data.nauShipDto != null){
+
+                    $("#shipMMSI").val(data.nauShipDto.mmsi)
+                    $("#shipName").val(data.nauShipDto.nameEn)
+                    $("#shipType").val(data.nauShipDto.shipTypeCode)
+                    $("#shipCall").val(data.nauShipDto.callSign)
+                    $("#shipImo").val(data.nauShipDto.imo)
+                    $("#shipAisType").val(data.nauShipDto.aisType)
+                    $("#shipLength").val(data.nauShipDto.lengthh)
+                    $("#shipWidth").val(data.nauShipDto.width)
+                }
+
+                return {
+                    "code" : data.code,
+                    "msg" : data.msg,
+                    "count": data.total,
+                    "data" : data.whiteTblDtoList
+
+                }
+
+            },
+            cols: [[
+
+                {field: 'businessName', title: '通过类型',width:'50%',backgroundcolor:'#9f9f9f'},
+
+                {field: 'updateTime', title: '更新时间',backgroundcolor:'#9f9f9f'}
+
+
+            ]]
+        });
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,182 @@
+<div class="layui-card">
+    <div class="layui-card-header">
+        <h2 class="header-title">菜单模板管理</h2>
+    </div>
+    <div class="layui-card-body">
+        <div class="layui-form toolbar">
+            <div class="layui-form-item">
+                <label class="layui-form-label">模板名称</label>
+                <div class="layui-input-inline">
+                    <input id="menutemplate-name-value" class="layui-input search-input" type="text"
+                           placeholder="输入关键字"/>&emsp;
+                </div>
+
+                <label id="tenantNameChoose" class="layui-form-label">租户名称：</label>
+                <div id="tenantNameOption" class="layui-input-inline">
+                    <select name="tenant-names-value" id="tenant-names-value">
+                        <option value="">请选择</option>
+                    </select>
+                </div>
+                <button id="menutemplate-btn-search" class="layui-btn icon-btn"><i class="layui-icon">&#xe615;</i>搜索
+                </button>
+                <button id="menutemplate-btn-add" class="layui-btn icon-btn"><i class="layui-icon">&#xe654;</i>添加
+                </button>
+            </div>
+        </div>
+        <table class="layui-table" id="menutemplate-table" lay-filter="menutemplate-table"></table>
+    </div>
+</div>
+
+<!-- 表格操作列 -->
+<script type="text/html" id="menutemplate-table-bar">
+    <a class="layui-btn  layui-btn-xs" lay-event="edit">修改</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+<!-- 表格状态列 -->
+<script type="text/html" id="menutemplate-tpl-status">
+    <input type="checkbox" lay-filter="menutemplate-tpl-status" value="{{d.id}}" lay-skin="switch" lay-text="启用|停用"
+           {{d.status=='0'?'checked':''}}/>
+</script>
+
+<script>
+    layui.use(['form', 'table', 'util', 'common', 'admin'], function () {
+        var form = layui.form;
+        var table = layui.table;
+        var config = layui.common;
+        var layer = layui.layer;
+        var util = layui.util;
+        var admin = layui.admin;
+
+        var tenantCode = config.getUser().tenantCode;
+
+        // 获取所有租户
+        admin.reqSync('api-user/tenant/allTenants', {}, function (data) {
+            if (0 == data.code) {
+                $('#tenant-names-value').append(new Option("系统", "webapp"));
+                // 渲染下拉框
+                $.each(data.data, function (index, item) {
+                    $('#tenant-names-value').append(new Option(item.tenantName, item.tenantCode));
+                })
+            } else {
+                layer.msg('获取租户失败', {icon: 2, time: config.msgTime});
+            }
+            form.render();  //菜单渲染 把内容加载进去
+        }, 'GET');
+
+        if (tenantCode == "webapp") {
+        //渲染表格
+        table.render({
+            elem: '#menutemplate-table',
+            url: config.base_server + 'api-user/menuTemplate/queryMenuTemplates',
+            headers: {'Authorization': 'Bearer ' + config.getToken().access_token},
+            page: true,
+            cols: [[
+                {type: 'numbers'},
+                // {field: 'id', sort: true, title: 'ID',width: 80},
+                {field: 'name', sort: true, title: '模板名称'},
+                {field: 'tenantName', sort: true, title: '租户名称'},
+                {field: 'status', templet: '#menutemplate-tpl-status', title: '状态'},
+                {
+                    field: 'createTime', sort: true, templet: function (d) {
+                        return util.toDateString(d.createTime);
+                    }, title: '创建时间'
+                },
+                {align: 'center', toolbar: '#menutemplate-table-bar', title: '操作', width: 250}
+            ]]
+        });}else {
+            $("#tenantNameChoose").hide();
+            $("#tenantNameOption").hide();
+            table.render({
+                elem: '#menutemplate-table',
+                url: config.base_server + 'api-user/menuTemplate/queryMenuTemplates?tenantCode=' + tenantCode,
+                headers: {'Authorization': 'Bearer ' + config.getToken().access_token},
+                page: true,
+                cols: [[
+                    {type: 'numbers'},
+                    // {field: 'id', sort: true, title: 'ID',width: 80},
+                    {field: 'name', sort: true, title: '模板名称'},
+                    {field: 'status', templet: '#menutemplate-tpl-status', title: '状态'},
+                    {
+                        field: 'createTime', sort: true, templet: function (d) {
+                            return util.toDateString(d.createTime);
+                        }, title: '创建时间'
+                    },
+                    {align: 'center', toolbar: '#menutemplate-table-bar', title: '操作', width: 250}
+                ]]
+            });}
+
+        // 修改状态
+        form.on('switch(menutemplate-tpl-status)', function (obj) {
+            layer.load(2);
+            admin.req('api-user/menuTemplate/updateStatus', {
+                id: obj.elem.value,
+                status: obj.elem.checked ? '0' : '1'
+            }, function (data) {
+                layer.closeAll('loading');
+                if (data.resp_code == 0) {
+                    layer.msg(data.resp_msg, {icon: 1, time: config.msgTime});
+                    //table.reload('table-template', {});
+                } else {
+                    layer.msg(data.resp_msg, {icon: 2, time: config.msgTime});
+                    $(obj.elem).prop('checked', !obj.elem.checked);
+                    form.render('checkbox');
+                }
+            }, 'GET');
+        });
+
+        //显示表单弹窗
+        var showEditModel = function (data) {
+            admin.putTempData('t_template', data);
+            var title = data ? '修改菜单模板' : '添加菜单模板';
+            // let menuTemplateId = data.id;
+            admin.popupCenter({
+                title: title,
+                path: 'pages/system/menutemplate_form.html',
+                area: ['900px', '850px'],
+                offset:'50px',
+                finish: function () {
+                    table.reload('menutemplate-table', {});
+                }
+            });
+        };
+
+        // 添加按钮点击事件
+        $('#menutemplate-btn-add').click(function () {
+            showEditModel();
+        });
+
+        // 工具条点击事件
+        table.on('tool(menutemplate-table)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'edit') { //修改
+                showEditModel(data);
+            } else if (obj.event === 'del') { // 删除
+                layer.confirm('确定删除此菜单模板吗？', function (i) {
+                    layer.close(i);
+                    layer.load(2);
+                    admin.req('api-user/menuTemplate/' + obj.data.id, {}, function (data) {
+                        layer.closeAll('loading');
+                        if (data.resp_code == 0) {
+                            layer.msg(data.resp_msg, {icon: 1, time: config.msgTime});
+                            table.reload('menutemplate-table', {});
+                        } else {
+                            layer.msg(data.resp_msg, {icon: 2, time: config.msgTime});
+                        }
+                    }, 'delete');
+                });
+            }
+        });
+
+        // 搜索按钮点击事件
+        $('#menutemplate-btn-search').click(function () {
+            // var value = $('#menutemplate-name-value').val();
+            table.reload('menutemplate-table', {
+                where: {
+                    name: $('#menutemplate-name-value').val(),
+                    tenantCode: $('#tenant-names-value').val()
+                }
+            });
+        });
+    });
+</script>

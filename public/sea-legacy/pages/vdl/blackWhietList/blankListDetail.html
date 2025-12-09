@@ -1,0 +1,246 @@
+
+
+<div class="layui-card">
+    <div class="layui-card-header">
+        <h2 class="header-title">船舶基本信息</h2>
+    </div>
+    <div class="layui-card-body ">
+        <table  class=layui-table-box" lay-skin="line" style="font-size: 14px">
+            <tr>
+                <td >MMSI：</td>
+                <td><input style='border: 0px;' id='shipMMSI' readonly /></td>
+                <td >设备名称：</td>
+                <td><input style='border: 0px;' id='shipName' readonly /></td>
+                <td >船舶类型：</td>
+                <td><input style='border: 0px;' id='shipType' readonly /></td>
+                <td >呼号：</td>
+                <td><input style='border: 0px;' id='shipCall' readonly /></td>
+                <td >IMO：</td>
+                <td><input style='border: 0px;' id='shipImo' readonly /></td>
+            </tr>
+            <tr>
+                <td >AIS类型：</td>
+                <td><input style='border: 0px;' id='shipAisType' readonly /></td>
+                <td >船长：</td>
+                <td><input style='border: 0px;' id='shipLength' readonly /></td>
+                <td >船宽：</td>
+                <td><input style='border: 0px;' id='shipWidth' readonly /></td>
+            </tr>
+        </table>
+    </div>
+    <div class="layui-card-header">
+        <h2 class="header-title">异常目标详细(检查历史)</h2>
+    </div>
+    <div class="layui-card-body ">
+        <table class="layui-table" lay-even lay-skin="nob" id="abnormalTarget-table" lay-filter="abnormalTarget-table"></table>
+    </div>
+</div>
+<!-- 表格操作列 -->
+<script type="text/html" id="abnormalTarget-table-bar">
+    <a class="layui-btn layui-btn-xs" lay-event="abnormalTarget-table-bar">详细</a>
+</script>
+<script>
+    layui.use(['form', 'table', 'util', 'common', 'admin',  'jquery', 'layer', 'table'], function () {
+        var form = layui.form;
+        var table = layui.table;
+        var config = layui.common;
+        var layer = layui.layer;
+        var util = layui.util;
+        var admin = layui.admin;
+        var table = layui.table;
+
+        // 回显menu数据
+        var mmsi = admin.getTempData('mmsi');
+        if(mmsi == undefined){
+            mmsi = 0
+        }
+
+        // 渲染表格
+        table.render({
+
+            elem: '#abnormalTarget-table',
+            url: config.base_server + 'blackList-api/blacklist/findByMmsi',
+            method: 'GET',
+            headers: {'Authorization': 'Bearer ' + config.getToken().access_token},
+            page: true,
+            where:{mmsi:mmsi},
+            parseData : function(data) {
+                if (data.nauShipDto != null){
+
+                    $("#shipMMSI").val(data.nauShipDto.mmsi)
+                    $("#shipName").val(data.nauShipDto.nameEn)
+                    $("#shipType").val(data.nauShipDto.shipTypeCode)
+                    $("#shipCall").val(data.nauShipDto.callSign)
+                    $("#shipImo").val(data.nauShipDto.imo)
+                    $("#shipAisType").val(data.nauShipDto.aisType)
+                    $("#shipLength").val(data.nauShipDto.lengthh)
+                    $("#shipWidth").val(data.nauShipDto.width)
+                }
+
+            return {
+                "code" : data.code,
+                "msg" : data.msg,
+                "count": data.total,
+                "data" : data.blackDetailTblDto
+
+            }
+
+        },
+            cols: [[
+                {field: 'businessName', title: '异常类型', event: 'collapse',
+                    templet: function (d) {//展开折行
+                        return '<div style="position: relative;\n' + 'padding: 0 10px 0 20px;">' + d.businessName + '<i style="left: 0px;" lay-tips="展开" class="layui-icon layui-colla-icon layui-icon-right"></i></div>'
+                    }
+                },
+                {field: 'resultTypeName', title: '异常种类'},
+                {field: 'resultInfoName', title: '异常详细'},
+                {
+                    field: 'receiveTime', title: '更新时间', templet: function (e) {
+                        return layui.util.toDateString(e.receiveTime, "yyyy-MM-dd HH:mm:ss")
+                    }
+                },
+                {field: 'errorCount', title: '异常次数'},
+                {field: 'errorStatus', title: '状态',templet:function (e) {
+                    if(e.errorStatus =='ABNORMAL') return '异常'
+                        if(e.errorStatus =='ABNORMAL') return '异常'
+                        if(e.errorStatus =='RECTIFIED') return '已整改'
+                        if(e.errorStatus =='MISJUDGED') return '误判'
+                        if(e.errorStatus =='PROCESSING') return '处理中的'
+                        if(e.errorStatus =='SPECIAL') return '其它特殊情况'
+                        if(e.errorStatus =='REJUDGE') return '重判定'
+                    }}
+            ]]
+        });
+
+
+        // 工具条点击事件
+        table.on('tool(abnormalTarget-table)', function (obj) {
+            var data = obj.data;
+            var layEvent = obj.event;
+            var childData = obj.data.children;
+            if (layEvent === 'blank-ship-detail') {// 修改
+                // showEditModel(data);
+                showBlankShipDetail(data);
+            }else if (layEvent === 'collapse') {
+                //日志
+                var trObj = layui.$(this).parent('tr'); //当前行
+                var accordion = true //开启手风琴，那么在进行折叠操作时，始终只会展现当前展开的表格。
+                var content = '<table class="layui-table"  lay-filter="abnormalTarget-detail-table" ></table>';//内容
+                //表格行折叠方法
+                collapseTable({
+                    elem: trObj,
+                    accordion: accordion,
+                    content: content,
+                    success: function (trObjChildren, index) { //成功回调函数
+                        //trObjChildren 展开tr层DOM
+                        //index 当前层索引
+                        trObjChildren.find('table').attr("id", index);
+
+                        table.render({
+                            data: childData,
+                            elem: "#" + index,
+                            page: false,
+                            // limit: 100,
+                            // where: {fleetId: data.id},
+                            cellMinWidth: 80,
+                            cols: [[
+                                // {field: 'businessName', title: '异常类型'},
+                                {field: 'resultTypeName', title: '异常种类'},
+                                {field: 'resultInfoName', title: '异常详细'},
+                                {
+                                    field: 'receiveTime', title: '更新时间', templet: function (e) {
+                                        return layui.util.toDateString(e.receiveTime, "yyyy-MM-dd HH:mm:ss")
+                                    }
+                                },
+                                // {field: 'errorCount', title: '异常次数'},
+                                {field: 'errorStatus', title: '状态',templet:function (e) {
+                                        if(e.errorStatus =='ABNORMAL') return '异常'
+                                        if(e.errorStatus =='ABNORMAL') return '异常'
+                                        if(e.errorStatus =='RECTIFIED') return '已整改'
+                                        if(e.errorStatus =='MISJUDGED') return '误判'
+                                        if(e.errorStatus =='PROCESSING') return '处理中的'
+                                        if(e.errorStatus =='SPECIAL') return '其它特殊情况'
+                                        if(e.errorStatus =='REJUDGE') return '重判定'}
+                                        },
+                                {fixed: 'right', align: 'center', toolbar: '#abnormalTarget-table-bar', title: '操作'}
+                            ]],
+                            // done: function () { $("[data-field='ID']").css('display','none'); }
+
+                        });
+                    }
+                });
+            }});
+        // $('.layui-table .layui-table-cell > span').css({'display': 'none'});
+        //显示表单弹窗
+        var showBlankShipDetail = function (data) {
+
+            admin.putTempData('b_ship', data);
+            var title = '';
+            admin.popupCenter({
+                title:title,
+                path: 'pages/VDL/blackWhietList/blankListDetail.html',
+                finish: function () {
+                    table.reload('blank-table', {});
+                }
+            });
+        };
+
+        function collapseTable(options) {
+            var trObj = options.elem;
+            if (!trObj) return;
+            var accordion = options.accordion,
+                success = options.success,
+                content = options.content || '';
+            var tableView = trObj.parents('.layui-table-view'); //当前表格视图
+            var id = tableView.attr('lay-id'); //当前表格标识
+            var index = trObj.data('index'); //当前行索引
+            var leftTr = tableView.find('.layui-table-fixed.layui-table-fixed-l tr[data-index="' + index + '"]'); //左侧当前固定行
+            var rightTr = tableView.find('.layui-table-fixed.layui-table-fixed-r tr[data-index="' + index + '"]'); //右侧当前固定行
+            var colspan = trObj.find('td').length; //获取合并长度
+            var trObjChildren = trObj.next(); //展开行Dom
+            var indexChildren = id + '-' + index + '-children'; //展开行索引
+            var leftTrChildren = tableView.find('.layui-table-fixed.layui-table-fixed-l tr[data-index="' + indexChildren + '"]'); //左侧展开固定行
+            var rightTrChildren = tableView.find('.layui-table-fixed.layui-table-fixed-r tr[data-index="' + indexChildren + '"]'); //右侧展开固定行
+            var lw = leftTr.width() + 15; //左宽
+            var rw = rightTr.width() + 15; //右宽
+            //不存在就创建展开行
+            if (trObjChildren.data('index') != indexChildren) {
+                //装载HTML元素
+                var tr = '<tr data-index="' + indexChildren + '"><td colspan="' + colspan + '"><div style="height: auto;overflow-x:hidden;padding-left:' + lw + 'px;padding-right:' + rw + 'px" class="layui-table-cell">' + content + '</div></td></tr>';
+                trObjChildren = trObj.after(tr).next().hide(); //隐藏展开行
+                var fixTr = '<tr data-index="' + indexChildren + '"></tr>';//固定行
+                leftTrChildren = leftTr.after(fixTr).next().hide(); //左固定
+                rightTrChildren = rightTr.after(fixTr).next().hide(); //右固定
+            }
+            //展开|折叠箭头图标
+            trObj.find('td[lay-event="collapse"] i.layui-colla-icon').toggleClass("layui-icon-right layui-icon-down");
+            //显示|隐藏展开行
+            trObjChildren.toggle();
+            //开启手风琴折叠和折叠箭头
+            if (accordion) {
+                trObj.siblings().find('td[lay-event="collapse"] i.layui-colla-icon').removeClass("layui-icon-down").addClass("layui-icon-right");
+                trObjChildren.siblings('[data-index$="-children"]').hide(); //展开
+                rightTrChildren.siblings('[data-index$="-children"]').hide(); //左固定
+                leftTrChildren.siblings('[data-index$="-children"]').hide(); //右固定
+            }
+            success(trObjChildren, indexChildren); //回调函数
+            heightChildren = trObjChildren.height(); //展开高度固定
+            rightTrChildren.height(heightChildren + 115).toggle(); //左固定
+            leftTrChildren.height(heightChildren + 115).toggle(); //右固定
+        };
+
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+

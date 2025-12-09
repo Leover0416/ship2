@@ -1,0 +1,491 @@
+<div class="layui-card">
+    <div class="layui-card-header">
+        <h2 class="header-title">基站信息管理</h2>
+    </div>
+    <div class="layui-card-body">
+        <div class="layui-form toolbar">
+            <div class="layui-input-inline">
+                <label class="layui-form-label">基站名称:</label>
+                <input id="station_name" class="layui-input search-input" type="text" placeholder="输入关键字"/>&emsp;
+            </div>
+            <div class="layui-input-inline">
+                <label class="layui-form-label">基站MMSI:</label>
+                <input type="text" id="station_mmsi" class="layui-input search-input" placeholder="输入MMSI"/>
+            </div>
+            <div class="layui-input-inline">
+                <label class="layui-form-label">接入方式</label>
+                <div class="layui-input-inline">
+                    <select id="connectionType">
+                    </select>
+                </div>
+            </div>
+            &emsp;&emsp;
+            <button id="baseStationInfoSearch" class="layui-btn icon-btn"><i class="layui-icon">&#xe615;</i>搜索</button>
+            <button id="baseStationInfoAdd" class="layui-btn icon-btn"><i class="layui-icon">&#xe654;</i>添加</button>
+        </div>
+        <table class="layui-table" id="baseStationInfo-table" lay-filter="baseStationInfo-table"
+               style="overflow-x: scroll"></table>
+    </div>
+</div>
+<script type="text/html" id="change">
+    {{#if (d.connectionStatus == 0) { }}
+    <input type="checkbox" lay-filter="change" value="{{d.id}}" lay-skin="switch" lay-text="主站|备站" disabled="true"
+           {{d.manStandbyType=="A"?'checked':''}}/>
+    {{# } }}
+    {{#if (d.connectionStatus == null||d.connectionStatus == 1) { }}
+    <input type="checkbox" lay-filter="change" value="{{d.id}}" lay-skin="switch" lay-text="主站|备站" disabled="true"
+           {{d.manStandbyType=="A"?'checked':''}}/>
+    {{# } }}
+</script>
+<!-- 表格操作列 -->
+<script type="text/html" id="station-management">
+    <a class="layui-btn layui-btn-xs" style="background-color: #009f95" lay-event="show">查看</a>
+    {{#if (d.singleType == 1) { }}
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="add">添加</a>
+    {{# } }}
+    <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="edit">修改</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+<script type="text/html" id="stationFollow-management">
+    <a class="layui-btn layui-btn-xs" style="background-color: #009f95" lay-event="show1">查看</a>
+    <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="edit1">修改</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del1">删除</a>
+    <!--    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="change">切换</a>-->
+</script>
+
+<!-- 表格控制列 -->
+<script type="text/html" id="stationManagement-switch">
+    {{#if (d.singleType == 0&& d.connectionStatus == 0) { }}
+    <!--    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="reset"><i class="layui-icon layui-icon-password"></i>重置</a>-->
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="restart"><i class="layui-icon layui-icon-star"></i>重启</a>
+    {{# } }}
+    {{#if (d.singleType == 0&& d.connectionStatus!= 0) { }}
+    <!--    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="reset"><i class="layui-icon layui-icon-password"></i>重置</a>-->
+    <button class="layui-btn layui-btn-xs layui-btn-disabled"  style="background-color: #ff0000 !important"><i class="layui-icon layui-icon-star"></i>重启</button>
+    {{# } }}
+</script>
+<script type="text/html" id="stationManagement-switch-follow">
+    {{#if (d.singleType == 0&& d.connectionStatus == 0) { }}
+    <!--    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="reset"><i class="layui-icon layui-icon-password"></i>重置</a>-->
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="restart1"><i class="layui-icon layui-icon-star"></i>重启</a>
+    {{# } }}
+    {{#if (d.singleType == 0&& d.connectionStatus!= 0) { }}
+    <!--    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="reset1"><i class="layui-icon layui-icon-password"></i>重置</a>-->
+    <button class="layui-btn layui-btn-xs layui-btn-disabled"  style="background-color: #ff0000 !important"><i class="layui-icon layui-icon-star"></i>重启</button>
+    {{# } }}
+</script>
+
+<script>
+    var dict = {
+        connectionType: ["主动接入","被动接入" ]
+    }
+    var tableIndex="";
+    layui.use(['table', 'common', 'admin'], function () {
+        var table = layui.table;
+        var config = layui.common;
+        var layer = layui.layer;
+        var admin = layui.admin;
+        var form = layui.form;
+        // 渲染表格
+
+        table.render({
+            elem: '#baseStationInfo-table',
+            url: config.base_server + 'station-maintain/baseStationInfo/findPage',
+            method: 'GET',
+            headers: {'Authorization': 'Bearer ' + config.getToken().access_token},
+            page: true,
+            cols: [[
+                {type: 'numbers'},
+                {field: 'shoreName', title: '基站名称', event: 'collapse', width: 200, templet: function (d) {//展开折行
+                        return d.singleType == 1 ? '<div style="position: relative;\n' + '    padding: 0 10px 0 20px;">' + d.shoreName + '<i style="left: 0px;" lay-tips="展开" class="layui-icon layui-colla-icon layui-icon-right"></i></div>' : d.shoreName}},
+                {field: 'shoreMmsi', title: 'MMSI', width: 110,},
+                {field: 'ip', title: 'IP', templet: function (data) {
+                        return data.ip == 0 ? '' : data.ip;}},
+                {field: 'port', title: '端口', templet: function (data) {
+                        return data.port == 0 ? '' : data.port;}},
+                {field: 'longitude', title: '经度', templet: function (data) {
+                        return data.longitude == 0 ? '' : data.longitude;}},
+                {field: 'latitude', title: '纬度', templet: function (data) {
+                        return data.latitude == 0 ? '' : data.latitude;}},
+                {field: 'connectionType', title: '接入方式', templet: function (data) {
+                        // return data.connectionType == 1 ? '客户端' : '服务端';
+                        return dict.connectionType[data.connectionType];}},
+                {field: 'connectionStatus', title: '状态', templet: function (data) {
+                        return data.connectionStatus == 0 ? '已连接' : '已断开'}},
+                // {
+                //     field: 'singleType', title: '是否单机', width: 100,templet: function (d) {
+                //         return d.singleType == 0 ? '是' : '否';
+                //     }
+                // },
+                // {field: 'deviceType',width: 100, title: '设备型号'},
+                // {field: 'armVersion', width: 150,title: 'ARM版本'},
+                {title: '基站控制', align: 'center', toolbar: '#stationManagement-switch'},
+                {title: '操作', width: 200, toolbar: '#station-management'},
+                // {field: 'fpgaVersion', width: 150,title: 'FPGA版本'},
+                // {field: 'address', width: 300,title: '基站地址'},
+            ]],
+
+        });
+        $("#connectionType").append('<option selected="selected" value="">全部</option>');
+        dict.connectionType.forEach(function (item, index) {
+            $("#connectionType").append(`<option value="${index}">${item}</option>`);
+        });
+        form.render()
+
+
+
+        // 添加按钮点击事件
+        $('#baseStationInfoAdd').click(function () {
+            showEditModel();
+        });
+        var singleType = 0;
+        // 工具条点击事件
+        table.on('tool(baseStationInfo-table)', function (obj) {
+            var data = obj.data;
+            var layEvent = obj.event;
+            singleType = obj.data.singleType;
+            if (layEvent === 'show') {//查看
+                data.custom = 1;
+                showDetailModel(data);
+            } else if (layEvent === 'edit') { // 修改
+                showEditModel(data);
+            } else if (layEvent === 'add') {
+                var str = 0;
+                var para = {
+                    latitude: data.latitude,
+                    longitude: data.longitude,
+                    address: data.address,
+                    parentId: data.id,
+                    index: true,
+                }
+                showEditModel(para, str);
+            } else if (layEvent === 'del') { // 删除
+                deleteModel(data)
+            } else if (layEvent === 'reset') {
+                reset(data);
+            } else if (layEvent === 'restart') {
+                restart(data);
+            } else if (layEvent === 'collapse' && singleType == "1") {
+                //日志
+                var trObj = layui.$(this).parent('tr'); //当前行
+                var accordion = true //开启手风琴，那么在进行折叠操作时，始终只会展现当前展开的表格。
+                // var content = '<table></table>';//内容
+                var content = '<table class="layui-table"  lay-filter="follow-table" ></table>'
+                //表格行折叠方法
+                collapseTable({
+                    elem: trObj,
+                    accordion: accordion,
+                    content: content,
+                    success: function (trObjChildren, index) { //成功回调函数
+                        tableIndex=index;
+                        //trObjChildren 展开tr层DOM
+                        //index 当前层索引
+                        trObjChildren.find('table').attr("id", index);
+                        table.render({
+                            elem: '#'+index,
+                            url: config.base_server + 'station-maintain/baseStationInfo/findPageFollow',
+                            method: 'GET',
+                            headers: {'Authorization': 'Bearer ' + config.getToken().access_token},
+                            page: false,
+                            limit: 20,
+                            // where: {id: data.parentId},
+                            where: {parentId: data.id},
+                            cellMinWidth: 60,
+                            cols: [[
+                                {field: 'shoreName', title: '基站名称', width: '225'},
+                                {field: 'shoreMmsi', width: '110', title: 'MMSI'},
+                                {
+                                    field: 'ip', title: 'IP', width: '150', templet: function (data) {
+                                        return data.ip == 0 ? '' : data.ip;
+                                    }
+                                },
+                                {
+                                    field: 'port', title: '端口', width: '130', templet: function (data) {
+                                        return data.port == 0 ? '' : data.port;
+                                    }
+                                },
+                                {
+                                    field: 'longitude', title: '经度', width: '129', templet: function (data) {
+                                        return data.longitude == 0 ? '' : data.longitude;
+                                    }
+                                },
+                                {
+                                    field: 'latitude', title: '纬度', width: '129', templet: function (data) {
+                                        return data.latitude == 0 ? '' : data.latitude;
+                                    }
+                                },
+                                {
+                                    field: 'connectionType', title: '接入方式', width: '129', templet: function (data) {
+                                        return dict.connectionType[data.connectionType];
+                                    }
+                                },
+                                {
+                                    field: 'connectionStatus', title: '状态', width: '120', templet: function (d) {
+                                        return d.connectionStatus == 0 ? '已连接' : '已断开'
+                                    }
+                                },
+
+                                // {field: 'deviceType', title: '设备型号'},
+                                // {
+                                //     field: 'manStandbyType', title: '主备机', templet: function (d) {
+                                //         return d.manStandbyType == 'B' ? '备' : '主';
+                                //     }
+                                // },
+                                {title: '主备机', align: 'center', width: '120', templet: '#change', toolbar: '#change'},
+                                // {field: 'armVersion', title: 'ARM版本',width: 120,},
+                                // {field: 'fpgaVersion', title: 'FPGA版本',width: 120,},
+                                {
+                                    title: '基站控制',
+                                    width: '151',
+                                    align: 'center',
+                                    // fixed: 'right',
+                                    toolbar: '#stationManagement-switch-follow'
+                                },
+                                {
+                                    title: '操作',
+                                    width: '185',
+                                    // align: 'center',
+                                    // fixed: 'right',
+                                    toolbar: '#stationFollow-management'
+                                },
+                                // {field: 'address', title: '基站地址'},
+                            ]],
+                            done: function (res, curr, count) {
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+        table.on('tool(follow-table)', function (obj) {
+            var data = obj.data;
+            var layEvent = obj.event;
+            if (layEvent === 'show1') {
+                showDetailModel(data)
+            } else if (layEvent === 'edit1') { // 修改
+                showEditModel(data);
+            } else if (layEvent === 'change') {
+                // showChangeModel(data);
+            } else if (layEvent === 'del1') { // 删除
+                deleteModel(data)
+            } else if (layEvent === 'reset1') {
+                reset(data);
+            } else if (layEvent === 'restart1') {
+                restart(data);
+            }
+        })
+        var showDetailModel = function (data) {
+            var title = '基站详情';
+            admin.putTempData('baseStationInfo-table', data);
+            admin.popupCenter({
+                offset: '10',
+                title: title,
+                area: ['750px', '640px'],
+                path: 'pages/basestationinfo/baseStationInfoDetail.html',
+                finish: function () {
+                }
+            });
+        }
+        //显示表单弹窗
+        var showEditModel = function (data, str) {
+            if (str == 0) {
+                var title = '添加基站';
+            } else {
+                var title = data ? '修改基站' : '添加基站';
+            }
+            admin.putTempData('baseStationInfo-table', data);
+            var reloadIndex=data?data.parentId:"";
+            admin.popupCenter({
+                offset: '10',
+                title: title,
+                area: ['700px', '550px'],
+                path: 'pages/basestationinfo/baseStationInfo_form.html',
+                finish: function () {
+                    if(reloadIndex==0){
+                        table.reload('baseStationInfo-table', {});
+                    }else{
+                        table.reload(tableIndex, {});
+                    }
+
+                }
+            });
+        };
+        //删除
+        var deleteModel = function (data) {
+            var reloadFlag=data.parentId;
+            layer.confirm('确定删除此基站吗？', function (i) {
+                layer.close(i);
+                layer.load(2);
+                admin.req('station-maintain/baseStationInfo/delete',JSON.stringify(data), function (data) {
+                    layer.closeAll('loading');
+                    if (data.resp_code == 0) {
+                        layer.msg(data.resp_msg, {icon: 1, time: config.msgTime});
+
+                    } else {
+                        layer.msg(data.resp_msg, {icon: 2, time: config.msgTime});
+
+                    }
+                    if(reloadFlag==0){
+                        table.reload('baseStationInfo-table', {});
+                    }else{
+
+                        table.reload(tableIndex, {});
+                    }
+                }, 'delete');
+            });
+
+        };
+        //基站重置
+        var reset = function (data) {
+            if (data.shoreMmsi == "") {
+                layer.msg('基站不能执行此操作', {icon: 2, time: config.msgTime});
+                return;
+            }
+            data.baseStationControl = "2";
+            data = JSON.stringify(data)
+            layer.confirm('确定要重置该基站吗？', function (index) {
+                //调用后台更改基站控制的接口
+                admin.req('station-management/shoreInfoDb/baseStationControl', data, function (data) {
+                    layer.closeAll('loading');
+                    if (data.resp_code == 0) {
+                        layer.msg('重置成功', {icon: 1, time: config.msgTime});
+                        table.reload('baseStationInfo-table', {});
+                    } else {
+                        layer.msg(data.resp_msg, {icon: 2, time: config.msgTime});
+                    }
+                }, 'POST');
+                layer.tips('基站状态' + ':' + "重置");
+            })
+        }
+        //基站重启
+        var restart = function (data) {
+            if (data.shoreMmsi == "") {
+                layer.msg('基站不能执行此操作', {icon: 2, time: config.msgTime});
+                return
+            }
+            var reloadFlag=data.parentId;
+            data.baseStationControl = "1";
+            data = JSON.stringify(data)
+            layer.confirm('确定要重启该基站吗？',function (i) {
+                layer.close(i);
+                layer.load(2);
+                //调用后台更改基站控制的接口
+                admin.req('station-maintain/baseStationInfo/baseStationControl', data, function (data) {
+                    layer.closeAll('loading');
+                    if (data.resp_code == 0) {
+                        layer.msg('重启成功', {icon: 1, time: config.msgTime});
+
+                    } else {
+                        layer.msg(data.resp_msg, {icon: 2, time: config.msgTime});
+                    }
+                    if(reloadFlag==0){
+                        table.reload('baseStationInfo-table', {});
+                    }else{
+                        table.reload(tableIndex, {});
+                    }
+                }, 'POST');
+                layer.tips('基站状态' + ':' + "重启");
+            });
+        };
+
+        //切换
+        form.on('switch(change)', function (obj) {
+            var data = {
+                id: obj.value,
+                manStandbyType: obj.elem.checked ? "A" : "B"
+            }
+            layer.confirm('确定切换此基站吗？', {
+                    btn: ['确定', '取消'], //按钮
+                    cancel: function () {
+                        table.reload(tableIndex, {});
+                    }
+                }, function () {
+                    admin.req('station-maintain/baseStationInfo/change', JSON.stringify(data), function (data) {
+                        layer.closeAll('loading');
+                        if (data.resp_code == 0) {
+                            layer.msg(data.resp_msg, {icon: 1, time: config.msgTime});
+                        } else {
+                            layer.msg(data.resp_msg, {icon: 2, time: config.msgTime});
+                        }
+                        table.reload(tableIndex, {})
+                    }, "POST");
+                }, function () {
+                    table.reload(tableIndex, {})
+                }
+
+            );
+
+        });
+        // var showChangeModel = function (data) {
+        //     layer.confirm('确定切换此基站吗？', function (i) {
+        //         admin.req('station-maintain/baseStationInfo/change', JSON.stringify(data), function (data) {
+        //             layer.closeAll('loading');
+        //             if (data.resp_code == 0) {
+        //                 layer.msg(data.resp_msg, {icon: 1, time: config.msgTime});
+        //                 table.reload('baseStationInfo-table', {});
+        //             } else {
+        //                 layer.msg(data.resp_msg, {icon: 2, time: config.msgTime});
+        //             }
+        //         }, "POST");
+        //     });
+        // };
+        // 搜索按钮点击事件
+        $('#baseStationInfoSearch').click(function () {
+            var shoreName = $('#station_name').val();
+            var shoreMmsi = $('#station_mmsi').val();
+            var connectionType = $('#connectionType').val();
+            table.reload('baseStationInfo-table', {
+                where: {
+                    shoreName: shoreName,
+                    shoreMmsi: shoreMmsi,
+                    connectionType: connectionType
+                }
+            });
+        });
+
+        function collapseTable(options) {
+            var trObj = options.elem;
+            if (!trObj) return;
+            var accordion = options.accordion,
+                success = options.success,
+                content = options.content || '';
+            var tableView = trObj.parents('.layui-table-view'); //当前表格视图
+            var id = tableView.attr('lay-id'); //当前表格标识
+            var index = trObj.data('index'); //当前行索引
+            var leftTr = tableView.find('.layui-table-fixed.layui-table-fixed-l tr[data-index="' + index + '"]'); //左侧当前固定行
+            var rightTr = tableView.find('.layui-table-fixed.layui-table-fixed-r tr[data-index="' + index + '"]'); //右侧当前固定行
+            var colspan = trObj.find('td').length; //获取合并长度
+            var trObjChildren = trObj.next(); //展开行Dom
+            var indexChildren = id + '-' + index + '-children'; //展开行索引
+            var leftTrChildren = tableView.find('.layui-table-fixed.layui-table-fixed-l tr[data-index="' + indexChildren + '"]'); //左侧展开固定行
+            var rightTrChildren = tableView.find('.layui-table-fixed.layui-table-fixed-r tr[data-index="' + indexChildren + '"]'); //右侧展开固定行
+            var lw = leftTr.width() + 15; //左宽
+            var rw = rightTr.width() + 15; //右宽
+            //不存在就创建展开行
+            if (trObjChildren.data('index') != indexChildren) {
+                //装载HTML元素
+                var tr = '<tr data-index="' + indexChildren + '"><td colspan="' + colspan + '"><div style="height: auto;padding-left:' + lw + 'px;padding-right:' + rw + 'px" class="layui-table-cell">' + content + '</div></td></tr>';
+                trObjChildren = trObj.after(tr).next().hide(); //隐藏展开行
+                var fixTr = '<tr data-index="' + indexChildren + '"></tr>';//固定行
+                leftTrChildren = leftTr.after(fixTr).next().hide(); //左固定
+                rightTrChildren = rightTr.after(fixTr).next().hide(); //右固定
+            }
+            //展开|折叠箭头图标
+            trObj.find('td[lay-event="collapse"] i.layui-colla-icon').toggleClass("layui-icon-right layui-icon-down");
+            //显示|隐藏展开行
+            trObjChildren.toggle();
+            //开启手风琴折叠和折叠箭头
+            if (accordion) {
+                trObj.siblings().find('td[lay-event="collapse"] i.layui-colla-icon').removeClass("layui-icon-down").addClass("layui-icon-right");
+                trObjChildren.siblings('[data-index$="-children"]').hide(); //展开
+                rightTrChildren.siblings('[data-index$="-children"]').hide(); //左固定
+                leftTrChildren.siblings('[data-index$="-children"]').hide(); //右固定
+            }
+            success(trObjChildren, indexChildren); //回调函数
+            heightChildren = trObjChildren.height(); //展开高度固定
+            rightTrChildren.height(heightChildren + 115).toggle(); //左固定
+            leftTrChildren.height(heightChildren + 115).toggle(); //右固定
+        };
+    });
+</script>

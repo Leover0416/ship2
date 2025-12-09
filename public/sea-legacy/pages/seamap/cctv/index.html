@@ -1,0 +1,69 @@
+<div>
+    <div style="width: 100%;height: 394px;background: black;display: flex;align-items: center;justify-content: center;overflow: hidden;">
+        <div class="camera-box">
+            <div class="video-box">
+                <div class="target-box" style="display: none">
+                    <p></p>
+                </div>
+                <canvas id="video-canvas" width="700" height="394" style="display: block; width: 100%;"></canvas>
+                <canvas class="video-t"
+                        width="700" height="394"
+                        style="width:700px;height:394px;display: none;top: 0;position: absolute;"></canvas>
+                <canvas id="camera-direction" width="50" height="50"
+                        style="display: none; position: absolute;margin-top: -52px;right: 0px;border: 1px dashed #393d496b;border-radius: 50%;"></canvas>
+            </div>
+            <div class="camera_control">
+                <div>
+                    <button class="camera-control-placeholder">占位符</button>
+                    <button class="camera-control-up" event-key="CTRL_CMD_UP"><i class="layui-icon layui-icon-up"></i>
+                    </button>
+                    <button class="camera-control-placeholder">占位符</button>
+                </div>
+                <div>
+                    <button class="camera-control-left" event-key="CTRL_CMD_LEFT"><i
+                            class="layui-icon layui-icon-left"></i>
+                    </button>
+                    <button class="camera-control-placeholder">占位符</button>
+                    <button class="camera-control-right" event-key="CTRL_CMD_RIGHT"><i
+                            class="layui-icon layui-icon-right"></i>
+                    </button>
+                </div>
+                <div>
+                    <button class="camera-control-placeholder">占位符</button>
+                    <button class="camera-control-down" event-key="CTRL_CMD_DOWN">
+                        <i class="layui-icon layui-icon-down"></i>
+                    </button>
+                    <button class="camera-control-placeholder">占位符</button>
+                </div>
+                <div>
+                    <button class="camera-control-zoom-in" event-key="CTRL_CMD_ZOOM_IN">
+                        <i class="layui-icon layui-icon-addition"></i>
+                    </button>
+                    <button class="camera-control-placeholder">占位符</button>
+                    <button class="camera-control-zoom-out" event-key="CTRL_CMD_ZOOM_OUT">
+                        <i class="layui-icon layui-icon-subtraction"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+   <!-- <div class="camera-ai-box">
+        &lt;!&ndash;阈值越小对边界和背景的差别要求越小，识别出来的目标整体性更好，但是更不精准。&ndash;&gt;
+        &lt;!&ndash;阈值越小对边界和背景的差别要求越高，识别出来的目标更注重细节，精准，但是整体性不好。&ndash;&gt;
+        &lt;!&ndash;比如值设置的大了，可能就把船上的花纹，标记，窗户什么的识别出来了，而不是识别整条船。&ndash;&gt;
+        <input class="ai-flag-close threshold hidden" title="识别阈值设置" type="range" value="20" min="0" max="255"
+               style="height: 3px;">
+        <button class="ai-flag-close btn-gauss hidden" title="高斯模糊">
+            <svg class="icon" style="width: 1em;height: 1em;vertical-align: middle;fill: currentColor;overflow: hidden;"
+                 viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1559">
+                <path d="M773.740236 476.496391h-51.7752c0-121.247458-98.69686-219.943294-219.943295-219.943294S282.078447 355.249957 282.078447 476.496391h-51.775201c0-149.865239 121.854279-271.718495 271.718495-271.718494s271.718495 121.853255 271.718495 271.718494z"
+                      fill="#AEAEAD" p-id="1560"></path>
+                <path d="M907.425981 475.181443h-25.8876c0-213.269291-173.426865-386.696156-386.696156-386.696156s-386.697179 173.426865-386.697179 386.696156H82.257445c0-227.52804 185.055716-412.583756 412.583757-412.583756S907.425981 247.653403 907.425981 475.181443z"
+                      fill="#AEAEAD" p-id="1561"></path>
+                <path d="M684.920328 912.12398l34.902928 49.278333 95.740528-73.593112-34.903951-49.273216-280.676518-396.274302-34.902928-49.278334-95.739504 73.593112 34.901904 49.27731 280.677541 396.270209zM318.836629 393.940141l34.901904 49.278333 95.740528-73.593112-34.904974-49.273217-19.390629-27.378557-34.901905-49.278333-95.739505 73.592088 34.902928 49.278333 19.391653 27.374465zM278.295284 505.078357s-45.097104 163.54275 107.09411 244.321518C215.159338 734.041072 170.06121 897.582799 170.06121 897.582799S215.159338 734.041072 62.968124 653.262304c170.230056 15.359826 215.32716-148.183947 215.32716-148.183947zM877.17705 519.124258s0 87.497796 83.853803 104.997356c-83.853803 17.499559-83.853803 104.997356-83.853803 104.997355s0-87.497796-83.853803-104.997355c83.853803-17.499559 83.853803-104.997356 83.853803-104.997356z"
+                      fill="#FFFFFF" p-id="1562"></path>
+            </svg>
+        </button>
+        <button class="btn-ai hidden" title="船舶识别">AI</button>
+    </div>-->
+</div>

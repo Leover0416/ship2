@@ -1,0 +1,80 @@
+<link rel="stylesheet" href="/assets/libs/zTree/css/zTreeStyle/zTreeStyle.css"/>
+<script type="text/javascript" src="/assets/libs/zTree/js/jquery.ztree.all-3.5.min.js"></script>
+<!-- 菜单权限表单弹窗 -->
+<form id="tenant-menu-form" lay-filter="tenant-menu-form" class="layui-form model-form" >
+    <input name="tenantCode" type="hidden"/>
+    <!--    tree-->
+    <ul id="treeMenu" class="ztree" style="padding: 25px 0px 20px 60px;"></ul>
+    <div  class="layui-form-item model-form-footer">
+        <button class="layui-btn layui-btn-primary" ew-event="closeDialog" type="button">取消</button>
+        <button class="layui-btn" lay-filter="tenant-menu-form-submit" lay-submit>保存</button>
+    </div>
+
+</form>
+
+<script>
+    layui.use(['layer','tree','util', 'admin', 'form', 'formSelects','common'], function () {
+        var layer = layui.layer;
+        var admin = layui.admin;
+        var form = layui.form;
+        var formSelects = layui.formSelects;
+        var config=layui.common;
+        var tree = layui.tree;
+        var util = layui.util;
+        // tree
+        var setting = {
+            check: {enable: true},
+            data: {
+                simpleData: {
+                    enable: true
+                }
+            }
+        };
+
+        // 回显menu数据
+        var tenant = admin.getTempData('t_tenant_menu');
+        var tenantCode = (typeof(tenant) == "undefined") ? '' : tenant.tenantCode;
+
+        admin.req('api-user/tenant/menu?tenantCode='+tenantCode, {}, function (data) {
+            if (tenant) {
+                form.val('tenant-menu-form', tenant);
+                $('#tenant-menu-form').attr('method', 'POST');
+                var n = new Array();
+                formSelects.value('tenantCode', n);
+            }
+            $.fn.zTree.init($('#treeMenu'), setting, data);
+            layer.closeAll('loading');
+        }, 'GET');
+
+        // 表单提交事件
+        form.on('submit(tenant-menu-form-submit)', function (data) {
+
+            layer.load(2);
+            var treeObj = $.fn.zTree.getZTreeObj('treeMenu');
+            var nodes = treeObj.getCheckedNodes(true);
+            var ids = new Array();
+            for (var i = 0; i < nodes.length; i++) {
+                ids[i] = nodes[i].id;
+            }
+
+            var Data = new Object();
+
+            Data.tenantCode = data.field.tenantCode;
+
+            Data.menuIds = ids;
+            admin.req('api-user/tenant/saveMenu', JSON.stringify(Data) , function (data) {
+                layer.closeAll('loading');
+                if (0 == data.resp_code) {
+                    layer.msg(data.resp_msg, {icon: 1, time: config.msgTime});
+                    admin.finishPopupCenter();
+                } else {
+                    layer.msg(data.resp_msg, {icon: 2, time: config.msgTime});
+                }
+            }, 'POST');
+            return false;
+        });
+
+    });
+</script>
+
+

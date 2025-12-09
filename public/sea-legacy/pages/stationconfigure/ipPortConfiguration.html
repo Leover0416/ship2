@@ -1,0 +1,344 @@
+<div class="layui-card">
+    <div class="layui-card-header">
+        <h2 class="header-title">IP、Port配置</h2>
+    </div>
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <div class="layui-card-body" style="padding: 15px;">
+                <form class="layui-form" action="" lay-filter="StationBaseInfoConfig-form">
+
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:130px;"><i
+                                    style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>选择基站</label>
+                            <div class="layui-input-inline">
+                                <select name="shoreMmsi" id="shoreMmsiNET" lay-filter="stationChanged1"
+                                        lay-verify="required">
+                                    <option selected="selected" value=""></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:130px;"><i
+                                    style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>IP</label>
+                            <div class="layui-input-inline">
+                                <input type="hidden" id="mac" name="mac" value=""/>
+                                <input type="hidden" id="dns" name="dns" value=""/>
+                                <input type="hidden" id="targetDomain" name="targetDomain" value=""/>
+                                <input type="hidden" id="logIp" name="logIp" value=""/>
+                                <input type="hidden" id="logPort" name="logPort" value=""/>
+<!--                                <input type="hidden" id="protocolStackIp" name="protocolStackIp" value=""/>-->
+<!--                                <input type="hidden" id="protocolStackPort" name="protocolStackPort" value=""/>-->
+                                <input type="hidden" id="udpIp" name="udpIp" value=""/>
+                                <input type="hidden" id="udpPort" name="udpPort" value=""/>
+                                <!--                                <input type="hidden" id="encodeMethod" name="encodeMethod" value=""/>-->
+                                <!--                                <input type="hidden" id="bandwidth" name="bandwidth" value=""/>-->
+                                <!--                                <input type="hidden" id="fillBit" name="fillBit" value=""/>-->
+                                <!--                                onKeyUp="this.value=this.value.replace(/[^\d]/g,'');"-->
+                                <input type="text" placeholder="请输入基站IP" name="ip" id="ip"
+                                       autocomplete="off" lay-verify="IPCheck" class="layui-input" >
+                            </div>
+                        </div>
+
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:130px;"><i
+                                    style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>子网掩码</label>
+                            <div class="layui-input-inline">
+                                <input type="text" placeholder="请输入子网掩码" name="mask" id="mask"
+                                       autocomplete="off" lay-verify="subnetMask" class="layui-input" >
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:130px;"><i
+                                    style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>网关</label>
+                            <div class="layui-input-inline">
+                                <input type="text" placeholder="请输入网关" name="gateWay" id="gateWay"
+                                       autocomplete="off" lay-verify="gateWay" class="layui-input" >
+                            </div>
+                        </div>
+
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:130px;"><i
+                                    style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>PORT</label>
+                            <div class="layui-input-inline">
+                                <input type="text" placeholder="请输入基站PORT" name="port" id="port"
+                                       autocomplete="off" lay-verify="port" class="layui-input" oninput="if(value.length>5)value=value.slice(0,5)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:130px;"><i
+                                    style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>连接服务器IP</label>
+                            <div class="layui-input-inline">
+                                <input type="text" placeholder="请输入连接服务器IP" name="serverIp" id="serverIp"
+                                       autocomplete="off" lay-verify="IPorGateWay" class="layui-input" maxlength="32">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:130px;"><i
+                                    style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>连接服务器端口</label>
+                            <div class="layui-input-inline">
+                                <input type="text" placeholder="请输入连接服务器端口" name="serverPort" id="serverPort"
+                                       autocomplete="off" lay-verify="port" class="layui-input" oninput="if(value.length>5)value=value.slice(0,5)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-inline" style="margin-left:50px;">
+                            <div class="layui-input-inline">
+                                <div class="layui-input-block">
+                                    <a class="layui-btn" lay-submit=""
+                                       lay-filter="NET-submit">立即提交</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['form', 'table', 'util', 'common', 'admin', 'laydate'], function () {
+        var $ = layui.$;
+        var form = layui.form;
+        var laydate = layui.laydate;
+        var id = '';
+        var oldData = {};
+        var isFail = false;
+        var admin = layui.admin;
+        var config = layui.common;
+        var table = layui.table;
+        //获取基站下拉列表
+        var checkutils = {
+            //ip地址校验
+            IPCheck:function(value){
+                var regIP =/^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+                return regIP.test(value);
+            },
+            //子网掩码校验
+            subnetMask:function(value){
+                var subnetMask = /^(254|252|248|240|224|192|128|0)\.0\.0\.0|255\.(254|252|248|240|224|192|128|0)\.0\.0|255\.255\.(254|252|248|240|224|192|128|0)\.0|255\.255\.255\.(254|252|248|240|224|192|128|0)$/
+                return subnetMask.test(value);
+            },
+            //网关校验
+            gateWay:function(value){
+                var regIP =/^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+                return regIP.test(value);
+            },
+            //端口校验
+            port:function(s){
+                if(s >= 0 && s <= 65535){
+                    return true;
+                }
+                return false;
+            },
+        }
+        // 自定义验证规则
+        form.verify({
+            IPCheck: function (s) {
+                if (s == '') {
+                    return '必填项不能为空';
+                } else if (s.length > 0) {
+                    if (!checkutils.IPCheck(s)) {
+                        return '请输入正确的IP地址';
+                    }
+                }
+            },
+            subnetMask: function (s) {
+                if (s == '') {
+                    return '必填项不能为空';
+                } else if (s.length > 0) {
+                    if (!checkutils.subnetMask(s)) {
+                        return '请输入正确的子网掩码';
+                    }
+                }
+            },
+            gateWay: function (s) {
+                if (s == '') {
+                    return '必填项不能为空';
+                } else if (s.length > 0) {
+                    if (!checkutils.gateWay(s)) {
+                        return '请输入正确的网关';
+                    }
+                }
+            },
+            port: function (s) {
+                if (s == '') {
+                    return '必填项不能为空';
+                } else if (s.length > 0) {
+                    if (!checkutils.port(s)) {
+                        return '请输入正确的端口';
+                    }
+                }
+            },
+
+        });
+        getStationSelectList();
+
+        function getStationSelectList() {
+            admin.req('station-maintain/baseStationAPI/selectAllBaseStation', "", function (res) {
+                var data = res;
+                for(var i in data){
+                    if(data[i].connectionStatus=="0"){
+                        $("#shoreMmsiNET").prepend("<option  value='" + data[i].shoreMmsi + "'>" + data[i].shoreName + "</option>");
+                    }else {
+                        $("#shoreMmsiNET").append("<option value='" + data[i].shoreMmsi + "' disabled='true'>" + data[i].shoreName + "(暂未连接)</option>")
+                    }
+                }
+                form.render();
+            },"post");
+        };
+
+        form.on('select(stationChanged1)', function (data) {
+            if (data.value == '') {
+                id = '';
+                $("#ip").val('');
+                $("#mask").val('');
+                $("#gateWay").val('');
+                $("#port").val('');
+                $("#serverIp").val('');
+                $("#serverPort").val('');
+
+                $("#mac").val('');
+                $("#dns").val('');
+                $("#targetDomain").val('');
+                $("#logIp").val('');
+                $("#logPort").val('');
+                // $("#protocolStackIp").val('');
+                // $("#protocolStackPort").val('');
+                $("#udpIp").val('');
+                $("#udpPort").val('');
+                // $("#encodeMethod").val('');
+                // $("#bandwidth").val('');
+                // $("#fillBit").val('');
+
+                form.render('select');
+                return
+            }
+            admin.req('stationConfigure/stationBaseInfoConfig/getByShoreMmsiNET', JSON.stringify({shoreMmsi: data.value}), function (res) {
+                if (res.resp_code == '0') {
+                    oldData = res.datas;
+                    if (res.datas) {
+                        id = res.datas.id;
+                        $("#ip").val(res.datas.ip);
+                        $("#mask").val(res.datas.mask);
+                        $("#gateWay").val(res.datas.gateWay);
+                        $("#port").val(res.datas.port);
+                        $("#serverIp").val(res.datas.serverIp);
+                        $("#serverPort").val(res.datas.serverPort);
+
+                        $("#mac").val(res.datas.mac);
+                        $("#dns").val(res.datas.dns);
+                        $("#targetDomain").val(res.datas.targetDomain);
+                        $("#logIp").val(res.datas.logIp);
+                        $("#logPort").val(res.datas.logPort);
+                        // $("#protocolStackIp").val(res.datas.protocolStackIp);
+                        // $("#protocolStackPort").val(res.datas.protocolStackPort);
+                        $("#udpIp").val(res.datas.udpIp);
+                        $("#udpPort").val(res.datas.udpPort);
+                        // $("#encodeMethod").val(res.datas.encodeMethod);
+                        // $("#bandwidth").val(res.datas.bandwidth);
+                        // $("#fillBit").val(res.datas.fillBit);
+                    } else {
+                        id = '';
+                        $("#ip").val('');
+                        $("#mask").val('');
+                        $("#gateWay").val('');
+                        $("#port").val('');
+                        $("#serverIp").val('');
+                        $("#serverPort").val('');
+
+                        $("#mac").val('');
+                        $("#dns").val('');
+                        $("#targetDomain").val('');
+                        $("#logIp").val('');
+                        $("#logPort").val('');
+                        // $("#protocolStackIp").val('');
+                        // $("#protocolStackPort").val('');
+                        $("#udpIp").val('');
+                        $("#udpPort").val('');
+                        // $("#encodeMethod").val('');
+                        // $("#bandwidth").val('');
+                        // $("#fillBit").val('');
+                    }
+                    form.render('select');
+                    layer.msg("获取成功！");
+                }else {
+                    layer.msg("获取失败！");
+
+                }
+            }, "post")
+        });
+
+        form.on('submit(NET-submit)', function (data) {
+            var field = data.field;
+            if (!isFail && oldData != null && isNotChange(field)) {
+                layer.msg("没有任何值发生改变，无需提交");
+                return;
+            } else {
+                oldData = field
+            }
+            var param = {
+                shoreMmsi: field.shoreMmsi,
+                ip: field.ip,
+                mask: field.mask,
+                gateWay: field.gateWay,
+                port: field.port,
+                // serverIp: field.serverIp,
+                // serverPort: field.serverPort,
+                serverIp: field.serverIp,
+                serverPort: field.serverPort,
+
+                mac: field.mac,
+                dns: field.dns,
+                targetDomain: field.targetDomain,
+                logIp: field.logIp,
+                logPort: field.logPort,
+                protocolStackIp: field.protocolStackIp,
+                protocolStackPort: field.protocolStackPort,
+                udpIp: field.udpIp,
+                udpPort: field.udpPort,
+                // encodeMethod: field.encodeMethod,
+                // bandwidth: field.bandwidth,
+                // fillBit: field.fillBit,
+            }
+            var requestUrl = 'stationConfigure/stationBaseInfoConfig/updateNET';
+            if (id != '' && id != null) {
+                param.id = id;
+            }
+
+            admin.req(requestUrl, JSON.stringify(param), function (res) {
+                if (res.resp_code == '0') {
+                    isFail = false;
+                    if (res.datas) {
+                        id = res.datas.id;
+                    }
+                    layer.msg("配置成功！");
+                } else {
+                    isFail = true;
+                    layer.msg("配置失败！");
+                }
+            }, "post");
+        })
+
+        function isNotChange(obj) {
+            for (var key in obj) {
+                var old = oldData[key] == null ? '' : oldData[key];
+                if (key!="shoreMmsi"&&(!oldData || obj[key] != old)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    })
+</script>

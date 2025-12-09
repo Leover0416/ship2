@@ -1,0 +1,1 @@
+var my_api_server_url = 'http://192.168.20.40/';

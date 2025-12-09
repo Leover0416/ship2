@@ -1,0 +1,11 @@
+/bower_components/
+/node_modules/
+/doc/
+/dist/
+/build/
+/target/
+/coverage/
+results.txt
+npm-debug.log
+*~
+.idea/

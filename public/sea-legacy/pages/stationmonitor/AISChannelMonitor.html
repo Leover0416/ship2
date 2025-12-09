@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no'/>
+    <link rel="icon" type="image/png" href="../../favicon.ico"/>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <script type="text/javascript" src="../../assets/libs/layui/layui.js"></script>
+    <link rel="stylesheet" href="../../assets/libs/layui/css/layui.css"/>
+    <link rel="stylesheet" href="../../assets/css/admin.css"/>
+    <link rel="stylesheet" href="../../assets/css/main.css" media="all">
+    <script>
+        document.head.appendChild(document.createElement('script')).src = '../../module/checkutils.js?ver=1.0.2';
+    </script>
+
+    <title>频道监控</title>
+    <style>
+        .slot {
+            margin-top: 1px;
+            border-left-width: 1px;
+            border-left-style: solid;
+            border-left-color: black;
+            border-bottom: 1px solid black;
+            border-top: 1px solid black;
+            width: 3.8px;
+            height: 20px;
+            float: left;
+        }
+
+        .slot-right {
+            border-right: 1px solid black;
+        }
+
+        .ruler {
+            margin-left: 1.9px;
+            margin-top: 8px;
+            border-left: 1px solid black;
+            width: 1.9px;
+            height: 7px;
+            float: left;
+        }
+
+        .ruler-double {
+            margin-left: 1.9px;
+            margin-top: 10px;
+            border-left: 1px solid black;
+            width: 1.9px;
+            height: 5px;
+            float: left;
+        }
+
+        .ruler-high {
+            margin-left: 1.9px;
+            border-left: 1px solid black;
+            width: 1.9px;
+            height: 15px;
+            float: left;
+        }
+
+        .ruler-num {
+            position: absolute;
+            margin-top: -20px;
+            margin-left: -8px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layui-fluid" style="padding:0;">
+    <div class="layui-card">
+        <div class="layui-card-body" style="padding: 15px 0 0 0;">
+            <form class="layui-form" action="" lay-filter="channelMonitoring-form">
+                <div class="layui-form">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style="width:130px">选择基站</label>
+                            <div class="layui-input-inline">
+                                <select name="shoreList" id="shoreList" >
+                                </select>
+                            </div>
+                            <a id="search" lay-submit="" lay-filter="channelMonitoring-submit"
+                               class="layui-btn layuiadmin-btn-admin" data-type="search"
+                               style="margin-left:10px;">搜索</a>
+                        </div>
+                        <div class="layui-inline" style="float: right;margin-right: 60px;height: 38px ">
+                            <div class="layui-inline" style="width:220px;height: 38px;line-height: 38px">
+                                <label class="layui-inline layui-form-label" >信号强度:</label>
+                                <div class=" layui-inline"><p  class=" layui-inline" id="signal-intensity" style="float:left;"></p></div>
+                            </div>
+                            <div class="layui-inline" style="width:200px;height: 38px;line-height: 38px">
+                                <label class="layui-inline layui-form-label" >信噪比:</label>
+                                <div class="layui-inline"> <p  class=" layui-inline" id="signal-to-noise-ratio" style="float:left;"></p></div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item" style="margin-left: 20px;margin-top: 20px;width:1870px;margin-bottom:20px">
+                        <div><p style="float:left;">AIS A信道</p></div>
+                        <div class="layui-inline"
+                             style="border-radius: 5px;width: 10px;height: 10px;border-color: green;background-color: green;margin-left: 20px;margin-top: 5px;float: left;">
+                        </div>
+                        <div><p style="float:left;">船台</p></div>
+                        <div class="layui-inline"
+                             style="border-radius: 5px;width: 10px;height: 10px;border-color: red;background-color: red;margin-left: 20px;margin-top: 5px;float: left;">
+                        </div>
+                        <div><p style="float:left;">基站</p></div>
+                        <div class="layui-inline"
+                             style="border-radius: 5px;width: 10px;height: 10px;border-color: gray;background-color: gray;margin-left: 20px;margin-top: 5px;float: left;">
+                        </div>
+                        <div><p style="float:left;">其他</p></div>
+                        <div><p style="float:left;margin-left: 20px;">信道占用率:</p></div>
+                        <div class="layui-inline" style="height: 10px;line-height: 13px;"><p id="Achannel-occupancy" style="float:left;"></p></div>
+                    </div>
+                    <div class="layui-form-item" style="margin-left:20px;">
+                        <div>
+                            <div style="float:left;width:40px;height:10px;"></div>
+                            <div style="float:left;height:15px;border-bottom: 1px solid black; margin-bottom:10px;">
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">25</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">50</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">75</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">100</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">125</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">150</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">175</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">200</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">225</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">250</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">275</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">300</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">325</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">350</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                            </div>
+                        </div>
+                        <div class="layui-inline" id="blockBox">
+                            <div id="box1" style="background-color:grey;font-size:10px;padding:5px 5px 5px 5px;z-index :299;
+							overflow: hidden;position: absolute;text-align:center;display:none;color:#ffffff;">
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item" style="margin-left: 20px;margin-top: 20px;width:1870px;margin-bottom:20px">
+                        <div><p style="float:left;">AIS B信道</p></div>
+                        <div class="layui-inline"
+                             style="border-radius: 5px;width: 10px;height: 10px;border-color: green;background-color: green;margin-left: 20px;margin-top: 5px;float: left;">
+                        </div>
+                        <div><p style="float:left;">船台</p></div>
+                        <div class="layui-inline"
+                             style="border-radius: 5px;width: 10px;height: 10px;border-color: red;background-color: red;margin-left: 20px;margin-top: 5px;float: left;">
+                        </div>
+                        <div><p style="float:left;">基站</p></div>
+                        <div class="layui-inline"
+                             style="border-radius: 5px;width: 10px;height: 10px;border-color: gray;background-color: gray;margin-left: 20px;margin-top: 5px;float: left;">
+                        </div>
+                        <div><p style="float:left;">其他</p></div>
+                        <div><p style="float:left;margin-left: 20px;">信道占用率:</p></div>
+                        <div class="layui-inline" style="height: 10px;line-height: 13px;"><p id="Bchannel-occupancy" style="float:left;"></p></div>
+                    </div>
+                    <div class="layui-form-item" style="margin-left:20px;">
+                        <div>
+                            <div style="float:left;width:40px;height:10px;"></div>
+                            <div style="float:left;height:15px;border-bottom: 1px solid black; margin-bottom:10px;">
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">25</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">50</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">75</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">100</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">125</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">150</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">175</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">200</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">225</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">250</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">275</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">300</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">325</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-high">
+                                    <div class="ruler-num">350</div>
+                                </div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                                <div class="ruler-double"></div>
+                                <div class="ruler"></div>
+                            </div>
+                        </div>
+                        <div class="layui-inline" id="blockBox1">
+                            <div id="box2" style="background-color:grey;font-size:10px;padding:5px 5px 5px 5px;z-index :299;
+							overflow: hidden;position: absolute;text-align:center;display:none;color:#ffffff;">
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    layui.config({
+        base: '/module/', //静态资源所在路径
+    }).extend({
+        //  myfleet:'js/myFleet',
+    }).use(['element', 'common', 'admin', 'form', 'table', 'laydate', 'util'], function () {
+        var $ = layui.$;
+        var form = layui.form;
+        var admin = layui.admin;
+        var shoreList = [];
+        var shoreMmsi = '';
+
+        getStationSelectList();
+
+        function getStationSelectList() {
+            admin.req('station-maintain/baseStationAPI/selectBaseStation', "", function (res) {
+                var data = res;
+                for(var i in data){
+                    if(data[i].connectionStatus=="0"){
+                        shoreMmsi=data[i].shoreMmsi
+                        $("#shoreList").prepend("<option  value='" + data[i].shoreMmsi + " 'selected='selected'>" + data[i].shoreName + "</option>");
+                    }else {
+                        $("#shoreList").append("<option value='" + data[i].shoreMmsi + "' disabled='true'>" + data[i].shoreName + "(暂未连接)</option>")
+                    }
+                }
+                form.render();
+                // 时隙图
+                boxVal();
+                initPageData();
+                getAdditionInfo(shoreMmsi)
+            },"post");
+        };
+
+        // 定时任务
+        window.setInterval(function (){
+            initPageData();
+            getAdditionInfo(shoreMmsi)
+        },1000*60);
+
+        // 时隙图
+        function boxVal() {
+            // AIS A信道
+            let leng = 0;
+            for (let i = 0; i < 6; i++) {
+                $("#blockBox").append('<div class="layui-row">');
+                $("#blockBox").append('<span class="blockRow" style="float:left;width:40px;height:10px;margin-top:2px;">' + leng + '</span>');
+                for (let j = 0; j < 375; j++) {
+                    if (j == 374) {
+                        $("#blockBox").append('<span class="blockRow1 slot slot-right" id="a-' + leng + '"></span>');
+                    } else {
+                        $("#blockBox").append('<span class="blockRow1 slot" id="a-' + leng + '"></span>');
+                    }
+                    leng++;
+                }
+                $("#blockBox").append('</div>');
+            }
+
+            // AIS B信道
+            let leng1 = 0;
+            for (let i = 0; i < 6; i++) {
+                $("#blockBox1").append('<div class="layui-row">');
+                $("#blockBox1").append('<span class="blockRow" style="float:left;width:40px;height:10px;margin-top:2px;">' + leng1 + '</span>');
+                for (let j = 0; j < 375; j++) {
+                    if (j == 374) {
+                        $("#blockBox1").append('<span class="blockRow2 slot slot-right" id="a1-' + leng1 + '"></span>');
+                    } else {
+                        $("#blockBox1").append('<span class="blockRow2 slot" id="a1-' + leng1 + '"></span>');
+                    }
+                    leng1++;
+                }
+                $("#blockBox1").append('</div>');
+            }
+
+        }
+
+        // 页面渲染
+        function initPageData() {
+            // 清空原有时隙颜色
+            $.each($(".blockRow1"), function(idx,item){
+                // itemId （普通）后面会把占用的普通格子覆盖
+                $(item).css("backgroundColor","white");
+            })
+            $.each($(".blockRow2"), function(idx,item){
+                // itemId （普通）后面会把占用的普通格子覆盖
+                $(item).css("backgroundColor","white");
+            })
+
+            var formData = {
+                // shoreList:shoreList,
+            };
+            form.val("channelMonitoring-form", formData);
+
+            // 调用时隙信息查询接口
+            var listAisA = [];
+            var listAisB = [];
+
+            admin.req("station-maintain/channelMonitor/timeSlotData", JSON.stringify({mmsi: shoreMmsi}), function (res) {
+                if (res.resp_code == 0) {
+                    var list = res.datas;
+                    if (list.length > 0) {
+                        for (var index in list) {
+                            if (list[index] != null) {
+                                if ("AIS" == list[index].messageType) {
+                                    if ("A" == list[index].channel) {
+                                        var beanList = {};
+                                        beanList.devMmsi = list[index].devMmsi;
+                                        beanList.devName = list[index].devName;
+                                        beanList.messageId = list[index].messageId;
+                                        beanList.timeSlotCode = list[index].timeSlotCode;
+                                        beanList.timeSlotCount = list[index].timeSlotCount;
+                                        beanList.deviceType = list[index].deviceType;
+                                        listAisA.push(beanList);
+                                    } else if ("B" == list[index].channel) {
+                                        var beanList = {};
+                                        beanList.devMmsi = list[index].devMmsi;
+                                        beanList.devName = list[index].devName;
+                                        beanList.messageId = list[index].messageId;
+                                        beanList.timeSlotCode = list[index].timeSlotCode;
+                                        beanList.timeSlotCount = list[index].timeSlotCount;
+                                        beanList.deviceType = list[index].deviceType;
+                                        listAisB.push(beanList);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    //A信道占用率
+                    $("#Achannel-occupancy").html(parseInt(listAisA.length*10000/2250)/100+"%" );
+                    //B信道占用率
+                    $("#Bchannel-occupancy").html(parseInt(listAisB.length*10000/2250)/100+"%" );
+
+                    // 普通时隙
+                    $.each($(".blockRow1"), function (idx, item) {
+                        let itemId = $(item).attr("id");
+                        // itemId （普通）后面会把占用的普通格子覆盖
+                        $(item).mouseover(function () {
+                            let val = $(this).attr("id").split("a-")[1];
+                            var e = event || window.event;
+                            $("#box1").css('display', 'block');
+                            if (e.pageX > 1800) {
+                                $("#box1").css({top: e.pageY - 150, left: e.pageX - 50});
+                            } else {
+                                $("#box1").css({top: e.pageY - 150, left: e.pageX});
+                            }
+                            var strHTML = "<div>" + val + "</div>";
+                            $("#box1").html(strHTML);
+                        })
+                        $(item).mouseleave(function () {
+                            $("#box1").css('display', 'none');
+                        })
+                    })
+                    // 占用时隙
+                    for (var index in listAisA) {
+                        var timeSlotCode = listAisA[index].timeSlotCode;
+                        var timeSlotCount = listAisA[index].timeSlotCount;
+                        for (var j = 0; j < timeSlotCount; j++) {
+                            var val = parseInt(timeSlotCode) + j;
+                            var item = $("#a-" + val);
+                            $.each(item, function (idx, item) {
+                                var devMmsi = listAisA[index].devMmsi;
+                                var devName = listAisA[index].devName;
+                                var shoreOrShip = '';
+                                let valCode = $(this).attr("id").split("a-")[1];
+                                if ("1" == listAisA[index].deviceType) {
+                                    $(item).css("backgroundColor", "green");
+                                    shoreOrShip = "船台"
+                                } else if ("2" == listAisA[index].deviceType) {
+                                    $(item).css("backgroundColor", "red");
+                                    for (var sName in shoreList) {
+                                        if (devMmsi == shoreList[sName].mmsi) {
+                                            devName = shoreList[sName].label
+                                        }
+                                    }
+                                    shoreOrShip = "基站"
+                                } else if ("3" == listAisA[index].deviceType) {
+                                    $(item).css("backgroundColor", "gray");
+                                    shoreOrShip = "其他设备"
+                                }
+                                $(item).mouseover(function () {
+                                    var e = event || window.event;
+                                    $("#box1").css('display', 'block');
+                                    if (e.pageX > 1613) {
+                                        $("#box1").css({top: e.pageY - 150, left: e.pageX - 200});
+                                    } else {
+                                        $("#box1").css({top: e.pageY - 150, left: e.pageX});
+                                    }
+                                    var strHTML = "<div><div>" + shoreOrShip + "</div><div>设备名称：" + devName + "</div><div>设备MMSI：" + devMmsi + "</div><div>报文类型：AIS</div><div>时隙号：" + valCode + "</div></div>";
+                                    $("#box1").html(strHTML);
+                                })
+                                $(item).mouseleave(function () {
+                                    $("#box1").css('display', 'none');
+                                })
+                            })
+
+                        }
+                    }
+
+                    // 普通时隙2
+                    $.each($(".blockRow2"), function (idx, item) {
+                        let itemId = $(item).attr("id");
+                        // itemId （普通）后面会把占用的普通格子覆盖
+                        $(item).mouseover(function () {
+                            let val = $(this).attr("id").split("a1-")[1];
+                            var e = event || window.event;
+                            $("#box2").css('display', 'block');
+                            if (e.pageX > 1800) {
+                                $("#box2").css({top: e.pageY - 370, left: e.pageX - 50});
+                            } else {
+                                $("#box2").css({top: e.pageY - 370, left: e.pageX});
+                            }
+                            var strHTML = "<div>" + val + "</div>";
+                            $("#box2").html(strHTML);
+                        })
+                        $(item).mouseleave(function () {
+                            $("#box2").css('display', 'none');
+                        })
+                    })
+                    // 占用时隙
+                    for (var index in listAisB) {
+                        var timeSlotCode = listAisB[index].timeSlotCode;
+                        var timeSlotCount = listAisB[index].timeSlotCount;
+                        for (var j = 0; j < timeSlotCount; j++) {
+                            var val = parseInt(timeSlotCode) + j;
+                            var item = $("#a1-" + val);
+                            $.each(item, function (idx, item) {
+                                var devMmsi = listAisB[index].devMmsi;
+                                var devName = listAisB[index].devName;
+                                var shoreOrShip = '';
+                                let valCode = $(this).attr("id").split("a1-")[1];
+                                if ("1" == listAisB[index].deviceType) {
+                                    $(item).css("backgroundColor", "green");
+                                    shoreOrShip = "船台"
+                                } else if ("2" == listAisB[index].deviceType) {
+                                    $(item).css("backgroundColor", "red");
+                                    for (var sName in shoreList) {
+                                        if (devMmsi == shoreList[sName].mmsi) {
+                                            devName = shoreList[sName].label
+                                        }
+                                    }
+                                    shoreOrShip = "基站"
+                                } else if ("3" == listAisB[index].deviceType) {
+                                    $(item).css("backgroundColor", "gray");
+                                    shoreOrShip = "其他设备"
+                                }
+                                $(item).mouseover(function () {
+                                    var e = event || window.event;
+                                    $("#box2").css('display', 'block');
+                                    if (e.pageX > 1613) {
+                                        $("#box2").css({top: e.pageY - 370, left: e.pageX - 200});
+                                    } else {
+                                        $("#box2").css({top: e.pageY - 370, left: e.pageX});
+                                    }
+                                    var strHTML = "<div><div>" + shoreOrShip + "</div><div>设备名称：" + devName + "</div><div>设备MMSI：" + devMmsi + "</div><div>报文类型：AIS</div><div>时隙号：" + valCode + "</div></div>";
+                                    $("#box2").html(strHTML);
+                                })
+                                $(item).mouseleave(function () {
+                                    $("#box2").css('display', 'none');
+                                })
+                            })
+                        }
+                    }
+                } else {
+                    layer.msg(res.msg);
+                }
+            }, "POST");
+        }
+
+        function getAdditionInfo(data){
+        admin.reqNoLoad('station-maintain/getStationAdditionInfo?mmsi='+data, "" , function (res) {
+            // 信号强度
+            $("#signal-intensity").html(res.signalStrength + "dbm");
+            //信噪比
+            $("#signal-to-noise-ratio").html(res.noiseRatio + "db");
+
+        },'get')
+        }
+
+
+        // 监听搜索
+        form.on('submit(channelMonitoring-submit)', function (data) {
+            shoreMmsi = data.field.shoreList;
+            initPageData();
+            getAdditionInfo(shoreMmsi);
+        });
+
+    })
+</script>

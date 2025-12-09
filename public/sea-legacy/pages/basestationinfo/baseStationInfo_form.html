@@ -1,0 +1,436 @@
+<!-- 基站信息表单弹窗 -->
+<form id="stationInfo-form" lay-filter="stationInfo-form" class="layui-form model-form">
+    <input name="parentId" id="parentId" type="hidden"/>
+    <input name="id" id="id" type="hidden"/>
+    <div class="layui-form-item">
+        <label class="layui-form-label"><i style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>基站名称</label>
+        <div class="layui-input-block">
+            <input name="shoreName" placeholder="请输入基站名称" type="text" class="layui-input" maxlength="50"
+                   lay-verify="required" required/>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label"><i style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>MMSI</label>
+            <div class="layui-input-inline">
+                <input name="shoreMmsi" placeholder="请输入基站MMSI" type="number" maxlength="9" oninput="if (value.length>9)value=value.slice(0,9)" class="layui-input"
+                       lay-verify="required"  required/>
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">设备型号</label>
+            <div class="layui-input-inline">
+                <input name="deviceType" placeholder="最长不超过30个字符" type="text" maxlength="30" class="layui-input"
+                />
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label layui-required"><i style="color:#F00;font-family:serif;font-style: normal;">*</i>接入方式</label>
+            <div class="layui-input-inline">
+                <select name="connectionType" id="connectionType" lay-filter="selecte-connectionType"
+                        lay-verify="connectionTypeCheck">
+                    <option selected="selected" value=""></option>
+                    <option value="0">主动接入</option>
+                    <option value="1">被动接入</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-inline" id="ifSample">
+            <label class="layui-form-label layui-required"><i style="color:#F00;font-family:serif;font-style: normal;">*</i>是否单机</label>
+            <div class="layui-input-inline">
+                <select name="singleType" id="singleType" lay-filter="selecte-singleType"
+                        lay-verify="singleTypeCheck">
+                    <option selected="selected" value=""></option>
+                    <option value="0">是</option>
+                    <option value="1">否</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-inline" id="ifManStandbyType" style="display: none">
+            <label class="layui-form-label layui-required"><i style="color:#F00;font-family:serif;font-style: normal;">*</i>主备机类型</label>
+            <div class="layui-input-inline">
+                <select name="manStandbyType" id="selecte-manStandbyType"
+                        lay-verify="manStandbyTypeCheck">
+                    <option selected="selected" value=""></option>
+                    <option value="A">主</option>
+                    <option value="B">备</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">基站IP</label>
+            <div class="layui-input-inline">
+                <input id="ip" name="ip" placeholder="请输入基站IP" type="text" class="layui-input"
+                       lay-verify="IPCheck"/>
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">端口</label>
+            <div class="layui-input-inline">
+                <input id="port" name="port" placeholder="请输入基站端口" type="number" maxlength="5"
+                       class="layui-input" lay-verify="PORTCheck"/>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">纬度</label>
+            <div class="layui-input-inline">
+                <input name="latitude" id="latitude" placeholder="请输入纬度" type="text" lay-verify="LatCheck"
+                       class="layui-input"/>
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">经度</label>
+            <div class="layui-input-inline">
+                <input name="longitude" id="longitude" placeholder="请输入经度" type="text" lay-verify="LngCheck"
+                       class="layui-input"/>
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-form-item" id="version" style="display: none">
+        <div class="layui-inline">
+            <label class="layui-form-label">ARM版本</label>
+            <div class="layui-input-inline">
+                <input id="armVersion" name="armVersion" placeholder="请输入ARM版本" type="text" class="layui-input"/>
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">FPGA版本</label>
+            <div class="layui-input-inline">
+                <input id="fpgaVersion" name="fpgaVersion" placeholder="请输入FPGA版本" type="text"
+                       class="layui-input"/>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">基站地址</label>
+        <div class="layui-input-block">
+            <textarea rows="3" name="address" id="stationAddress" placeholder="请输入基站地址" type="text" maxlength="100"
+                      class="layui-textarea"></textarea>
+        </div>
+    </div>
+
+    <div class="layui-form-item model-form-footer">
+        <button class="layui-btn layui-btn-primary" ew-event="closeDialog" type="button">取消</button>
+        <button class="layui-btn" lay-filter="baseStationInfo-form-submit" lay-submit>保存</button>
+        <button class="layui-btn layui-btn-warm" id="station-btn-test" type="button">测试</button>
+    </div>
+</form>
+
+<script>
+    layui.use(['layer', 'admin', 'form', 'common', 'table'], function () {
+        var layer = layui.layer;
+        var admin = layui.admin;
+        var form = layui.form;
+        var table = layui.table;
+        var config = layui.common;
+        form.render();
+        // 回显基站信息数据
+        var station = admin.getTempData('baseStationInfo-table');
+
+        if (station) {
+            if (station.index == true) {
+                $('#ifSample').remove();
+                $('#ifManStandbyType').show();
+            } else if (station.index != true && station.parentId != 0) {
+                $('#ifSample').remove();
+                $('#ifManStandbyType').show();
+            } else {
+                $('#ifManStandbyType').remove();
+            }
+            form.val('stationInfo-form', station);
+            if(station.port==0){
+                $("input[name='port']").val("");
+            }
+            if(station.longitude==0){
+                $("input[name='longitude']").val("");
+            }
+            if(station.latitude==0){
+                $("input[name='latitude']").val("");
+            }
+            if(station.singleType==1){
+                $("#ip").val("");
+                $("#port").val("");
+                $("#ip").attr("disabled",true);
+                $("#port").attr("disabled",true);
+                document.getElementById("ip").style.backgroundColor="#fafafa";
+                document.getElementById("port").style.backgroundColor="#fafafa";
+            }
+
+        } else {
+            $('#ifSample').show();
+            $('#ifManStandbyType').remove();
+        }
+        $('#stationInfo-form').attr('method', 'POST');
+
+        form.on('select(selecte-singleType)', function (data) {
+            if (data.value == 1) {
+                $("#ip").val("");
+                $("#port").val("");
+                $("#ip").attr("disabled",true);
+                $("#port").attr("disabled",true);
+                document.getElementById("ip").style.backgroundColor="#fafafa";
+                document.getElementById("port").style.backgroundColor="#fafafa";
+            }else {
+                $("#ip").attr("disabled",false);
+                $("#port").attr("disabled",false);
+                document.getElementById("ip").style.backgroundColor="#ffffff";
+                document.getElementById("port").style.backgroundColor="#ffffff";
+            }
+        });
+
+        var checkutils = {
+            //ip地址校验
+            IPCheck: function (value) {
+                var regIP = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+                return regIP.test(value);
+            },
+            //端口校验
+            PORTCheck: function (s) {
+                if (s >= 0 && s <= 65535) {
+                    return true;
+                }
+                return false;
+            },
+            LatCheck: function (s) {
+                if (s >= -90 && s <= +90) {
+                    return true;
+                }
+                return false;
+            },
+            LngCheck: function (s) {
+                if (s >= -180 && s <= +180) {
+                    return true;
+                }
+                return false;
+            },
+            connectionTypeCheck: function (s) {
+                if (s != '') {
+                    return true;
+                }
+                return false;
+            },
+            singleTypeCheck: function (s) {
+                if (s != '') {
+                    return true;
+                }
+                return false;
+            },
+            manStandbyTypeCheck: function (s) {
+                if (s != '') {
+                    return true;
+                }
+                return false;
+            },
+        }
+
+        form.verify({
+            connectionTypeCheck: function (s) {
+                if (!checkutils.connectionTypeCheck(s)) {
+                    return '必选项不能为空';
+                }
+            },
+            singleTypeCheck: function (s) {
+                if (!checkutils.singleTypeCheck(s)) {
+                    return '必选项不能为空';
+                }
+            },
+            manStandbyTypeCheck: function (s) {
+                if (!checkutils.manStandbyTypeCheck(s)) {
+                    return '必选项不能为空';
+                }
+            },
+            LatCheck: function (s) {
+                // if (s == '') {
+                //     return '必填项不能为空';
+                // } else
+                if (s.length > 0) {
+                    if (!checkutils.LatCheck(s)) {
+                        return '请输入正确的纬度';
+                    }
+                    if(s.split(".").length>1){
+                        if(s.split(".")[1].length>4) {
+                            return '小数点后最多保留四位小数';
+                        }
+                    }
+                }
+            },
+            LngCheck: function (s) {
+                // if (s == '') {
+                //     return '必填项不能为空';
+                // } else
+                if (s.length > 0) {
+                    if (!checkutils.LngCheck(s)) {
+                        return '请输入正确的经度';
+                    }
+                    if(s.split(".").length>1){
+                        if(s.split(".")[1].length>4) {
+                            return '小数点后最多保留四位小数';
+                        }
+                    }
+                }
+            },
+            IPCheck: function (s) {
+                if ($("#port").val()!=""&&s == '') {
+                    return '此项不能为空';
+                } else
+                if (s.length > 0) {
+                    if (!checkutils.IPCheck(s)) {
+                        return '请输入正确的IP地址';
+                    }
+                }
+            },
+            PORTCheck: function (s) {
+                if ($("#ip").val() != "" && s == '') {
+                    return '此项不能为空';
+                } else if (s.length > 0) {
+                    if (!checkutils.PORTCheck(s)) {
+                        return '请输入正确的端口';
+                    }
+                    if (s.split(".").length > 1) {
+                        return '端口不可以输入小数';
+                    }
+                }
+            },
+        });
+        // if(singleType=="0"&&connectionType=="1"){
+        //     check2()
+        // }
+        // function check2() {
+        //     form.verify({
+        //         IPCheck: function (s) {
+        //             if (s == '') {
+        //                 return '必填项不能为空';
+        //             } else if (s.length > 0) {
+        //                 if (!checkutils.IPCheck(s)) {
+        //                     return '请输入正确的IP地址';
+        //                 }
+        //             }
+        //         },
+        //         PORTCheck: function (s) {
+        //             if (s == '') {
+        //                 return '必填项不能为空';
+        //             } else if (s.length > 0) {
+        //                 if (!checkutils.PORTCheck(s)) {
+        //                     return '请输入正确的端口';
+        //                 }
+        //             }
+        //         },
+        //     });
+        // }
+
+        // 表单提交事件
+        form.on('submit(baseStationInfo-form-submit)', function (data) {
+            if (data.field.connectionType == 0 && data.field.singleType == 0) {
+                // check2()
+                if (data.field.ip == "" || data.field.port == "") {
+                    layer.msg("IP、端口必须填写", {icon: 2, time: config.msgTime});
+                    return false;
+                } else {
+                    var regIP = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+                    if (regIP.test(data.field.ip) == false) {
+                        layer.msg("请输入正确的IP地址", {icon: 2, time: config.msgTime});
+                        return false;
+                    }
+                    if ((data.field.port >= 0 && data.field.port <= 65535) == false) {
+                        layer.msg("请输入正确的端口", {icon: 2, time: config.msgTime});
+                        return false;
+                    }
+                }
+            }
+            if(data.field.connectionType == 0 && (data.field.manStandbyType == "A"||data.field.manStandbyType == "B")){
+                if (data.field.ip == "" || data.field.port == "") {
+                    layer.msg("IP、端口必须填写", {icon: 2, time: config.msgTime});
+                    return false;
+                } else {
+                    var regIP = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+                    if (regIP.test(data.field.ip) == false) {
+                        layer.msg("请输入正确的IP地址", {icon: 2, time: config.msgTime});
+                        return false;
+                    }
+                    if ((data.field.port >= 0 && data.field.port <= 65535) == false) {
+                        layer.msg("请输入正确的端口", {icon: 2, time: config.msgTime});
+                        return false;
+                    }
+                }
+            }
+            layer.load(2);
+            admin.req('station-maintain/baseStationInfo/saveOrUpdate', JSON.stringify(data.field), function (data) {
+                layer.closeAll('loading');
+
+                if (data.resp_code == 0) {
+                    admin.closePopupCenter();
+                    layer.msg(data.resp_msg, {icon: 1, time: config.msgTime});
+                    if(data.datas.parentId==0){
+                        table.reload('baseStationInfo-table', {})
+                    }else{
+                        table.reload(tableIndex, {})
+                    }
+                } else {
+                    layer.msg(data.resp_msg, {icon: 2, time: config.msgTime});
+                }
+
+            }, "POST");
+            return false;
+        });
+
+
+        $('#station-btn-test').click(function () {
+            stationTest();
+        });
+
+        function stationTest() {
+            var ip = $("#ip").val();
+            var port = $("#port").val();
+            var r = checkIP();
+            var p = checkPort();
+
+            if (r == false) {
+                layer.msg("请输入正确的IP地址", {icon: 2, time: config.msgTime});
+                return false;
+            }
+            if (p == false) {
+                layer.msg("请输入正确的端口", {icon: 2, time: config.msgTime});
+                return false;
+            }
+            layer.load(2);
+            admin.req('station-maintain/baseStationInfo/test', JSON.stringify({
+                "ip": ip,
+                "port": port
+            }), function (data) {
+                layer.closeAll('loading');
+                if (data.resp_code == 0) {
+                    layer.msg("连接成功", {icon: 1, time: config.msgTime});
+                } else {
+                    layer.msg("连接失败", {icon: 2, time: config.msgTime});
+                }
+            }, "POST");
+        }
+        function checkIP() {
+            var obj = $("#ip").val();
+            //ip地址
+            var exp = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+            var reg = obj.match(exp);
+            if (reg == null) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+        function checkPort() {
+            var s = $("#port").val();
+            if (s >= 0 && s <= 65535 && s!="") {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    });
+
+</script>

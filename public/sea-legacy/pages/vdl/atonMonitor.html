@@ -1,0 +1,366 @@
+<script src="../../assets/libs/echarts/echarts.min.js"></script>
+<head><style>
+    .layui-laydate-range {
+    width: 550px;}
+</style><head>
+<div class="layui-card">
+    <div class="layui-card-header">
+        <h2 class="header-title">助航设备（AtoN）监测</h2>
+    </div>
+    <div class="layui-card-body">
+        <!-- 饼状图 -->
+        <div class="layui-card">
+            <!--echarts图表-->
+            <div class="layui-row">
+                <div class="layui-card-header">图表统计</div>
+                <div class="layui-col-md6" id="aton-resultTypeClassify" style="height: 220px;display: inline-block;"></div>
+                <div class="layui-col-md6" id="aton-errorStatus" style="height: 220px;display: inline-block;"></div>
+            </div>
+        </div>
+
+        <div class="layui-form toolbar">
+            <div class="layui-form-item" style="margin-bottom: 0px">
+                <label class="layui-form-label">AtoN：</label>
+                <div class="layui-input-inline" style="width:120px">
+                    <input id="mmsi" name ="mmsi" class="layui-input search-input" type="text" placeholder="搜索MMSI号"/>
+                </div>
+                <label  class="layui-form-label">虚拟航标：</label>
+                <div  style="width: 120px" class="layui-input-inline " >
+                    <select name="virtual" id="virtual">
+                        <option value="">请选择</option>
+                        <option  value='1'>是</option>
+                        <option  value='0'>否</option>
+                    </select>
+                    </select>
+                </div>
+                <label class="layui-form-label">异常类型：</label>
+                <div class="layui-input-inline" style="width:120px">
+                    <select name="resultTypeClassify" id="resultTypeClassify" >
+                        <option value="">请选择</option>
+<!--                        <option  value='800'>报文播发频率判定中</option>-->
+                        <option  value='801'>报文MMSI异常</option>
+                        <option  value='802'>报文播发频率异常</option>
+                        <option  value='803'>助航设备（AtoN）列表</option>
+                        <option  value='804'>虚假航标</option>
+                        <option  value='805'>MMSI重号</option>
+                    </select>
+                </div>
+                <label class="layui-form-label">处理结果：</label>
+                <div class="layui-input-inline" style="width:150px">
+                    <select name="errorStatus" id="errorStatus">
+                        <option value="">请选择</option>
+                        <option value="ABNORMAL">异常</option>
+                        <option value="RECTIFIED">已整改</option>
+                        <option value="MISJUDGED">误判</option>
+                    </select>
+                </div>
+                <label class="layui-form-label">异常时间</label>
+                <div class="layui-input-inline" style="width:300px">
+                    <input type="text" id="searchWarningTime" name="searchWarningTime" placeholder="请选择异常时间"
+                           autocomplete="off" class="layui-input" readonly>
+                </div>
+                <button id="aton-btn-search" filter="aisDuplicateIdentity-btn-search" class="layui-btn icon-btn"><i
+                        class="layui-icon">&#xe615;</i>搜索
+                </button>
+                <button id="aton-btn-excel" class="layui-btn icon-btn"><i
+                        class="layui-icon">&#xe654;</i>导出excel
+                </button>
+            </div>
+
+        </div>
+
+        <table class="layui-table" id="aton-table" lay-filter="aton-table"></table>
+    </div>
+</div>
+
+<!-- 表格操作列 -->
+<script type="text/html" id="aton-table-bar">
+    <a class="layui-btn layui-btn-primary layui-btn-xs"  lay-event="detail" >
+        <i class="layui-icon layui-icon-layer"></i>
+    </a>
+</script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.1.1/dist/echarts.min.js"></script>
+
+<!--layUI-->
+<script>
+    layui.use(['form', 'table', 'util', 'common', 'admin', 'laydate', 'jquery', 'layer', 'table', 'layedit', 'upload', 'element', 'carousel'], function () {
+        var form = layui.form;
+        var table = layui.table;
+        var config = layui.common;
+        var admin = layui.admin;
+        var laydate = layui.laydate;
+        var $ = layui.jquery;
+        carousel = layui.carousel;
+        // var echarts = layui.echarts;
+        var table = layui.table;
+        var layedit = layui.layedit;
+        var upload = layui.upload;
+        //异常时间
+        laydate.render({
+            elem: '#searchWarningTime',
+            type: 'datetime',
+            format: 'yyyy/MM/dd HH:mm:ss',
+            range: true
+        });//laydate
+        // 渲染表格
+
+        table.render({
+            elem: '#aton-table',
+            url: config.base_server + 'atonStationRecognition-api/aton/findPage',
+
+            method: 'GET',
+            headers: {'Authorization': 'Bearer ' + config.getToken().access_token},
+            page: true,
+            cols: [[
+                {type: 'numbers'},
+                {field: 'mmsi', title: 'MMSI'},
+                {field: 'name', title: '名称'},
+                {field: 'virtual', title: '虚拟航标'},
+                {field: 'resultType', title: '异常类型'},
+                {
+                    field: 'receiveTime', title: '异常时间'/*, templet: function (e) {
+                        return layui.util.toDateString(e.receiveTime, "yyyy-MM-dd HH:mm:ss")
+                    }*/
+                },
+                {field: 'validatorCount', title: '异常次数'},
+                {field: 'errorStatus', title: '处理结果'},
+                {fixed: 'right', align: 'center', toolbar: '#aton-table-bar', title: '操作', width: 175}//表格操作列
+
+            ]]
+        });//table
+
+        $(function () {
+            getEchart();
+            getEchart2();
+        });
+        function  getEchart() {
+            $.ajax({
+                type: 'post',
+                dataType: 'text',
+                url:  config.base_server + 'atonStationRecognition-api/aton/findAllInfo',
+                headers: {'Authorization': 'Bearer ' + config.getToken().access_token},
+                cache: false,
+                async: true,
+                success: function (data) {
+                    var data = eval('(' + data + ')');
+                    var data1 = new Array();
+
+                    var total = null;
+                    for(var i=0; i < data.circleDto.resultType.item.length; i++){
+                        total=data.circleDto.resultType.total;
+                        data1[i] = {value:data.circleDto.resultType.item[i].value,name:data.circleDto.resultType.item[i].name + ":" +  Math.round(data.circleDto.resultType.item[i].value /data.circleDto.resultType.total * 10000) / 100 + "%"}
+                            }
+                    var resultTypeClassifyEchart = echarts.init(document.getElementById('aton-resultTypeClassify'));
+                    var resultTypeClassifyEchartOption = {
+                        title: {
+                            text: '异常类型统计',
+                            x: 'center'
+                        },
+                        graphic: {
+                            type: "text",
+                            left: "center",
+                            top: "48%",
+                            style: {
+                                // text: total==0?"当前无统计数据":"合计" +total,
+                                text: total==0?"当前无统计数据":"合计" +total,
+                                textAlign: "center",
+                                fill: "#000",
+                                fontSize: 12,
+                                fontcolor:"black",
+                            },
+                        },
+                        tooltip: {
+
+                        },
+                        series: [{
+                            type: 'pie', //饼状
+                            radius: ['30%', '50%'], //圆的大小
+                            center: ['50%', '50%'], //居中
+                            data:data1
+                        }]
+                    };
+                    // 使用刚指定的配置项和数据显示图表。
+                    resultTypeClassifyEchart.setOption(resultTypeClassifyEchartOption, true);
+
+                }
+            });
+        }
+
+        function  getEchart2() {
+            $.ajax({
+                type: 'post',
+                dataType: 'text',
+                url:  config.base_server + 'atonStationRecognition-api/aton/findAllInfo',
+                headers: {'Authorization': 'Bearer ' + config.getToken().access_token},
+                cache: false,
+                async: true,
+                success: function (data) {
+                    var data = eval('(' + data + ')');
+                    var data1 = new Array();
+                    var total = null;
+                    for(var i=0; i < data.circleDto.status.item.length; i++){
+                        data1[i] = {value:data.circleDto.status.item[i].value,name:data.circleDto.status.item[i].name + ":" +  Math.round(data.circleDto.status.item[i].value / data.circleDto.status.total * 10000) / 100 + "%"}
+                        total = data.circleDto.status.total;
+                    }
+                    var chartExceptionType = echarts.init(document.getElementById('aton-errorStatus'));
+                    //指定图表配置项和数据
+                    chartException = {
+                        title: {
+                            text: '异常处理结果统计',
+                            x: 'center' //标题居中
+                        },
+                        tooltip: {
+                            // trigger: 'item' //悬浮显示对比
+                        },
+                        graphic: {
+                            type: "text",
+                            left: "center",
+                            top: "48%",
+                            style: {
+                                text: total==0 ? "当前无统计数据" :"合计" + total,
+                                textAlign: "center",
+                                fill: "#000",
+                                fontSize: 12,
+                                fontcolor:"black",
+                            },
+                        },
+                        series: [{
+                            type: 'pie', //饼状
+                            radius: ['30%', '50%'], //圆的大小
+                            center: ['50%', '50%'], //居中
+                            data:data1
+
+                        }]
+                    };
+                    // 使用刚指定的配置项和数据显示图表。
+                    chartExceptionType.setOption(chartException, true);
+                }//
+            });
+        }
+
+
+        // excel按钮点击事件
+        $('#aton-btn-excel').click(function () {
+            $(".aton-btn-excel").attr("disabled", "disabled");
+            var xmlhttp = new XMLHttpRequest();
+            var url = config.base_server + 'atonStationRecognition-api/aton/getExcel';
+            var param = getParam();
+            var content = JSON.stringify(param)
+            xmlhttp.open("POST", url);
+            xmlhttp.withCredentials = true;
+            xmlhttp.setRequestHeader("Content-Type", "application/json");
+            xmlhttp.setRequestHeader('Authorization', 'Bearer ' + config.getToken().access_token);
+            xmlhttp.responseType = 'blob';
+            xmlhttp.send(content);
+            xmlhttp.onreadystatechange = function (oEvent) {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    const url = window.URL.createObjectURL(new Blob([oEvent.currentTarget.response], {
+                        type: 'application/octet-stream;charset=utf-8'
+                    }))
+                    const link = document.createElement('a')
+                    link.style.display = 'none'
+                    link.href = url
+                    const fileName = parseTime(new Date()) + '-AtoN异常监测.xlsx'
+                    link.setAttribute('download', fileName)
+                    document.body.appendChild(link)
+                    link.click()
+                    document.body.removeChild(link)
+                    $(".timelineExport").show()
+                    $(".timelineExportDisable").hide()
+                }
+            }
+
+        });
+
+
+        // 搜索按钮点击事件
+        $('#aton-btn-search').click(function () {
+            var param = getParam();
+            table.reload('aton-table', {where: param});
+        });
+//                searchWarningTime errorStatus  resultTypeClassify virtual mmsi
+
+        // 工具条点击事件aton
+        table.on('tool(aton-table)', function (obj) {
+            var data = obj.data;
+            var layEvent = obj.event;
+            if (layEvent === 'detail') { // 修改
+                var index = layui.index;
+                admin.putTempData('id', data.id);
+                var title = '详情页面';
+                admin.popupCenter({
+                    title: title,
+                    path: 'pages/vdl/atonMonitorDetail.html',
+                    area:['1500px','800px'],
+                    offset:'120px',
+                    finish: function () {
+                        table.reload('station-table1', {});
+                    }
+                });
+            }
+        });
+
+        function getParam() {
+            var warningTime = $('#searchWarningTime').val();
+            var startTime;
+            var endTime;
+            if (warningTime.trim() != undefined && warningTime.trim() != "") {
+                var time = warningTime.trim().split("-");
+                startTime = new Date(time[0]).getTime();
+                endTime = new Date(time[1]).getTime();
+            }
+            var param = {
+                mmsi: $('#mmsi').val(),
+                virtual: $('#virtual').val(),
+                resultTypeClassify: $('#resultTypeClassify').val(),
+                errorStatus: $('#errorStatus').val(),
+                startTime: startTime,
+                endTime: endTime
+            }
+            return param;
+        }
+
+        function parseTime(time, cFormat) {
+            if (arguments.length === 0) {
+                return null
+            }
+            const format = cFormat || '{y}-{m}-{d} {h}:{i}:{s}'
+            let date
+            if (typeof time === 'undefined' || time === null || time === 'null') {
+                return ''
+            } else if (typeof time === 'object') {
+                date = time
+            } else {
+                if ((typeof time === 'string') && (/^[0-9]+$/.test(time))) {
+                    time = parseInt(time)
+                }
+                if ((typeof time === 'number') && (time.toString().length === 10)) {
+                    time = time * 1000
+                }
+                date = new Date(time)
+            }
+            const formatObj = {
+                y: date.getFullYear(),
+                m: date.getMonth() + 1,
+                d: date.getDate(),
+                h: date.getHours(),
+                i: date.getMinutes(),
+                s: date.getSeconds(),
+                a: date.getDay()
+            }
+            const time_str = format.replace(/{(y|m|d|h|i|s|a)+}/g, (result, key) => {
+                let value = formatObj[key]
+                // Note: getDay() returns 0 on Sunday
+                if (key === 'a') {
+                    return ['日', '一', '二', '三', '四', '五', '六'][value]
+                }
+                if (result.length > 0 && value < 10) {
+                    value = '0' + value
+                }
+                return value || 0
+            })
+            return time_str
+        }
+
+    });//layui.use
+</script>

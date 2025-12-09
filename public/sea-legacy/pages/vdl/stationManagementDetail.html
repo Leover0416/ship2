@@ -1,0 +1,310 @@
+
+
+<div class="layui-card">
+    <div class="layui-card-header">
+        <h2 class="header-title">基站基本信息</h2>
+    </div>
+    <div class="layui-card-body ">
+        <table  class=layui-table-box" lay-skin="line" style="font-size: 14px">
+            <tr>
+                <td >MMSI：</td>
+                <td><input style='border: 0px;' id='mmsi' readonly /></td>
+                <td >基站名称：</td>
+                <td><input style='border: 0px;' id='name' readonly /></td>
+                <td >最近更新时间：</td>
+                <td><input style='border: 0px;' id='updatetime' readonly /></td>
+                <td >当前位置：</td>
+                <td><input style='border: 0px;' id='position' readonly /></td>
+            </tr>
+
+        </table>
+
+        <div  style=" width: 120px;"> <label style="font-size: small" > <p style="background-color: #9F9F9F;">基站异常信息 </p></label></div >
+        <table class=layui-table" lay-skin="line" >
+            <tr>
+                <td  style="white-space:nowrap;   width: auto;   font-size: small">异常确定时间：</td>
+                <td><input style='white-space:nowrap;   width: auto;   border: 0px;font-size: small' id='receiveTime' readonly /></td>
+                <td  style="white-space:nowrap;   width: auto;   font-size: small">异常类型：</td>
+                <td><input style='white-space:nowrap;   width: auto;   border: 0px;font-size: small' id='resultType' readonly /></td>
+            </tr>
+
+        </table>
+    </div>
+
+    <div class="layui-card-header">
+        <h2 class="header-title">异常目标详细(检查历史)</h2>
+    </div>
+    <div class="layui-card-body ">
+        <table class="layui-table" lay-even lay-skin="nob" id="abnormalTarget-table" lay-filter="abnormalTarget-table"></table>
+    </div>
+
+    <script type="text/html" id="expandAll">
+        <div class="detailView">
+            <div class="detailTitle">报文类型：{{d.msgContent.messageId}}转发指示符：{{d.msgContent.data.aisMessage.repeat}}MMSI：{{d.msgContent.shoreMmsi}} RAIM标志：{{d.msgContent.data.aisMessage.raim}}备用：{{d.msgContent.data.aisMessage.spare1}}</div>
+            <div class="detailAuthor">位置准确度：{{d.msgContent.data.aisMessage.posAcc}} 经度： 纬度： 定位装置类型：{{d.msgContent.data.aisMessage.posType}} 广播传输控制：{{d.msgContent.data.aisMessage.transmissionControl}}</div>
+            <div class="detailContent">UTC年：{{d.msgContent.data.aisMessage.utcYear}} UTC月：{{d.msgContent.data.aisMessage.utcMonth}}
+                UTC日：{{d.msgContent.data.aisMessage.utcDay}} UTC时：{{d.msgContent.data.aisMessage.utcHour}}
+                UTC分：{{d.msgContent.data.aisMessage.utcMinute}} UTC秒：{{d.msgContent.data.aisMessage.utcSecond}}</div>
+            <div class="detailAuthor">通信状态（同步状态）：{{d.msgContent.data.aisMessage.syncState}} 通信状态（时隙超时）：{{d.msgContent.data.aisMessage.slotTimeout}} 通信状态（子消息）： {{d.msgContent.data.aisMessage.subMessage}}</div>
+            <div class="detailAuthor">原始报文:{{d.msgContent.message}} </div>
+        </div>
+
+
+    </script>
+
+    <div style="width: 100% ; height: 30px;background-color: white;margin-top:100px ; ">
+        <p style="font-weight: bold; font-size: 20px ;background-color: white;padding: 10px">异常处理：</p>
+    </div>
+
+    <div class="layui-card-body  " style="margin-top: 2px;background-color: white; height: 150px;padding: 0px ">
+        <label class="layui-form-label" style="padding: 0px">处理结果：</label>
+        <div class="layui-input-block" style="margin-top: 7px;padding: 0px">
+            <input type="radio" name="dealResult" value="MISJUDGED" title="误判" lay-filter="dealResult"
+                   checked/><span>误判</span>
+            <input type="radio" name="dealResult" value="RECTIFIED" title="已整改"
+                   lay-filter="dealResult"/><span>已整改</span>
+            <input type="radio" name="dealResult" value="SPECIAL" title="其他特殊情况"
+                   lay-filter="dealResult"/><span>其他特殊情况</span>
+        </div>
+        <div class="layui-form-item" style="margin-top: 10px;min-height: 0px;padding: 0px;margin: 0px">
+            <label class="layui-form-label" style="padding: 0px">情况说明：</label>
+            <div class="layui-input-block" style="padding: 0px;">
+                <input name="title" id="description" class="layui-input layui-form-danger" required="" type="text"
+                       placeholder="请输入情况说明" autocomplete="off" lay-verify="required">
+            </div>
+        </div>
+        <div style=" margin-top: 10px; margin-left: 50px;">
+            <button class="layui-btn layui-btn-normal" style="float: left;"
+                    lay-filter="dealDuplicateIdentity-submit" lay-submit>保存
+            </button>
+            <!--                <a class="layui-btn layui-btn-normal " onclick="window.location.href='\#!aisDynamicInformation'"-->
+            <!--                   style="margin-left: 20px;" id="return" lay-event="return">-->
+            <!--                    返回-->
+            <!--                </a>-->
+
+            <a class="layui-btn layui-btn-normal "
+               style="margin-left: 20px;" id="return" lay-event="return">
+                返回
+            </a>
+        </div>
+</div>
+</div>
+<!-- 表格操作列 -->
+<script type="text/html" id="abnormalTarget-table-bar">
+    <a class="layui-btn layui-btn-xs" lay-event="abnormalTarget-table-bar">详细</a>
+</script>
+<script>
+
+    // 自定义模块，这里只需要开放soulTable即可
+    layui.config({
+        base: 'module/',   // 第三方模块所在目录
+        version: 'v1.6.4' // 插件版本号
+    }).extend({
+        soulTable: 'soulTable/soulTable',
+        tableChild: 'soulTable/tableChild',
+        tableMerge: 'soulTable/tableMerge',
+        tableFilter: 'soulTable/tableFilter',
+        excel: 'soulTable/excel',
+    });
+
+    layui.use(['form', 'table', 'util','soulTable' ,'common', 'admin',  'jquery', 'layer', 'table'], function () {
+        var form = layui.form;
+        var table = layui.table;
+        var config = layui.common;
+        var layer = layui.layer;
+        var util = layui.util;
+        var admin = layui.admin;
+        var table = layui.table;
+        var soulTable = layui.soulTable;
+        // 回显menu数据
+        var id = admin.getTempData('id');
+
+        // 渲染表格
+        table.render({
+
+            elem: '#abnormalTarget-table',
+            url: config.base_server + 'atonStationRecognition-api/StationInfo/checkErrorStationEntity/findByMmsi',
+            method: 'GET',
+            headers: {'Authorization': 'Bearer ' + config.getToken().access_token},
+            page: true,
+            where:{id:id},
+            parseData : function(data) {
+                if (data.infoStation != null){
+
+                    $("#mmsi").val(data.infoStation.mmsi)
+                    $("#name").val(data.infoStation.name)
+                    $("#updatetime").val(data.infoStation.updatetime)
+                    // $("#position").val(data.infoStation.callSign)
+                    // latitude longitude
+                }
+                if (data.errorDetailShipStaticDto != null){
+
+                    $("#receiveTime").val(data.errorDetailShipStaticDto.receiveTime)
+                    $("#resultType").val(data.errorDetailShipStaticDto.resultType)
+                }
+
+
+            return {
+                "code" : data.code,
+                "msg" : data.msg,
+                "count": data.total,
+                "data" : data.errorInfoAton
+
+            }
+
+        },
+            cols: [[
+                {
+                    field: 'receiveTime', title: '接收时间', collapse: true, children: '#expandAll', childWidth: 'full',templet: function (e) {
+                        return  layui.util.toDateString(e.receiveTime, "yyyy-MM-dd HH:mm:ss");
+
+                    }
+                },
+                {field: 'msgId', title: '报文类型', templet: function (e) {
+                        return e.msgId + '号';
+                    }},
+                {field: 'mmsi', title: 'MMSI'},
+                {field: 'resultInfo', title: '异常信息'},
+                {field: '', title: '异常说明'},
+            ]],done: function () {
+                soulTable.render(this)
+        }});
+
+
+        // 工具条点击事件
+        table.on('tool(abnormalTarget-table)', function (obj) {
+            var data = obj.data;
+            var layEvent = obj.event;
+            var childData = obj.data.children;
+            if (layEvent === 'blank-ship-detail') {// 修改
+                // showEditModel(data);
+                showBlankShipDetail(data);
+            }else if (layEvent === 'collapse') {
+                //日志
+                var trObj = layui.$(this).parent('tr'); //当前行
+                var accordion = true //开启手风琴，那么在进行折叠操作时，始终只会展现当前展开的表格。
+                var content = '<table class="layui-table"  lay-filter="abnormalTarget-detail-table" ></table>';//内容
+                //表格行折叠方法
+                collapseTable({
+                    elem: trObj,
+                    accordion: accordion,
+                    content: content,
+                    success: function (trObjChildren, index) { //成功回调函数
+                        //trObjChildren 展开tr层DOM
+                        //index 当前层索引
+                        trObjChildren.find('table').attr("id", index);
+
+                        table.render({
+                            data: childData,
+                            elem: "#" + index,
+                            page: false,
+                            // limit: 100,
+                            // where: {fleetId: data.id},
+                            cellMinWidth: 80,
+                            cols: [[
+                                // {field: 'businessName', title: '异常类型'},
+                                {field: 'resultTypeName', title: '异常种类'},
+                                {field: 'resultInfoName', title: '异常详细'},
+                                {
+                                    field: 'receiveTime', title: '更新时间', templet: function (e) {
+                                        return layui.util.toDateString(e.receiveTime, "yyyy-MM-dd HH:mm:ss")
+                                    }
+                                },
+                                // {field: 'errorCount', title: '异常次数'},
+                                {field: 'errorStatus', title: '状态',templet:function (e) {
+                                        if(e.errorStatus =='ABNORMAL') return '异常'
+                                        if(e.errorStatus =='ABNORMAL') return '异常'
+                                        if(e.errorStatus =='RECTIFIED') return '已整改'
+                                        if(e.errorStatus =='MISJUDGED') return '误判'
+                                        if(e.errorStatus =='PROCESSING') return '处理中的'
+                                        if(e.errorStatus =='SPECIAL') return '其它特殊情况'
+                                        if(e.errorStatus =='REJUDGE') return '重判定'}
+                                        },
+                                {fixed: 'right', align: 'center', toolbar: '#abnormalTarget-table-bar', title: '操作'}
+                            ]],
+                            // done: function () { $("[data-field='ID']").css('display','none'); }
+
+                        });
+                    }
+                });
+            }});
+        // $('.layui-table .layui-table-cell > span').css({'display': 'none'});
+
+        form.on('submit(dealDuplicateIdentity-submit)', function () {
+            var data = {
+                id: id,
+                errorStatus: $("input[name='dealResult']:checked").val(),
+                errorContent: $('#description').val(),
+            }
+            admin.req('atonStationRecognition-api/StationInfo/saveDeal', JSON.stringify(data), function (data) {
+                if (data.resp_code === 0) {
+                    layer.msg(data.resp_msg, {icon: 1, time: config.msgTime});
+                    $('#duplicateIdentityAbnormalExplain').val($('#description').val());
+                } else {
+                    layer.msg(data.resp_msg, {icon: 2, time: config.msgTime});
+                }
+                table.reload('abnormalTarget-table');
+            }, "POST");
+        });
+
+
+        //显示表单弹窗
+        var showBlankShipDetail = function (data) {
+
+            admin.putTempData('b_ship', data);
+            var title = '';
+            admin.popupCenter({
+                title:title,
+                path: 'pages/VDL/blackWhietList/blankListDetail.html',
+                finish: function () {
+                    table.reload('blank-table', {});
+                }
+            });
+        };
+
+        function collapseTable(options) {
+            var trObj = options.elem;
+            if (!trObj) return;
+            var accordion = options.accordion,
+                success = options.success,
+                content = options.content || '';
+            var tableView = trObj.parents('.layui-table-view'); //当前表格视图
+            var id = tableView.attr('lay-id'); //当前表格标识
+            var index = trObj.data('index'); //当前行索引
+            var leftTr = tableView.find('.layui-table-fixed.layui-table-fixed-l tr[data-index="' + index + '"]'); //左侧当前固定行
+            var rightTr = tableView.find('.layui-table-fixed.layui-table-fixed-r tr[data-index="' + index + '"]'); //右侧当前固定行
+            var colspan = trObj.find('td').length; //获取合并长度
+            var trObjChildren = trObj.next(); //展开行Dom
+            var indexChildren = id + '-' + index + '-children'; //展开行索引
+            var leftTrChildren = tableView.find('.layui-table-fixed.layui-table-fixed-l tr[data-index="' + indexChildren + '"]'); //左侧展开固定行
+            var rightTrChildren = tableView.find('.layui-table-fixed.layui-table-fixed-r tr[data-index="' + indexChildren + '"]'); //右侧展开固定行
+            var lw = leftTr.width() + 15; //左宽
+            var rw = rightTr.width() + 15; //右宽
+            //不存在就创建展开行
+            if (trObjChildren.data('index') != indexChildren) {
+                //装载HTML元素
+                var tr = '<tr data-index="' + indexChildren + '"><td colspan="' + colspan + '"><div style="height: auto;overflow-x:hidden;padding-left:' + lw + 'px;padding-right:' + rw + 'px" class="layui-table-cell">' + content + '</div></td></tr>';
+                trObjChildren = trObj.after(tr).next().hide(); //隐藏展开行
+                var fixTr = '<tr data-index="' + indexChildren + '"></tr>';//固定行
+                leftTrChildren = leftTr.after(fixTr).next().hide(); //左固定
+                rightTrChildren = rightTr.after(fixTr).next().hide(); //右固定
+            }
+            //展开|折叠箭头图标
+            trObj.find('td[lay-event="collapse"] i.layui-colla-icon').toggleClass("layui-icon-right layui-icon-down");
+            //显示|隐藏展开行
+            trObjChildren.toggle();
+            //开启手风琴折叠和折叠箭头
+            if (accordion) {
+                trObj.siblings().find('td[lay-event="collapse"] i.layui-colla-icon').removeClass("layui-icon-down").addClass("layui-icon-right");
+                trObjChildren.siblings('[data-index$="-children"]').hide(); //展开
+                rightTrChildren.siblings('[data-index$="-children"]').hide(); //左固定
+                leftTrChildren.siblings('[data-index$="-children"]').hide(); //右固定
+            }
+            success(trObjChildren, indexChildren); //回调函数
+            heightChildren = trObjChildren.height(); //展开高度固定
+            rightTrChildren.height(heightChildren + 115).toggle(); //左固定
+            leftTrChildren.height(heightChildren + 115).toggle(); //右固定
+        };
+
+    });
+</script>

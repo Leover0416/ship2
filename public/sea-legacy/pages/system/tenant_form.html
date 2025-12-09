@@ -1,0 +1,91 @@
+<!-- 表单弹窗 -->
+
+    <form id="tenant-form" lay-filter="tenant-form" class="layui-form model-form">
+        <input name="id" type="hidden"/>
+        <div class="layui-form-item">
+            <label class="layui-form-label">租户名称</label>
+            <div class="layui-input-block">
+                <input name="tenantName" placeholder="请输入租户名称" type="text" class="layui-input" maxlength="20"
+                       lay-verify="required" required/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">租户编码</label>
+            <div class="layui-input-block">
+                <input name="tenantCode" placeholder="请输入租户编码" type="text" class="layui-input" maxlength="20"
+                       lay-verify="required" required />
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">负责人</label>
+            <div class="layui-input-block">
+                <input name="master" placeholder="请输入负责人" type="text" class="layui-input" maxlength="20"
+                       lay-verify="required" required />
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">负责人电话</label>
+            <div class="layui-input-block">
+                <input name="phone" placeholder="请输入负责人电话" type="tel" class="layui-input"  maxlength="20"
+                       lay-verify="required|phone" required />
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">负责人邮箱</label>
+            <div class="layui-input-block">
+                <input name="email" placeholder="请输入负责人邮箱" type="text" class="layui-input" lay-verify="email" maxlength="20"
+                        required />
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">备注</label>
+            <div class="layui-input-block">
+                <input name="remarks" placeholder="请输入备注" type="text" class="layui-input" maxlength="20"
+                       lay-verify="required" required />
+            </div>
+        </div>
+        <div class="layui-form-item model-form-footer">
+            <button class="layui-btn layui-btn-primary" ew-event="closeDialog" type="button">取消</button>
+            <button class="layui-btn" lay-filter="tenant-form-submit" lay-submit>保存</button>
+        </div>
+    </form>
+
+<script>
+        layui.use(['layer', 'admin', 'form', 'formSelects','common','layedit'], function () {
+            var layer = layui.layer;
+            var admin = layui.admin;
+            var form = layui.form;
+            layedit = layui.layedit;
+            var formSelects = layui.formSelects;
+            var config=layui.common;
+            form.render();//selet选择框
+            //回显tenant数据
+            var tenant = admin.getTempData('t_tenant');
+            if (tenant) {
+                form.val('tenant-form', tenant);
+                //租户Code不能修改
+                $("input[name='tenantCode']").attr('disabled',true);
+                $("input[name='tenantCode']").attr('class',"layui-input layui-disabled");
+                $('#tenant-form').attr('method', 'POST');
+            }
+
+            // 表单提交事件
+            form.on('submit(tenant-form-submit)', function (data) {
+                layer.load(2);
+                admin.req('api-user/tenant/saveOrUpdate', JSON.stringify(data.field), function (data) {
+                    layer.closeAll('loading');
+                    if (data.resp_code === 0) {
+                        layer.msg(data.resp_msg, {icon: 1, time: config.msgTime});
+                        // table.reload('tenant-table');
+                        // layer.closeAll('page');
+                        admin.finishPopupCenter();
+                    } else {
+                        layer.msg(data.resp_msg, {icon: 2, time: config.msgTime});
+                    }
+                }, "POST");
+                return false;
+            });
+    });
+
+</script>

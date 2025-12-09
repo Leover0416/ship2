@@ -1,0 +1,302 @@
+<div class="layui-card">
+    <div class="layui-card-header">
+        <h2 class="header-title">基站异常监测</h2>
+        <!--        <span class="layui-breadcrumb pull-right">-->
+        <!--          <a href="#!console">首页</a>-->
+        <!--          <a><cite>船台管理</cite></a>-->
+        <!--        </span>-->
+    </div>
+    <div class="layui-card-body ">
+        <!-- 饼状图 -->
+        <div class="layui-card">
+        <div class="layui-row">
+                <div class="layui-col-md6" id="StationEchartEquipType"
+                     style="height: 220px;display: inline-block;"></div>
+                <div class="layui-col-md6" id="StationEchartExceptionType"
+                     style="height: 220px;display: inline-block;"></div>
+            </div>
+        </div>
+
+        <div class="layui-form toolbar">
+            <div class="layui-form-item">
+                <label class="layui-form-label">基站：</label>
+                <div class="layui-input-inline">
+                    <input id="ship-name-mmsi" class="layui-input search-input" type="text" placeholder="搜索MMSI号"/>
+                </div>
+
+                <label id="abnormalType" class="layui-form-label">异常类型：</label>
+                <div id="abnormalTypeSelect" class="layui-input-inline">
+                    <select name="abnormalTypeValue" id="abnormalTypeValue">
+                        <option value="">请选择</option>
+                        <option value="2101">基站MMSI</option>
+                        <option value="2102">虚假基站</option>
+                        <option value="2103">重复基站</option>
+                    </select>
+                </div>
+
+                <label id="real-processResults" class="layui-form-label">处理结果：</label>
+                <div id="realProcessResults" class="layui-input-inline">
+                    <select name="realProcessResultsSelect" id="realProcessResultsSelect">
+                        <option value="">请选择</option>
+                        <option value="ABNORMAL">异常</option>
+                        <option value="RECTIFIED">已整改</option>
+                        <option value="MISJUDGED">误判</option>
+                        <option value="PROCESSING">处理中的</option>
+                        <option value="SPECIAL">其它特殊情况</option>
+                        <option value="REJUDGE">重判定</option>
+                    </select>
+                </div>
+
+                <label class="layui-form-label">更新时间</label>
+                <div class="layui-input-inline">
+                    <input type="text" style="width:285px;" id="blackupdateTime" name="blackupdateTime" placeholder="更新时间"
+                           autocomplete="off" class="layui-input" readonly>
+                </div>
+
+                <button id="station-search" class="layui-btn icon-btn" style="margin-left: 130px"><i class="layui-icon">&#xe615;</i>查询
+                </button>
+                <button id="station-export" class="layui-btn icon-btn" style="margin-left: 10px"><i class="layui-icon">&#xe654;</i>导出excel
+                </button>
+            </div>
+        </div>
+        <table class="layui-table" id="station-table1" lay-filter="station-table1"></table>
+    </div>
+</div>
+
+<!-- 表格操作列 -->
+<script type="text/html" id="station-table1-bar">
+    <a class="layui-btn layui-btn-xs" lay-event="station-ship-detail">查看详情</a>
+</script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.1.1/dist/echarts.min.js"></script>
+<script>
+    layui.use(['form', 'table', 'util', 'common', 'admin', 'laydate', 'jquery', 'layer', 'table', 'layedit', 'upload', 'element', 'carousel'], function () {
+        var form = layui.form;
+        var table = layui.table;
+        var config = layui.common;
+        var layer = layui.layer;
+        var util = layui.util;
+        var admin = layui.admin;
+        var laydate = layui.laydate;
+        //异常时间
+        laydate.render({
+            elem: '#blackupdateTime',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            range: false
+        });
+        var $ = layui.jquery;
+        var element = layui.element;
+        carousel = layui.carousel;
+        // echarts = layui.echarts;
+        var table = layui.table;
+        var layedit = layui.layedit;
+        var upload = layui.upload;
+        // var dtree = layui.dtree;
+
+        // 渲染表格
+        table.render({
+
+            elem: '#station-table1',
+            url: config.base_server + 'atonStationRecognition-api/StationInfo/list',
+            method: 'GET',
+            headers: {'Authorization': 'Bearer ' + config.getToken().access_token},
+            page: true,
+            cols: [[
+                {type: 'numbers'},
+                {field: 'mmsi', title: 'MMSI'},
+                {field: 'name', title: '名称'},
+                {field: 'resultType', title: '异常类型'},
+                {
+                    field: 'receiveTime', title: '异常时间', templet: function (e) {
+                        return layui.util.toDateString(e.receiveTime, "yyyy-MM-dd HH:mm:ss")
+                    }
+                },
+                {field: 'count', title: '异常次数'},
+                {field: 'errorStatus', title: '处理结果',templet:function (e) {
+                        if(e.errorStatus =='ABNORMAL') return '异常'
+                        if(e.errorStatus =='RECTIFIED') return '已整改'
+                        if(e.errorStatus =='MISJUDGED') return '误判'
+                        if(e.errorStatus =='PROCESSING') return '处理中的'
+                        if(e.errorStatus =='SPECIAL') return '其它特殊情况'
+                        if(e.errorStatus =='REJUDGE') return '重判定'
+                    }},
+                {fixed: 'right', align: 'center', toolbar: '#station-table1-bar', title: '操作'}
+            ]]
+        });
+
+        // 导出excel按钮点击事件
+        $('#station-export').click(function () {
+            var mmsi = $('#ship-name-mmsi').val();
+            var errorStatus = $('#realProcessResultsSelect').val();
+            var resultType = $('#abnormalTypeValue').val();
+            var receiveTime = $('#blackupdateTime').val();
+                var url = config.base_server + 'atonStationRecognition-api/StationInfo/export'+ '?page=1&limit=10&mmsi'+  mmsi + '&errorStatus'+  errorStatus + '&resultType'+  resultType+ '&receiveTime'+  receiveTime;
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', url, true);
+                xhr.responseType = "blob";
+                xhr.setRequestHeader("client_type", "DESKTOP_WEB");
+                xhr.setRequestHeader("Authorization", "Bearer " + config.getToken().access_token);
+                xhr.onload = function () {
+                    if (this.status == 200) {
+                        var fileName = "基站异常监测.xlsx";
+                        var blob = this.response;
+                        var a = document.createElement('a');
+                        a.innerHTML = fileName;
+                        // 指定生成的文件名
+                        a.download = fileName;
+                        a.href = URL.createObjectURL(blob);
+                        document.body.appendChild(a);
+                        var evt = document.createEvent("MouseEvents");
+                        evt.initEvent("click", false, false);
+                        a.dispatchEvent(evt);
+                        document.body.removeChild(a);
+                    }
+                }
+                xhr.send();
+
+        });
+
+        // 工具条点击事件
+        table.on('tool(station-table1)', function (obj) {
+            var data = obj.data;
+            var layEvent = obj.event;
+            if (layEvent === 'station-ship-detail') {// 修改
+                var index = layui.index;
+                admin.putTempData('id', data.stationId);
+                var title = '详情页面';
+                admin.popupCenter({
+                    title: title,
+                    path: 'pages/vdl/stationManagementDetail.html',
+                    area:['1500px','800px'],
+                    offset:'120px',
+                    finish: function () {
+                        table.reload('station-table1', {});
+                    }
+                });
+
+                // 分离用html页面
+                // index.openNewTab({
+                //     title: '个人信息',
+                //     url: 'pages/vdl/blackWhietList/stationListDetail.html',
+                //     MMSI: 'myInfo'
+                // });
+                // jump(data);
+            }
+        });
+
+
+        // 搜索按钮点击事件
+        $('#station-search').click(function () {
+
+            var mmsi = $('#ship-name-mmsi').val();
+            var errorStatus = $('#realProcessResultsSelect').val();
+            var resultType = $('#abnormalTypeValue').val();
+            var updateTime = $('#blackupdateTime').val();
+            var startTime="";
+            var endTime="";
+            if(updateTime.trim()!=undefined&&updateTime.trim()!="") {
+                var time = updateTime.trim().split("-");
+                startTime = time[0];
+                endTime = time[1];
+            }
+            table.reload('station-table1', {where: {mmsi: mmsi, errorStatus: errorStatus, resultType: resultType, updateTime: updateTime}});
+        });
+
+        $(function () {
+            getEchart();
+            // getEchart2();
+        });
+        function  getEchart() {
+            $.ajax({
+                type: 'post',
+                dataType: 'text',
+                url:  config.base_server + 'atonStationRecognition-api/StationInfo/StationInfoList',
+                headers: {'Authorization': 'Bearer ' + config.getToken().access_token},
+                cache: false,
+                async: true,
+                success: function (data) {
+
+                    var data = eval('(' + data + ')');
+                    var data1 = new Array();
+                    for(var i=0; i < data.circleDto.resultType.item.length; i++){
+                        data1[i] = {value:data.circleDto.resultType.total,name:data.circleDto.resultType.item[i].name + ":" +  Math.round(data.circleDto.resultType.item[i].value / data.circleDto.resultType.total * 10000) / 100 + "%"}
+                    }
+                    var data2 = new Array();
+                    for(var i=0; i < data.circleDto.status.item.length; i++){
+                        data2[i] = {value:data.circleDto.status.total,name:data.circleDto.status.item[i].name + ":" +  Math.round(data.circleDto.status.item[i].value / data.circleDto.status.total * 10000) / 100 + "%"}
+                    }
+                    var chartEquipType = echarts.init(document.getElementById('StationEchartEquipType'));
+                    //指定图表配置项和数据
+                     chartEquip = {
+                        title: {
+                            text: '异常类型统计',
+                            x: 'center' //标题居中
+                        },
+                        tooltip: {
+                            // trigger: 'item' //悬浮显示对比
+                        },
+                        // legend: {
+                        //     orient: 'vertical', //类型垂直,默认水平
+                        //     left: 'left', //类型区分在左 默认居中
+                        //     // data: data1
+                        //         // ['A类船台', 'B类船台', '其他类船台']
+                        // },
+                        series: [{
+                            type: 'pie', //饼状
+                            radius: ['30%', '50%'], //圆的大小
+                            center: ['50%', '50%'], //居中
+                            data:data1
+
+                        }]
+                    };
+                    // 使用刚指定的配置项和数据显示图表。
+                    chartEquipType.setOption(chartEquip, true);
+
+                    var chartExceptionType = echarts.init(document.getElementById('StationEchartExceptionType'));
+                    //指定图表配置项和数据
+                    chartException = {
+                        title: {
+                            text: '异常处理结果统计',
+                            x: 'center' //标题居中
+                        },
+                        tooltip: {
+                            // trigger: 'item' //悬浮显示对比
+                        },
+                        // legend: {
+                        //     orient: 'vertical', //类型垂直,默认水平
+                        //     left: 'left', //类型区分在左 默认居中
+                        //     // data: data1
+                        //         // ['A类船台', 'B类船台', '其他类船台']
+                        // },
+                        series: [{
+                            type: 'pie', //饼状
+                            radius: ['30%', '50%'], //圆的大小
+                            center: ['50%', '50%'], //居中
+                            data:data2
+
+                        }]
+                    };
+                    // 使用刚指定的配置项和数据显示图表。
+                    chartExceptionType.setOption(chartException, true);
+                }
+            });
+        }
+
+
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

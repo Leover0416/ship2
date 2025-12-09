@@ -1,0 +1,147 @@
+<div class="layui-card">
+	<div class="layui-card-header">
+		<h2 class="header-title">告警列表</h2>
+<!--		<span class="layui-breadcrumb pull-right">-->
+<!--          <a href="#!console">首页</a>-->
+<!--          <a><cite>告警服务</cite></a>-->
+<!--        </span>-->
+	</div>
+	<div class="layui-card-body">
+		<div class="layui-form toolbar">
+			<div class="layui-input-inline">
+			<label class="layui-form-label">告警设备</label>
+			<div class="layui-input-inline">
+				<input type="text" style="width:170px;" id="shoreName1" name="shoreName1" placeholder="请输入告警设备名称" class="layui-input" >
+			</div>
+			</div>
+		<div class="layui-input-inline">
+			<label class="layui-form-label">告警时间</label>
+			<div class="layui-input-inline">
+				<input type="text" style="width:285px;" id="warningTime1" name="warningTime1" placeholder="请输入告警时间" autocomplete="off" class="layui-input" readonly>
+			</div>
+		</div>
+			<button id="alarm-btn-search1" class="layui-btn icon-btn"><i class="layui-icon">&#xe615;</i>搜索</button>
+		</div>
+
+		<table class="layui-table" id="alarm-table" lay-filter="alarm-table"></table>
+	</div>
+</div>
+
+
+<!-- 表格操作列 -->
+<script type="text/html" id="alarm-table-bar">
+	<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit">修改</a>
+</script>
+
+<!-- 表格状态列 -->
+
+<script type="text/html" id="alarm-table-button">
+
+	{{#	if(d.status == '0'){ }}
+	<a id="{{d.id}}" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="confirm">确认</a>
+	{{#	} else { }}
+	<a id="{{d.id}}" class="layui-btn layui-btn-disabled layui-btn-xs">确认</a>
+	{{#	} }}
+</script>
+<script>
+	layui.use(['form', 'table',  'common', 'admin','laydate'], function () {
+		var form = layui.form;
+		var table = layui.table;
+		var config = layui.common;
+		var layer = layui.layer;
+		var admin = layui.admin;
+		var laydate = layui.laydate;
+		//告警时间
+		laydate.render({
+			elem: '#warningTime1',
+			type: 'datetime',
+			format: 'yyyy/MM/dd HH:mm:ss',
+			range: true
+		});
+
+
+		// 渲染表格
+		table.render({
+			elem: '#alarm-table',
+			url: config.base_server + 'alarm-management/faultAlarm/findPage',
+			method: 'GET',
+			headers:{'Authorization': 'Bearer ' + config.getToken().access_token},
+			page: true,
+			cols: [[
+				{ type: 'numbers' },
+				{ field:'shoreName', title: '告警设备' },
+				{ field: 'alarmName', title: '告警信息' },
+				{ field: 'createTime', title: '告警时间',templet:function(e){
+						return layui.util.toDateString(e.createTime, "yyyy-MM-dd HH:mm:ss")
+					}},
+				{ field:'confirmBy', title: '告警确认人',templet:function(e){
+						var str = ''
+						if(e.status!='0'){
+							str = e.confirmBy==null?'':e.confirmBy;
+						}
+						return str;
+					}},
+				{ field: 'confirmAt', title: '告警确认时间',templet:function(e){
+						var str = ''
+						if(e.status!='0'){
+							str = e.confirmAt==null?'':e.confirmAt;
+						}
+						return str;
+					}},
+				{ field: 'recoveryAt', title: '告警恢复时间'},
+				{ field: 'status', title: '告警状态',templet:function(e){
+						var str = ''
+						if(e.status=='0'){
+							str = '告警'
+						}else if(e.status=='1'){
+							str = '已确认'
+						}else{
+							str = '已恢复'
+						}
+						return str;
+					}},
+				{ title: '告警确认', width:200, align: 'center', fixed: 'right', toolbar: '#alarm-table-button'}
+			]],
+
+		});
+
+		// 工具条点击事件
+		table.on('tool(alarm-table)', function (obj) {
+			var data = obj.data;
+			var layEvent = obj.event;
+			 if (layEvent === 'confirm'){
+				var param = {
+					id:data.id,
+					mmsi:data.mmsi,
+					alarmNumber:data.alarmNumber
+				}
+				admin.req('alarm-management/faultAlarm/confirm', JSON.stringify(param), function (res) {
+						$("#" + data.id).addClass("layui-btn-disabled").removeClass('layui-btn-normal').removeAttr("lay-event");
+						layer.msg("已发送确认信息",{icon:1,time:config.msgTime});
+				}, 'POST');
+			}
+
+		});
+
+		// 搜索按钮点击事件
+		$('#alarm-btn-search1').click(function () {
+			var shoreName1 = $('#shoreName1').val();
+			var warningTime1 = $('#warningTime1').val();
+			var startTime="";
+			var endTime="";
+			if(shoreName1.trim()!=undefined&&shoreName1.trim()!=""){
+				if(warningTime1.trim()==undefined||warningTime1.trim()==""){
+					layer.msg("请选择告警时间",{icon:2,time: config.msgTime})
+					return false;
+				}
+			}
+			if(warningTime1.trim()!=undefined&&warningTime1.trim()!="") {
+				var time = warningTime1.trim().split("-");
+				startTime = time[0];
+				endTime = time[1];
+			}
+			table.reload('alarm-table', {where: {shoreName: shoreName1, startTime: startTime,endTime:endTime}});
+		});
+
+	});
+</script>

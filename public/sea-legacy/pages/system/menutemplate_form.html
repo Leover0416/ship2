@@ -1,0 +1,156 @@
+<link rel="stylesheet" href="/assets/libs/zTree/css/zTreeStyle/zTreeStyle.css"/>
+<script type="text/javascript" src="/assets/libs/zTree/js/jquery.ztree.all-3.5.min.js"></script>
+<!-- menutemplate表单弹窗 -->
+<form id="menutemplate-form" lay-filter="menutemplate-form" class="layui-form model-form">
+    <input name="id" type="hidden"/>
+    <div id="tenType3" class="layui-form-item">
+        <label class="layui-form-label">租户</label>
+        <div class="layui-input-block">
+            <select name="tenantCode" id="tenantCode" lay-filter="tenantChanged">
+                <option value="webapp">系统</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">模板名称：</label>
+        <div class="layui-input-block">
+            <input name="name" placeholder="请输入模板名称" type="text" class="layui-input" maxlength="20"
+                   lay-verify="required" required/>
+        </div>
+    </div>
+    <!--    tree-->
+    <ul id="treeMenu" class="ztree" style="padding: 25px 0px 20px 60px;overflow-y: auto;height: 450px;"></ul>
+    <div class="layui-form-item model-form-footer">
+        <button class="layui-btn layui-btn-primary" ew-event="closeDialog" type="button">取消</button>
+        <button class="layui-btn" lay-filter="menutemplate-form-submit" lay-submit>保存</button>
+    </div>
+</form>
+
+<script>
+    layui.use(['layer', 'tree', 'util', 'admin', 'form', 'formSelects', 'common'], function () {
+        var layer = layui.layer;
+        var admin = layui.admin;
+        var form = layui.form;
+        var formSelects = layui.formSelects;
+        var config = layui.common;
+        var tree = layui.tree;
+        var util = layui.util;
+        // tree
+        var setting = {
+            check: {enable: true},
+            data: {
+                simpleData: {
+                    enable: true
+                }
+            }
+        };
+
+        // 回显menu数据
+        let template = admin.getTempData('t_template');
+
+        var tenantCode = config.getUser().tenantCode;
+        // var tenantCode = tenantCodeValue;
+
+        init();
+
+        form.render(); //菜单渲染 把内容加载进去
+
+        //根据租户查菜单模板
+        form.on('select(tenantChanged)', function (data) {
+            $('#treeMenu').empty();
+            queryTreeMenus(data.value);
+            form.render(); //菜单渲染 把内容加载进去
+        });
+
+        //
+        // var templateId = (typeof (template) == "undefined") ? '' : template.id;
+        //
+        // admin.req('api-user/menuTemplate/menu?templateId=' + templateId, {}, function (data) {
+        //     if (template) {
+        //         form.val('menutemplate-form', template);
+        //         $('#menutemplate-form').attr('method', 'POST');
+        //         var n = new Array();
+        //         formSelects.value('name', n);
+        //     }
+        //     $.fn.zTree.init($('#treeMenu'), setting, data);
+        //     layer.closeAll('loading');
+        // }, 'GET');
+//FSS
+//         var tenant = admin.getTempData('t_tenant_menu');
+//         var tenantCode = (typeof (tenant) == "undefined") ? '' : tenant.tenantCode;
+
+
+        // 表单提交事件
+        form.on('submit(menutemplate-form-submit)', function (data) {
+            layer.load(2);
+            var treeObj = $.fn.zTree.getZTreeObj('treeMenu');
+            var nodes = treeObj.getCheckedNodes(true);
+            var ids = new Array();
+            for (var i = 0; i < nodes.length; i++) {
+                ids[i] = nodes[i].id;
+            }
+            //数据获取
+            var menuData = new Object();
+            menuData.templateId = data.field.id;
+            menuData.templateName = data.field.name;
+            menuData.menuIds = ids;
+            menuData.tenantCode = data.field.tenantCode;
+            //表单提交
+            admin.req('api-user/menuTemplate/saveOrUpdate', JSON.stringify(menuData), function (data) {
+                layer.closeAll('loading');
+                if (0 == data.resp_code) {
+                    layer.msg(data.resp_msg, {icon: 1, time: config.msgTime});
+                    admin.finishPopupCenter();
+                } else {
+                    layer.msg(data.resp_msg, {icon: 2, time: config.msgTime});
+                }
+            }, 'POST');
+            return false;
+        });
+
+        function init() {
+            if (tenantCode == "webapp") {
+                $("#tenType3").show();
+                // tenantCode = '';
+                queryTenant();
+                let userTenantCode =  (typeof(template) == "undefined") ? 'webapp' : template.tenantCode;
+                let templateId = (typeof (template) == "undefined") ? '' : template.id;
+                queryTreeMenus(userTenantCode,templateId);
+            } else {
+                $("#tenType3").hide();
+                queryTreeMenus(tenantCode,'');
+            }
+            form.val('menutemplate-form', template);
+        }
+
+        function queryTenant() {
+            // 获取所有租户
+            admin.reqSync('api-user/tenant/allTenants', {}, function (data) {
+                if (0 == data.code) {
+                    // 渲染下拉框
+                    $.each(data.data, function (index, item) {
+                        $('#tenantCode').append(new Option(item.tenantName, item.tenantCode));
+                    })
+                } else {
+                    layer.msg('获取租户失败', {icon: 2, time: config.msgTime});
+                }
+            }, 'GET');
+            // form.render();  //菜单渲染 把内容加载进去
+        }
+
+        function queryTreeMenus(tenantCode,templateId) {
+            admin.req('api-user/tenantMenu?tenantCode=' + tenantCode+'&templateId='+templateId, {}, function (data) {
+                // if (tenant) {
+                //     form.val('tenant-menu-form', tenant);
+                //     $('#tenant-menu-form').attr('method', 'POST');
+                //     var n = new Array();
+                //     formSelects.value('tenantCode', n);
+                // }
+                $.fn.zTree.init($('#treeMenu'), setting, data);
+                // layer.closeAll('loading');
+            }, 'GET');
+        }
+    });
+</script>
+
+

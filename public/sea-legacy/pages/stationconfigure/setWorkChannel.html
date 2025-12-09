@@ -1,0 +1,271 @@
+<div class="layui-card">
+    <div class="layui-card-header">
+        <h2 class="header-title">工作频道管理配置</h2>
+    </div>
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <div class="layui-card-body" style="padding: 15px;">
+                <form class="layui-form" action="" lay-filter="workChannel-form">
+                    <div class="layui-form-item">
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label" style="width:170px;"><i
+                                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>选择基站</label>
+                                <div class="layui-input-inline">
+                                    <select name="shoreMmsiWorkChannel" id="shoreMmsiWorkChannel"
+                                            lay-filter="stationChangedWorkChannel" lay-verify="required">
+                                        <option selected="selected" value=""></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label" style="width:170px;"><i
+                                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>基站功率配置</label>
+                                <div class="layui-input-inline">
+                                    <select name="transmitPower" id="transmitPower" lay-verify="required">
+                                        <option value="">请选择</option>
+                                        <option value="0">1w</option>
+                                        <option value="1">12.5w</option>
+                                        <option value="2">25w</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label" style="width:170px;"><i
+                                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>AIS A信道配置（CFI）</label>
+                                <div class="layui-input-inline">
+                                <div class="layui-input-inline">
+                                    <input type="text" placeholder="请输入" lay-verify="shipMMSIA" name="aisAConfig" id="aisAConfig" onKeyUp="this.value=this.value.replace(/[^\d]/g,'');"
+                                           autocomplete="off" class="layui-input" maxlength="32" lay-verify="required">
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label" style="width:170px;"><i
+                                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>AIS B信道配置（CFI）</label>
+                                <div class="layui-input-inline">
+                                    <div class="layui-input-inline">
+                                        <input type="text" placeholder="请输入" lay-verify="shipMMSIA" name="aisBConfig" id="aisBConfig" onKeyUp="this.value=this.value.replace(/[^\d]/g,'');"
+                                               autocomplete="off" class="layui-input" maxlength="32" lay-verify="required">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label" style="width:170px;"><i
+                                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>ASM A信道配置（CFI）</label>
+                                <div class="layui-input-inline">
+                                    <div class="layui-input-inline">
+                                        <input type="text" placeholder="请输入" lay-verify="shipMMSIA" name="asmAConfig" id="asmAConfig" onKeyUp="this.value=this.value.replace(/[^\d]/g,'');"
+                                               autocomplete="off" class="layui-input" maxlength="32" lay-verify="required">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label" style="width:170px;"><i
+                                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>ASM B信道配置（CFI）</label>
+                                <div class="layui-input-inline">
+                                    <div class="layui-input-inline">
+                                        <input type="text" placeholder="请输入" lay-verify="shipMMSIA" name="asmBConfig" id="asmBConfig" onKeyUp="this.value=this.value.replace(/[^\d]/g,'');"
+                                               autocomplete="off" class="layui-input" maxlength="32" lay-verify="required">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label" style="width:170px;"><i
+                                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>VDE A信道配置（CFI）</label>
+                                <div class="layui-input-inline">
+                                    <div class="layui-input-inline">
+                                        <input type="text" placeholder="请输入" lay-verify="shipMMSIA" name="vdeAConfig" id="vdeAConfig" onKeyUp="this.value=this.value.replace(/[^\d]/g,'');"
+                                               autocomplete="off" class="layui-input" maxlength="32" lay-verify="required">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label" style="width:170px;"><i
+                                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>VDE B信道配置（CFI）</label>
+                                <div class="layui-input-inline">
+                                    <div class="layui-input-inline">
+                                        <input type="text" placeholder="请输入" lay-verify="shipMMSIA" name="vdeBConfig" id="vdeBConfig" onKeyUp="this.value=this.value.replace(/[^\d]/g,'');"
+                                               autocomplete="off" class="layui-input" maxlength="32" lay-verify="required">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label" style="width:170px;"><i
+                                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>开关配置</label>
+                                <div class="layui-input-inline">
+                                    <select name="switch" id="switch" lay-verify="required">
+                                        <option value="">请选择</option>
+                                        <option value="0">关闭</option>
+                                        <option value="1">开启</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline" style="margin-left:50px;">
+                                <div class="layui-input-inline">
+                                    <div class="layui-input-block">
+                                        <a class="layui-btn" lay-submit="" lay-filter="workChannel-submit">立即提交</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['form', 'util', 'common', 'admin'], function () {
+        var $ = layui.$;
+        var form = layui.form;
+        var admin = layui.admin;
+        var id = '';
+        var oldData = {};
+        var master = {};
+        var count = 0;
+        var isFail = false;
+        //var loadIndex = layer.load(1);
+        //获取基站下拉列表
+        getStationSelectList();
+
+        form.on('select(stationChangedWorkChannel)', function (data) {
+            if(data.value==''){
+                claerForm();
+                form.render('select');
+                return
+            }
+            var requestUrl = 'stationConfigure/VdesWorkChannel/getByShoreMmsi';
+            var param = {shoreMmsi:data.value}
+
+            admin.req(requestUrl, JSON.stringify(param), function (res) {
+                if(res.resp_code == '0'){
+                    oldData = res.datas;
+                    if(res.datas){
+                        id = res.datas.id;
+                        $("input[name=aisAConfig]").val(res.datas.aisAConfig);
+                        $("input[name=aisBConfig]").val(res.datas.aisBConfig);
+                        $("input[name=asmAConfig]").val(res.datas.asmAConfig);
+                        $("input[name=asmBConfig]").val(res.datas.asmBConfig);
+                        $("input[name=vdeAConfig]").val(res.datas.vdeAConfig);
+                        $("input[name=vdeBConfig]").val(res.datas.vdeBConfig);
+                        $("#transmitPower").val(res.datas.transmitPower);
+                        $("#switch").val(res.datas.switchStatus);
+                    }else{
+                        claerForm();
+                    }
+                    form.render('select');
+                }else{
+                    layer.msg('连接基站失败！');
+                }
+            }, "post");
+        })
+
+        function getStationSelectList() {
+            admin.req('station-maintain/baseStationAPI/selectAllBaseStation', "", function (res) {
+                var data = res;
+                for(var i in data){
+                    if(data[i].connectionStatus=="0"){
+                        $("#shoreMmsiWorkChannel").prepend("<option  value='" + data[i].shoreMmsi + "'>" + data[i].shoreName + "</option>");
+                    }else {
+                        $("#shoreMmsiWorkChannel").append("<option value='" + data[i].shoreMmsi + "' disabled='true'>" + data[i].shoreName + "(暂未连接)</option>")
+                    }
+                }
+                form.render();
+            },"post");
+        };
+
+        form.on('submit(workChannel-submit)', function (data) {
+            var field = data.field;
+            if(!isFail && oldData != null && isNotChange(field)){
+                layer.msg("没有任何值发生改变，无需提交");
+                return;
+            }else{
+                oldData = field
+            }
+
+            var param = {
+                shoreMmsi: field.shoreMmsiWorkChannel,
+                transmitPower: field.transmitPower,
+                aisAConfig: field.aisAConfig,
+                aisBConfig: field.aisBConfig,
+                asmAConfig: field.asmAConfig,
+                asmBConfig: field.asmBConfig,
+                vdeAConfig: field.vdeAConfig,
+                vdeBConfig: field.vdeBConfig,
+                switchStatus: field.switch,
+            }
+            var requestUrl = 'stationConfigure/VdesWorkChannel/save';
+            if(id != '' && id != null){
+                param.id = id;
+                requestUrl = 'stationConfigure/VdesWorkChannel/update';
+            }
+            admin.req(requestUrl, JSON.stringify(param), function (res) {
+                if(res.resp_code == '0'){
+                    isFail = false;
+                    if(res.datas){
+                        id = res.datas.id;
+                    }
+                    layer.msg("配置成功！");
+                }else{
+                    isFail = true;
+                    layer.msg("配置失败！");
+                }
+            }, "post");
+        })
+
+        function claerForm(){
+            id = '';
+            $("input[name=aisAConfig]").val('');
+            $("input[name=aisBConfig]").val('');
+            $("input[name=asmAConfig]").val('');
+            $("input[name=asmBConfig]").val('');
+            $("input[name=vdeAConfig]").val('');
+            $("input[name=vdeBConfig]").val('');
+            $("#transmitPower").val('');
+            $("#switch").val('');
+        }
+
+        function isNotChange (obj) {
+            for(var key in obj){
+                var old = oldData[key]==null?'':oldData[key];
+                if(!oldData || obj[key] != old){
+                    return false;
+                }
+            }
+            return true;
+        }
+
+
+    });
+
+</script>

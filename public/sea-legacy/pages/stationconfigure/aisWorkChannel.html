@@ -1,0 +1,445 @@
+<div class="layui-card">
+    <div class="layui-card-header">
+        <h2 class="header-title">AIS工作频道管理配置</h2>
+    </div>
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <div class="layui-card-body" style="padding: 15px;">
+                <form class="layui-form" action="" lay-filter="workChannel-form">
+                    <div class="layui-form-item">
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label" style="width:170px;"><i
+                                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>选择基站</label>
+                                <div class="layui-input-inline">
+                                    <select name="shoreMmsiAisWorkChannel" id="shoreMmsiAisWorkChannel"
+                                            lay-filter="stationChangedAisWorkChannel" lay-verify="required">
+                                        <option selected="selected" value=""></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label" style="width:170px;"><i
+                                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>基站A信道功率配置</label>
+                                <div class="layui-input-inline">
+                                    <select name="powerLevelChannelA" id="powerLevelChannelA" lay-verify="required">
+                                        <option value="">请选择</option>
+                                        <option value="0">2w</option>
+                                        <option value="1">12.5w</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label" style="width:170px;"><i
+                                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>AIS A信道配置</label>
+                                <div class="layui-input-inline">
+                                    <div class="layui-input-inline">
+                                        <select name="txChannelA" id="txChannelA" lay-verify="required" lay-search="" lay-filter="required">
+                                            <option value="">请选择</option>
+                                            <option value="1001">1001</option>
+                                            <option value="1002">1002</option>
+                                            <option value="1003">1003</option>
+                                            <option value="1004">1004</option>
+                                            <option value="1005">1005</option>
+                                            <option value="1006">1006</option>
+                                            <option value="1007">1007</option>
+                                            <option value="1008">1008</option>
+                                            <option value="1009">1009</option>
+                                            <option value="1010">1010</option>
+                                            <option value="1011">1011</option>
+                                            <option value="1012">1012</option>
+                                            <option value="1013">1013</option>
+                                            <option value="1014">1014</option>
+                                            <option value="1015">1015</option>
+                                            <option value="1016">1016</option>
+                                            <option value="1017">1017</option>
+                                            <option value="1018">1018</option>
+                                            <option value="1019">1019</option>
+                                            <option value="1020">1020</option>
+                                            <option value="1021">1021</option>
+                                            <option value="1022">1022</option>
+                                            <option value="1023">1023</option>
+                                            <option value="1024">1024</option>
+                                            <option value="1025">1025</option>
+                                            <option value="1026">1026</option>
+                                            <option value="1027">1027</option>
+                                            <option value="1028">1028</option>
+                                            <option value="1060">1060</option>
+                                            <option value="1061">1061</option>
+                                            <option value="1062">1062</option>
+                                            <option value="1063">1063</option>
+                                            <option value="1064">1064</option>
+                                            <option value="1065">1065</option>
+                                            <option value="1066">1066</option>
+                                            <option value="1067">1067</option>
+                                            <option value="1068">1068</option>
+                                            <option value="1069">1069</option>
+                                            <option value="1070">1070</option>
+                                            <option value="1071">1071</option>
+                                            <option value="1072">1072</option>
+                                            <option value="1073">1073</option>
+                                            <option value="1074">1074</option>
+                                            <option value="1075">1075</option>
+                                            <option value="1076">1076</option>
+                                            <option value="1077">1077</option>
+                                            <option value="1078">1078</option>
+                                            <option value="1079">1079</option>
+                                            <option value="1080">1080</option>
+                                            <option value="1081">1081</option>
+                                            <option value="1082">1082</option>
+                                            <option value="1083">1083</option>
+                                            <option value="1084">1084</option>
+                                            <option value="1085">1085</option>
+                                            <option value="1086">1086</option>
+                                            <option value="1087">1087</option>
+                                            <option value="1088">1088</option>
+                                            <option value="2001">2001</option>
+                                            <option value="2002">2002</option>
+                                            <option value="2003">2003</option>
+                                            <option value="2004">2004</option>
+                                            <option value="2005">2005</option>
+                                            <option value="2006">2006</option>
+                                            <option value="2007">2007</option>
+                                            <option value="2008">2008</option>
+                                            <option value="2009">2009</option>
+                                            <option value="2010">2010</option>
+                                            <option value="2011">2011</option>
+                                            <option value="2012">2012</option>
+                                            <option value="2013">2013</option>
+                                            <option value="2014">2014</option>
+                                            <option value="2015">2015</option>
+                                            <option value="2016">2016</option>
+                                            <option value="2017">2017</option>
+                                            <option value="2018">2018</option>
+                                            <option value="2019">2019</option>
+                                            <option value="2020">2020</option>
+                                            <option value="2021">2021</option>
+                                            <option value="2022">2022</option>
+                                            <option value="2023">2023</option>
+                                            <option value="2024">2024</option>
+                                            <option value="2025">2025</option>
+                                            <option value="2026">2026</option>
+                                            <option value="2027">2027</option>
+                                            <option value="2028">2028</option>
+                                            <option value="2060">2060</option>
+                                            <option value="2061">2061</option>
+                                            <option value="2062">2062</option>
+                                            <option value="2063">2063</option>
+                                            <option value="2064">2064</option>
+                                            <option value="2065">2065</option>
+                                            <option value="2066">2066</option>
+                                            <option value="2067">2067</option>
+                                            <option value="2068">2068</option>
+                                            <option value="2069">2069</option>
+                                            <option value="2070">2070</option>
+                                            <option value="2071">2071</option>
+                                            <option value="2072">2072</option>
+                                            <option value="2073">2073</option>
+                                            <option value="2074">2074</option>
+                                            <option value="2075">2075</option>
+                                            <option value="2076">2076</option>
+                                            <option value="2077">2077</option>
+                                            <option value="2078">2078</option>
+                                            <option value="2079">2079</option>
+                                            <option value="2080">2080</option>
+                                            <option value="2081">2081</option>
+                                            <option value="2082">2082</option>
+                                            <option value="2083">2083</option>
+                                            <option value="2084">2084</option>
+                                            <option value="2085">2085</option>
+                                            <option value="2086">2086</option>
+                                            <option value="2087">2087</option>
+                                            <option value="2088">2088</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label" style="width:170px;"><i
+                                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>基站B信道功率配置</label>
+                                <div class="layui-input-inline">
+                                    <select name="powerLevelChannelB" id="powerLevelChannelB" lay-verify="required">
+                                        <option value="">请选择</option>
+                                        <option value="0">2w</option>
+                                        <option value="1">12.5w</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label" style="width:170px;"><i
+                                        style="color:#F00;font-family:serif;padding-right:5px;font-style: normal;">*</i>AIS B信道配置</label>
+                                <div class="layui-input-inline">
+                                    <div class="layui-input-inline">
+                                        <select name="txChannelB" id="txChannelB" lay-verify="required" lay-search="" lay-filter="required">
+                                            <option value="">请选择</option>
+                                            <option value="1001">1001</option>
+                                            <option value="1002">1002</option>
+                                            <option value="1003">1003</option>
+                                            <option value="1004">1004</option>
+                                            <option value="1005">1005</option>
+                                            <option value="1006">1006</option>
+                                            <option value="1007">1007</option>
+                                            <option value="1008">1008</option>
+                                            <option value="1009">1009</option>
+                                            <option value="1010">1010</option>
+                                            <option value="1011">1011</option>
+                                            <option value="1012">1012</option>
+                                            <option value="1013">1013</option>
+                                            <option value="1014">1014</option>
+                                            <option value="1015">1015</option>
+                                            <option value="1016">1016</option>
+                                            <option value="1017">1017</option>
+                                            <option value="1018">1018</option>
+                                            <option value="1019">1019</option>
+                                            <option value="1020">1020</option>
+                                            <option value="1021">1021</option>
+                                            <option value="1022">1022</option>
+                                            <option value="1023">1023</option>
+                                            <option value="1024">1024</option>
+                                            <option value="1025">1025</option>
+                                            <option value="1026">1026</option>
+                                            <option value="1027">1027</option>
+                                            <option value="1028">1028</option>
+                                            <option value="1060">1060</option>
+                                            <option value="1061">1061</option>
+                                            <option value="1062">1062</option>
+                                            <option value="1063">1063</option>
+                                            <option value="1064">1064</option>
+                                            <option value="1065">1065</option>
+                                            <option value="1066">1066</option>
+                                            <option value="1067">1067</option>
+                                            <option value="1068">1068</option>
+                                            <option value="1069">1069</option>
+                                            <option value="1070">1070</option>
+                                            <option value="1071">1071</option>
+                                            <option value="1072">1072</option>
+                                            <option value="1073">1073</option>
+                                            <option value="1074">1074</option>
+                                            <option value="1075">1075</option>
+                                            <option value="1076">1076</option>
+                                            <option value="1077">1077</option>
+                                            <option value="1078">1078</option>
+                                            <option value="1079">1079</option>
+                                            <option value="1080">1080</option>
+                                            <option value="1081">1081</option>
+                                            <option value="1082">1082</option>
+                                            <option value="1083">1083</option>
+                                            <option value="1084">1084</option>
+                                            <option value="1085">1085</option>
+                                            <option value="1086">1086</option>
+                                            <option value="1087">1087</option>
+                                            <option value="1088">1088</option>
+                                            <option value="2001">2001</option>
+                                            <option value="2002">2002</option>
+                                            <option value="2003">2003</option>
+                                            <option value="2004">2004</option>
+                                            <option value="2005">2005</option>
+                                            <option value="2006">2006</option>
+                                            <option value="2007">2007</option>
+                                            <option value="2008">2008</option>
+                                            <option value="2009">2009</option>
+                                            <option value="2010">2010</option>
+                                            <option value="2011">2011</option>
+                                            <option value="2012">2012</option>
+                                            <option value="2013">2013</option>
+                                            <option value="2014">2014</option>
+                                            <option value="2015">2015</option>
+                                            <option value="2016">2016</option>
+                                            <option value="2017">2017</option>
+                                            <option value="2018">2018</option>
+                                            <option value="2019">2019</option>
+                                            <option value="2020">2020</option>
+                                            <option value="2021">2021</option>
+                                            <option value="2022">2022</option>
+                                            <option value="2023">2023</option>
+                                            <option value="2024">2024</option>
+                                            <option value="2025">2025</option>
+                                            <option value="2026">2026</option>
+                                            <option value="2027">2027</option>
+                                            <option value="2028">2028</option>
+                                            <option value="2060">2060</option>
+                                            <option value="2061">2061</option>
+                                            <option value="2062">2062</option>
+                                            <option value="2063">2063</option>
+                                            <option value="2064">2064</option>
+                                            <option value="2065">2065</option>
+                                            <option value="2066">2066</option>
+                                            <option value="2067">2067</option>
+                                            <option value="2068">2068</option>
+                                            <option value="2069">2069</option>
+                                            <option value="2070">2070</option>
+                                            <option value="2071">2071</option>
+                                            <option value="2072">2072</option>
+                                            <option value="2073">2073</option>
+                                            <option value="2074">2074</option>
+                                            <option value="2075">2075</option>
+                                            <option value="2076">2076</option>
+                                            <option value="2077">2077</option>
+                                            <option value="2078">2078</option>
+                                            <option value="2079">2079</option>
+                                            <option value="2080">2080</option>
+                                            <option value="2081">2081</option>
+                                            <option value="2082">2082</option>
+                                            <option value="2083">2083</option>
+                                            <option value="2084">2084</option>
+                                            <option value="2085">2085</option>
+                                            <option value="2086">2086</option>
+                                            <option value="2087">2087</option>
+                                            <option value="2088">2088</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-inline" style="margin-left:50px;">
+                                <div class="layui-input-inline">
+                                    <div class="layui-input-block">
+                                        <a class="layui-btn" lay-submit="" lay-filter="aisWorkChannel-submit">立即提交</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['form', 'util', 'common', 'admin'], function () {
+        var $ = layui.$;
+        var form = layui.form;
+        var admin = layui.admin;
+        var id = '';
+        var oldData = {};
+        var isFail = false;
+        //获取基站下拉列表
+        getStationSelectList();
+
+        form.on('select(stationChangedAisWorkChannel)', function (data) {
+            if(data.value==''){
+                clearForm();
+                form.render('select');
+                return
+            }
+            var requestUrl = 'stationConfigure/AisWorkChannel/getByShoreMmsi';
+            var param = {shoreMmsi:data.value}
+
+            admin.req(requestUrl, JSON.stringify(param), function (res) {
+                if(res.resp_code == '0'){
+                    oldData = res.datas;
+                    if(res.datas){
+                        id = res.datas.id;
+                        $("#txChannelA").val(res.datas.rxChannelA);
+                        $("#txChannelB").val(res.datas.rxChannelB);
+                        $("#powerLevelChannelA").val(res.datas.powerLevelChannelA);
+                        $("#powerLevelChannelB").val(res.datas.powerLevelChannelA);
+                    }else{
+                        clearForm();
+                    }
+                    form.render('select');
+                }else{
+                    layer.msg('连接基站失败！');
+                }
+            }, "post");
+        })
+
+        function getStationSelectList() {
+            admin.req('station-maintain/baseStationAPI/selectAllBaseStation', "", function (res) {
+                var data = res;
+                for(var i in data){
+                    if(data[i].connectionStatus=="0"){
+                        $("#shoreMmsiAisWorkChannel").prepend("<option  value='" + data[i].shoreMmsi + "'>" + data[i].shoreName + "</option>");
+                    }else {
+                        $("#shoreMmsiAisWorkChannel").append("<option value='" + data[i].shoreMmsi + "' disabled='true'>" + data[i].shoreName + "(暂未连接)</option>")
+                    }
+                }
+                form.render();
+            },"post");
+        };
+
+
+        form.on('submit(aisWorkChannel-submit)', function (data) {
+            var field = data.field;
+            if(!isFail && oldData != null && isNotChange(field)){
+                layer.msg("没有任何值发生改变，无需提交");
+                return;
+            }else{
+                oldData.powerLevelChannelA = field.powerLevelChannelA;
+                oldData.powerLevelChannelB = field.powerLevelChannelB;
+                oldData.txChannelA = field.txChannelA;
+                oldData.txChannelB = field.txChannelB;
+                oldData.rxChannelA = field.txChannelA;
+                oldData.rxChannelB = field.txChannelB;
+            }
+
+            var param = {
+                shoreMmsi: field.shoreMmsiAisWorkChannel,
+                powerLevelChannelA: field.powerLevelChannelA,
+                powerLevelChannelB: field.powerLevelChannelB,
+                txChannelA: field.txChannelA,
+                txChannelB: field.txChannelB,
+                rxChannelA: field.txChannelA,
+                rxChannelB: field.txChannelB,
+                vdlMessageRetries: oldData.vdlMessageRetries,
+                vdlRepeatIndicator: oldData.vdlRepeatIndicator,
+                controlOfRatdma: oldData.controlOfRatdma,
+                utcSource: oldData.utcSource,
+                adsInterval:  oldData.adsInterval,
+                assignedTalkerId: oldData.assignedTalkerId,
+                sentenceStatusFlag: oldData.sentenceStatusFlag
+            }
+            var requestUrl = 'stationConfigure/AisWorkChannel/save';
+            if(id != '' && id != null){
+                param.id = id;
+                requestUrl = 'stationConfigure/AisWorkChannel/update';
+            }
+            admin.req(requestUrl, JSON.stringify(param), function (res) {
+                if(res.resp_code == '0'){
+                    isFail = false;
+                    if(res.datas){
+                        id = res.datas.id;
+                    }
+                    layer.msg("配置成功！");
+                }else{
+                    isFail = true;
+                    layer.msg("配置失败！");
+                }
+            }, "post");
+        })
+
+        function clearForm(){
+            id = '';
+            $("input[name=txChannelA]").val('');
+            $("input[name=txChannelB]").val('');
+            $("#powerLevelChannelA").val('');
+            $("#powerLevelChannelB").val('');
+        }
+
+        function isNotChange (obj) {
+            if (oldData.powerLevelChannelA == obj.powerLevelChannelA && oldData.powerLevelChannelB == obj.powerLevelChannelB &&
+                oldData.txChannelA == obj.txChannelA && oldData.txChannelB == obj.txChannelB){
+                return true;
+            }
+            return false;
+        }
+
+
+    });
+
+</script>
