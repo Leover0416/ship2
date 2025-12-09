@@ -747,6 +747,16 @@ ${anchorageAssignmentsList}
                       return timeA - timeB;
                   });
               
+              // 查找只有锚位但没有泊位的船
+              const shipsWithoutBerth = finalShips
+                  .filter(s => 
+                      processingShipIds.includes(s.id) && 
+                      s.assignedAnchorageId &&
+                      (!s.assignedBerthId || s.assignedBerthId === s.assignedAnchorageId) && // 没有泊位或泊位等于锚位
+                      s.gantt &&
+                      !s.isDelayed
+                  );
+              
               const berthAssignments = assignedShipsForMessage.map(s => {
                   const anchorage = latestBerthsForMessage.find(b => b.id === s.assignedAnchorageId);
                   const berth = latestBerthsForMessage.find(b => b.id === s.assignedBerthId);
@@ -761,11 +771,30 @@ ${anchorageAssignmentsList}
                   return `${s.name} -> ${anchorageName} -> ${berthName}`;
               }).join('\n');
               
-              addMessage(AgentType.SCHEDULER, 'ALL', 
-`调度智能体（分配泊位）：
-${berthAssignments}
-物理约束(长度/吃水)校验通过。
-最终分配方案已确定(锚位->泊位)。`, "warning");
+              // 生成没有泊位的船的信息
+              const shipsWithoutBerthInfo = shipsWithoutBerth.map(s => {
+                  const anchorage = latestBerthsForMessage.find(b => b.id === s.assignedAnchorageId);
+                  const anchorageName = anchorage ? anchorage.name : s.assignedAnchorageId;
+                  return `${s.name} -> ${anchorageName} (只能在分配的锚位先待着)`;
+              }).join('\n');
+              
+              // 组合消息
+              let messageContent = '';
+              if (berthAssignments) {
+                  messageContent += `调度智能体（分配泊位）：\n${berthAssignments}\n`;
+              }
+              if (shipsWithoutBerthInfo) {
+                  if (messageContent) messageContent += '\n';
+                  messageContent += `调度智能体（待分配）：\n${shipsWithoutBerthInfo}\n`;
+              }
+              messageContent += '物理约束(长度/吃水)校验通过。\n';
+              if (berthAssignments) {
+                  messageContent += '最终分配方案已确定(锚位->泊位)。';
+              } else {
+                  messageContent += '当前无可用泊位，船舶需在锚位等待。';
+              }
+              
+              addMessage(AgentType.SCHEDULER, 'ALL', messageContent, "warning");
               
               // Generate AI message for Coordinator Agent
               const coordinatorMessage = await aiService.generateCoordinatorAgentMessage({
@@ -1061,16 +1090,49 @@ ${berthAssignments}
                   return `${ship?.name || shipId} -> ${anchorageName} -> ${berthName}`;
               });
 
-          addMessage(AgentType.SCHEDULER, 'ALL', 
-`调度智能体（分配泊位）：
-${berthAssignmentsList.join('\n')}
-物理约束(长度/吃水)校验通过。
-最终分配方案已确定(锚位->泊位)。`, "warning");
+          // 查找只有锚位但没有泊位的船
+          const shipsWithoutBerth = finalShips
+              .filter(s => 
+                  processingShipIds.includes(s.id) && 
+                  s.assignedAnchorageId &&
+                  (!s.assignedBerthId || s.assignedBerthId === s.assignedAnchorageId) && // 没有泊位或泊位等于锚位
+                  s.status === 'anchored' // 确保船已经在锚位
+              );
           
-          addMessage(AgentType.SCHEDULER, 'ALL', 
-`执行指令（第二阶段）：
-启动自动引航序列 (锚位 -> 泊位)。
-锁定泊位与航道资源。`, "success");
+          // 生成没有泊位的船的信息
+          const shipsWithoutBerthInfo = shipsWithoutBerth.map(s => {
+              const anchorage = latestBerthsForMessage.find(b => b.id === s.assignedAnchorageId);
+              const anchorageName = anchorage ? anchorage.name : s.assignedAnchorageId;
+              return `${s.name} -> ${anchorageName} (只能在分配的锚位先待着)`;
+          }).join('\n');
+          
+          // 组合消息
+          let messageContent = '';
+          if (berthAssignmentsList.length > 0) {
+              messageContent += `调度智能体（分配泊位）：\n${berthAssignmentsList.join('\n')}\n`;
+          }
+          if (shipsWithoutBerthInfo) {
+              if (messageContent) messageContent += '\n';
+              messageContent += `调度智能体（待分配）：\n${shipsWithoutBerthInfo}\n`;
+          }
+          messageContent += '物理约束(长度/吃水)校验通过。\n';
+          if (berthAssignmentsList.length > 0) {
+              messageContent += '最终分配方案已确定(锚位->泊位)。';
+          } else {
+              messageContent += '当前无可用泊位，船舶需在锚位等待。';
+          }
+          
+          addMessage(AgentType.SCHEDULER, 'ALL', messageContent, "warning");
+          
+          // 执行指令消息
+          let executionMessage = '执行指令（第二阶段）：\n';
+          if (berthAssignmentsList.length > 0) {
+              executionMessage += '启动自动引航序列 (锚位 -> 泊位)。\n锁定泊位与航道资源。';
+          } else {
+              executionMessage += '当前无可用泊位，船舶需在分配的锚位先等待。';
+          }
+          
+          addMessage(AgentType.SCHEDULER, 'ALL', executionMessage, "success");
 
           // 获取所有已分配泊位的船舶（从锚位出发）
           const shipsToBerth = finalShips
