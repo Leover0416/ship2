@@ -322,29 +322,33 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
   };
 
   useEffect(() => {
-    if (!mapRef.current) return;
+    if (!mapRef.current) {
+      console.warn('[StaticMap] mapRef.current 为空，等待容器准备就绪');
+      return;
+    }
 
     // 检查 Leaflet 是否已加载
     // @ts-ignore
-    if (window.L && !mapInstanceRef.current) {
+    if (window.L && typeof window.L.map === 'function' && !mapInstanceRef.current) {
+      console.log('[StaticMap] Leaflet 已存在，直接初始化地图');
       initializeMap();
       return;
     }
 
-    // 如果 Leaflet 未加载，动态加载
+    // 如果 Leaflet 未加载，从本地文件加载（优先使用本地文件，避免 CDN 网络问题）
     if (!leafletLoadedRef.current) {
       // 检查是否已经加载了 CSS
       let link = document.querySelector('link[href*="leaflet.css"]') as HTMLLinkElement;
       if (!link) {
         link = document.createElement('link');
         link.rel = 'stylesheet';
-        // 使用多个备用 CDN，提高可用性（移除 integrity 以避免某些网络环境下的问题）
-        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-        link.crossOrigin = 'anonymous';
+        // 优先使用本地文件
+        link.href = '/libs/leaflet/leaflet.css';
         link.onerror = () => {
-          console.warn('[StaticMap] 主 CDN CSS 加载失败，尝试备用 CDN');
+          console.warn('[StaticMap] 本地 CSS 加载失败，尝试 CDN');
           // 备用 CDN
-          link.href = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css';
+          link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+          link.crossOrigin = 'anonymous';
         };
         document.head.appendChild(link);
       }
@@ -353,60 +357,114 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
       let script = document.querySelector('script[src*="leaflet"]') as HTMLScriptElement;
       if (!script) {
         script = document.createElement('script');
-        // 使用多个备用 CDN，提高可用性（移除 integrity 以避免某些网络环境下的问题）
-        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-        script.crossOrigin = 'anonymous';
-        script.onload = () => {
+        // 优先使用本地文件
+        script.src = '/libs/leaflet/leaflet.js';
+        script.async = true;
+        
+        // 添加超时检测
+        const timeoutId = setTimeout(() => {
+          if (!leafletLoadedRef.current) {
+            console.warn('[StaticMap] 本地文件加载超时，尝试 CDN');
+            script.remove();
+            loadFallbackCDN();
+          }
+        }, 5000); // 5秒超时（本地文件应该很快）
+
+        // 轮询检查 window.L 是否可用（某些环境下 onload 可能不触发）
+        let checkCount = 0;
+        const maxChecks = 30; // 最多检查30次（3秒，本地文件应该很快）
+        const checkInterval = setInterval(() => {
           // @ts-ignore
-          if (window.L) {
-            console.log('[StaticMap] Leaflet 加载成功');
+          if (window.L && typeof window.L.map === 'function') {
+            clearInterval(checkInterval);
+            clearTimeout(timeoutId);
+            console.log('[StaticMap] Leaflet 从本地文件通过轮询检测加载成功');
             leafletLoadedRef.current = true;
             setIsLoading(false);
             initializeMap();
           } else {
-            console.error('[StaticMap] Leaflet 脚本加载完成，但 window.L 未定义');
+            checkCount++;
+            if (checkCount >= maxChecks) {
+              clearInterval(checkInterval);
+              clearTimeout(timeoutId);
+              console.warn('[StaticMap] 本地文件轮询超时，尝试 CDN');
+              if (!leafletLoadedRef.current) {
+                script.remove();
+                loadFallbackCDN();
+              }
+            }
+          }
+        }, 100); // 每100ms检查一次
+
+        script.onload = () => {
+          clearTimeout(timeoutId);
+          clearInterval(checkInterval);
+          // 再次检查，确保 L 已定义
+          // @ts-ignore
+          if (window.L && typeof window.L.map === 'function') {
+            console.log('[StaticMap] Leaflet 从本地文件通过 onload 加载成功');
+            leafletLoadedRef.current = true;
             setIsLoading(false);
+            initializeMap();
+          } else {
+            // 如果 onload 触发但 L 未定义，等待一小段时间后重试
+            setTimeout(() => {
+              // @ts-ignore
+              if (window.L && typeof window.L.map === 'function') {
+                console.log('[StaticMap] Leaflet 从本地文件延迟加载成功');
+                leafletLoadedRef.current = true;
+                setIsLoading(false);
+                initializeMap();
+              } else {
+                console.error('[StaticMap] 本地文件加载完成，但 window.L 未定义，尝试 CDN');
+                setIsLoading(false);
+                loadFallbackCDN();
+              }
+            }, 500);
           }
         };
+        
         script.onerror = () => {
-          console.warn('[StaticMap] 主 CDN 加载失败，尝试备用 CDN');
-          // 移除失败的脚本
+          clearTimeout(timeoutId);
+          clearInterval(checkInterval);
+          console.warn('[StaticMap] 本地文件加载失败，尝试 CDN');
           script.remove();
-          // 尝试备用 CDN
-          const fallbackScript = document.createElement('script');
-          fallbackScript.src = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js';
-          fallbackScript.crossOrigin = 'anonymous';
-          fallbackScript.onload = () => {
-            // @ts-ignore
-            if (window.L) {
-              console.log('[StaticMap] Leaflet 从备用 CDN 加载成功');
-              leafletLoadedRef.current = true;
-              setIsLoading(false);
-              initializeMap();
-            } else {
-              console.error('[StaticMap] 备用 CDN 加载完成，但 window.L 未定义');
-              setIsLoading(false);
-            }
-          };
-          fallbackScript.onerror = () => {
-            console.error('[StaticMap] 所有 CDN 加载失败，地图无法显示');
-            setIsLoading(false);
-            alert('地图库加载失败，请检查网络连接或刷新页面重试。如果问题持续，请联系管理员。');
-          };
-          document.body.appendChild(fallbackScript);
+          loadFallbackCDN();
         };
+        
         document.body.appendChild(script);
       } else {
+        // 脚本已存在，检查是否已加载完成
         // @ts-ignore
-        if (window.L) {
+        if (window.L && typeof window.L.map === 'function') {
           leafletLoadedRef.current = true;
           setIsLoading(false);
           initializeMap();
         } else {
           // 如果脚本已存在但 L 未定义，等待加载完成
-          script.onload = () => {
+          let checkCount = 0;
+          const maxChecks = 50;
+          const checkInterval = setInterval(() => {
             // @ts-ignore
-            if (window.L) {
+            if (window.L && typeof window.L.map === 'function') {
+              clearInterval(checkInterval);
+              leafletLoadedRef.current = true;
+              setIsLoading(false);
+              initializeMap();
+            } else {
+              checkCount++;
+              if (checkCount >= maxChecks) {
+                clearInterval(checkInterval);
+                console.error('[StaticMap] 脚本已存在但加载超时');
+                setIsLoading(false);
+              }
+            }
+          }, 100);
+          
+          script.onload = () => {
+            clearInterval(checkInterval);
+            // @ts-ignore
+            if (window.L && typeof window.L.map === 'function') {
               leafletLoadedRef.current = true;
               setIsLoading(false);
               initializeMap();
@@ -417,6 +475,85 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
           };
         }
       }
+    }
+
+    // 备用 CDN 加载函数（如果本地文件加载失败）
+    function loadFallbackCDN() {
+      if (leafletLoadedRef.current) return; // 如果已经加载成功，不再尝试
+      
+      console.log('[StaticMap] 开始从 CDN 加载 Leaflet');
+      const fallbackScript = document.createElement('script');
+      fallbackScript.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      fallbackScript.crossOrigin = 'anonymous';
+      fallbackScript.async = true;
+      
+      // 备用 CDN 的超时检测
+      const timeoutId = setTimeout(() => {
+        if (!leafletLoadedRef.current) {
+          console.error('[StaticMap] CDN 加载超时');
+          setIsLoading(false);
+          alert('地图库加载失败。\n\n已尝试：\n1. 本地文件（失败）\n2. CDN（超时）\n\n请检查网络连接或联系管理员。');
+        }
+      }, 10000);
+      
+      // 轮询检查
+      let checkCount = 0;
+      const maxChecks = 50;
+      const checkInterval = setInterval(() => {
+        // @ts-ignore
+        if (window.L && typeof window.L.map === 'function') {
+          clearInterval(checkInterval);
+          clearTimeout(timeoutId);
+          console.log('[StaticMap] Leaflet 从 CDN 通过轮询加载成功');
+          leafletLoadedRef.current = true;
+          setIsLoading(false);
+          initializeMap();
+        } else {
+          checkCount++;
+          if (checkCount >= maxChecks) {
+            clearInterval(checkInterval);
+            clearTimeout(timeoutId);
+            console.error('[StaticMap] CDN 轮询超时');
+            setIsLoading(false);
+            alert('地图库加载失败。\n\n已尝试：\n1. 本地文件（失败）\n2. CDN（超时）\n\n请检查网络连接或联系管理员。');
+          }
+        }
+      }, 100);
+      
+      fallbackScript.onload = () => {
+        clearTimeout(timeoutId);
+        clearInterval(checkInterval);
+        // @ts-ignore
+        if (window.L && typeof window.L.map === 'function') {
+          console.log('[StaticMap] Leaflet 从 CDN 通过 onload 加载成功');
+          leafletLoadedRef.current = true;
+          setIsLoading(false);
+          initializeMap();
+        } else {
+          setTimeout(() => {
+            // @ts-ignore
+            if (window.L && typeof window.L.map === 'function') {
+              console.log('[StaticMap] Leaflet 从 CDN 延迟加载成功');
+              leafletLoadedRef.current = true;
+              setIsLoading(false);
+              initializeMap();
+            } else {
+              console.error('[StaticMap] CDN 加载完成，但 window.L 未定义');
+              setIsLoading(false);
+            }
+          }, 500);
+        }
+      };
+      
+      fallbackScript.onerror = () => {
+        clearTimeout(timeoutId);
+        clearInterval(checkInterval);
+        console.error('[StaticMap] 所有加载方式都失败，地图无法显示');
+        setIsLoading(false);
+        alert('地图库加载失败。\n\n已尝试：\n1. 本地文件（失败）\n2. CDN（失败）\n\n请检查网络连接或联系管理员。');
+      };
+      
+      document.body.appendChild(fallbackScript);
     }
 
     // 清理函数
@@ -2252,6 +2389,11 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
       setIsLoading(false);
       return;
     }
+    if (typeof L.map !== 'function') {
+      console.error('[StaticMap] Leaflet.map 不是函数，Leaflet 可能未完全加载。当前 L 对象:', L);
+      setIsLoading(false);
+      return;
+    }
     if (!mapRef.current) {
       console.error('[StaticMap] mapRef.current 为空，无法初始化地图');
       setIsLoading(false);
@@ -2263,6 +2405,17 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
     }
 
     try {
+      // 设置 Leaflet 默认图标路径（使用本地文件）
+      // @ts-ignore
+      if (L.Icon && L.Icon.Default) {
+        // @ts-ignore
+        L.Icon.Default.mergeOptions({
+          iconUrl: '/libs/leaflet/images/marker-icon.png',
+          iconRetinaUrl: '/libs/leaflet/images/marker-icon-2x.png',
+          shadowUrl: '/libs/leaflet/images/marker-shadow.png',
+        });
+      }
+
       // 创建地图实例
       // 默认中心点：29°53.738 N 122°16.611 E
       // 将度分格式转换为十进制度数：29°53.738' = 29 + 53.738/60 = 29.89563
@@ -2762,8 +2915,12 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
       style={{ minHeight: '400px', position: 'relative', zIndex: 1 }}
     >
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-slate-900/50 z-10">
-          <div className="text-slate-400 text-sm">正在加载地图...</div>
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/80 z-10">
+          <div className="text-slate-300 text-base font-medium mb-2">正在加载地图库...</div>
+          <div className="text-slate-500 text-xs">如果长时间无法加载，请检查网络连接</div>
+          <div className="mt-4 w-64 h-1 bg-slate-700 rounded-full overflow-hidden">
+            <div className="h-full bg-blue-500 animate-pulse" style={{ width: '60%' }}></div>
+          </div>
         </div>
       )}
 
