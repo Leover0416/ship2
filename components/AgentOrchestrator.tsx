@@ -78,10 +78,53 @@ const AgentCard: React.FC<AgentCardProps> = ({ type, isActive, isSender, isRecei
 
 const AgentOrchestrator: React.FC<AgentOrchestratorProps> = ({ messages, activeAgents, isThinking = false, isSimulating = false }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const userScrolledRef = useRef(false); // 标记用户是否手动滚动过
+  const lastMessageCountRef = useRef(0);
 
+  // 检查用户是否滚动到底部（允许5px的误差）
+  const isNearBottom = () => {
+    if (!scrollRef.current) return false;
+    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+    return scrollHeight - scrollTop - clientHeight < 5;
+  };
+
+  // 监听滚动事件，检测用户是否手动滚动
+  useEffect(() => {
+    const scrollElement = scrollRef.current;
+    if (!scrollElement) return;
+
+    const handleScroll = () => {
+      userScrolledRef.current = true;
+      // 如果用户滚动到底部，重置标记，允许自动滚动
+      if (isNearBottom()) {
+        userScrolledRef.current = false;
+      }
+    };
+
+    scrollElement.addEventListener('scroll', handleScroll);
+    return () => {
+      scrollElement.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  // 只在用户已经滚动到底部时才自动滚动
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      // 如果是新消息（消息数量增加），且用户没有手动滚动，或者用户已经在底部，则自动滚动
+      const isNewMessage = messages.length > lastMessageCountRef.current;
+      const wasEmpty = lastMessageCountRef.current === 0;
+      lastMessageCountRef.current = messages.length;
+
+      // 初始加载或用户已经在底部时，自动滚动
+      if ((wasEmpty || isNewMessage) && (!userScrolledRef.current || isNearBottom())) {
+        // 使用 setTimeout 确保 DOM 更新完成后再滚动
+        setTimeout(() => {
+          if (scrollRef.current) {
+            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+            userScrolledRef.current = false; // 重置标记
+          }
+        }, 0);
+      }
     }
   }, [messages, isThinking]);
 

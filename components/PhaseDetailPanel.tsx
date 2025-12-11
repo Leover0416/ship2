@@ -2,6 +2,8 @@ import React from 'react';
 import { Ship, SimulationPhase } from '../types';
 import { Activity, ShieldCheck, Zap, TrendingUp, AlertTriangle, Search } from 'lucide-react';
 
+export type DetailViewType = 'perception' | 'matching' | 'optimization';
+
 interface PhaseDetailPanelProps {
   phase: SimulationPhase;
   ships: Ship[];
@@ -11,6 +13,7 @@ interface PhaseDetailPanelProps {
   hasConflict?: boolean; // 是否有冲突
   optimizationIterations?: number; // 优化迭代次数
   optimizationReward?: number; // 优化奖励值
+  activeView?: DetailViewType; // 当前激活的视图
 }
 
 const PhaseDetailPanel: React.FC<PhaseDetailPanelProps> = ({ 
@@ -21,7 +24,8 @@ const PhaseDetailPanel: React.FC<PhaseDetailPanelProps> = ({
   carbonSaved = 0,
   hasConflict = false,
   optimizationIterations = 0,
-  optimizationReward = 0
+  optimizationReward = 0,
+  activeView
 }) => {
 
   const ContainerClass = "h-full bg-gradient-to-br from-slate-900/95 to-slate-800/95 border border-slate-700/50 rounded-xl p-3 shadow-[0_8px_32px_rgba(0,0,0,0.3)] flex flex-col gap-3 overflow-hidden backdrop-blur-sm";
@@ -32,8 +36,15 @@ const PhaseDetailPanel: React.FC<PhaseDetailPanelProps> = ({
       ? ships.filter(s => processingIds.includes(s.id))
       : ships.filter(s => s.status === 'waiting');
 
+  // 根据 activeView 或 phase 决定显示哪个视图
+  const viewToShow = activeView || (
+    phase === SimulationPhase.PERCEPTION ? 'perception' :
+    phase === SimulationPhase.MATCHING ? 'matching' :
+    'optimization'
+  );
+
   // --- 1. Perception Phase View ---
-  if (phase === SimulationPhase.PERCEPTION) {
+  if (viewToShow === 'perception') {
     return (
       <div className={ContainerClass}>
         <h3 className="text-sm font-bold text-cyan-400 flex items-center gap-2 border-b border-slate-800 pb-2 shrink-0">
@@ -94,7 +105,7 @@ const PhaseDetailPanel: React.FC<PhaseDetailPanelProps> = ({
   }
 
   // --- 2. Matching Phase View ---
-  if (phase === SimulationPhase.MATCHING) {
+  if (viewToShow === 'matching') {
     return (
       <div className={ContainerClass}>
         <h3 className="text-sm font-bold text-amber-500 flex items-center gap-2 border-b border-slate-800 pb-2 shrink-0">
@@ -120,12 +131,24 @@ const PhaseDetailPanel: React.FC<PhaseDetailPanelProps> = ({
                         </div>
                     </div>
 
-                    {/* Candidate Set */}
-                    <div className="text-xs flex gap-1 items-center bg-slate-900 border border-slate-800 p-1.5 rounded">
-                        <span className="text-slate-500">候选:</span>
+                    {/* Candidate Berths */}
+                    <div className="text-xs flex gap-1 items-center bg-slate-900 border border-slate-800 p-1.5 rounded mb-1.5">
+                        <span className="text-slate-500">候选泊位:</span>
                         {s.candidateBerths && s.candidateBerths.length > 0 ? (
                             s.candidateBerths.map(b => (
                                 <span key={b} className="text-cyan-400 font-bold font-mono px-1.5 py-0.5 bg-cyan-900/30 rounded border border-cyan-900">{b}</span>
+                            ))
+                        ) : (
+                            <span className="text-slate-600 italic">校验中...</span>
+                        )}
+                    </div>
+                    
+                    {/* Candidate Anchorages */}
+                    <div className="text-xs flex gap-1 items-center bg-slate-900 border border-slate-800 p-1.5 rounded">
+                        <span className="text-slate-500">候选锚位:</span>
+                        {s.candidateAnchorages && s.candidateAnchorages.length > 0 ? (
+                            s.candidateAnchorages.map(a => (
+                                <span key={a} className="text-blue-400 font-bold font-mono px-1.5 py-0.5 bg-blue-900/30 rounded border border-blue-900">{a}</span>
                             ))
                         ) : (
                             <span className="text-slate-600 italic">校验中...</span>

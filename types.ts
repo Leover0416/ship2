@@ -67,6 +67,7 @@ export interface Ship {
   // Phase 2: Matching Data
   constraints?: ConstraintCheck;
   candidateBerths?: string[];
+  candidateAnchorages?: string[]; // 候选锚位列表
 
   // Phase 3 & 4: Execution Data
   assignedBerthId?: string;

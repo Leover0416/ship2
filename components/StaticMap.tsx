@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Berth, Ship, SimulationPhase } from '../types';
-import { X, Plus, Trash2, RotateCw, Download, Edit2 } from 'lucide-react';
+import { X, Plus, Trash2, RotateCw, Download, Edit2, Maximize2, Minimize2 } from 'lucide-react';
 
 interface StaticMapProps {
   className?: string;
@@ -40,6 +40,7 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
   const [isLoading, setIsLoading] = useState(true);
   const leafletLoadedRef = useRef(false);
   const [currentZoom, setCurrentZoom] = useState<number>(11); // 当前缩放级别
+  const [isFullscreen, setIsFullscreen] = useState(false); // 全屏状态
   
   // 编辑状态
   const [editingBerthId, setEditingBerthId] = useState<string | null>(null);
@@ -2221,11 +2222,13 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
         if (waypointMarker) {
           waypointMarker.setLatLng(latlng);
           
+          // 获取当前泊位的路径点
+          const waypoints = berthWaypoints[draggingWaypoint.berthId] || [];
+          
           // 实时更新路径线
           const polylineKey = `path-${draggingWaypoint.berthId}`;
           const polyline = polylinesRef.current.get(polylineKey);
           if (polyline) {
-            const waypoints = berthWaypoints[draggingWaypoint.berthId] || [];
             const pathPoints: [number, number][] = [];
             
             waypoints.forEach((w) => {
@@ -2923,12 +2926,93 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
     };
   }, []);
 
+  // 全屏切换函数
+  const toggleFullscreen = () => {
+    if (!mapRef.current) return;
+
+    if (!isFullscreen) {
+      // 进入全屏
+      if (mapRef.current.requestFullscreen) {
+        mapRef.current.requestFullscreen();
+      } else if ((mapRef.current as any).webkitRequestFullscreen) {
+        (mapRef.current as any).webkitRequestFullscreen();
+      } else if ((mapRef.current as any).mozRequestFullScreen) {
+        (mapRef.current as any).mozRequestFullScreen();
+      } else if ((mapRef.current as any).msRequestFullscreen) {
+        (mapRef.current as any).msRequestFullscreen();
+      }
+      setIsFullscreen(true);
+    } else {
+      // 退出全屏
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if ((document as any).webkitExitFullscreen) {
+        (document as any).webkitExitFullscreen();
+      } else if ((document as any).mozCancelFullScreen) {
+        (document as any).mozCancelFullScreen();
+      } else if ((document as any).msExitFullscreen) {
+        (document as any).msExitFullscreen();
+      }
+      setIsFullscreen(false);
+    }
+  };
+
+  // 监听全屏状态变化
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      const isCurrentlyFullscreen = !!(
+        document.fullscreenElement ||
+        (document as any).webkitFullscreenElement ||
+        (document as any).mozFullScreenElement ||
+        (document as any).msFullscreenElement
+      );
+      setIsFullscreen(isCurrentlyFullscreen);
+      
+      // 全屏状态改变后，调整地图尺寸
+      if (mapInstanceRef.current) {
+        setTimeout(() => {
+          try {
+            mapInstanceRef.current.invalidateSize();
+          } catch (e) {
+            console.warn('Error invalidating map size after fullscreen change:', e);
+          }
+        }, 100);
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+    };
+  }, []);
+
   return (
     <div 
       ref={mapRef} 
       className={`w-full h-full relative ${className}`}
       style={{ minHeight: '400px', position: 'relative', zIndex: 1 }}
     >
+      {/* 全屏切换按钮 */}
+      <button
+        onClick={toggleFullscreen}
+        className="absolute top-2 right-2 z-[1000] bg-slate-800/90 hover:bg-slate-700/90 border border-slate-600/50 rounded-lg p-2 shadow-lg backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
+        title={isFullscreen ? '退出全屏' : '全屏显示'}
+        style={{ zIndex: 10000 }}
+      >
+        {isFullscreen ? (
+          <Minimize2 size={18} className="text-slate-200" />
+        ) : (
+          <Maximize2 size={18} className="text-slate-200" />
+        )}
+      </button>
+
       {isLoading && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/80 z-10">
           <div className="text-slate-300 text-base font-medium mb-2">正在加载地图库...</div>

@@ -5,9 +5,9 @@ import PortMap from './components/PortMap';
 import StaticMap from './components/StaticMap';
 import AgentOrchestrator from './components/AgentOrchestrator';
 import Dashboard from './components/Dashboard';
-import PhaseDetailPanel from './components/PhaseDetailPanel';
+import PhaseDetailPanel, { DetailViewType } from './components/PhaseDetailPanel';
 import BottomVis from './components/BottomVis';
-import { Play, RotateCcw, Cpu, Anchor, Ship as ShipIcon, FastForward, CheckSquare, Layers, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Map as MapIcon } from 'lucide-react';
+import { Play, RotateCcw, Cpu, Anchor, Ship as ShipIcon, FastForward, CheckSquare, Layers, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Map as MapIcon, Activity, ShieldCheck, TrendingUp } from 'lucide-react';
 import * as aiService from './services/aiService';
 import * as schedulingAlgorithms from './services/schedulingAlgorithms';
 
@@ -151,8 +151,11 @@ const App: React.FC = () => {
   const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(true);
   const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(true);
   const [isBottomPanelOpen, setIsBottomPanelOpen] = useState(true);
+  const [activeDetailView, setActiveDetailView] = useState<DetailViewType>('perception');
   // 默认使用静态地图，不再需要切换按钮
   const mapViewMode: 'static' = 'static';
+
+  // 移除自动切换视图的逻辑，让用户可以自由切换视图而不被阶段变化打断
 
   // --- Helper: Centralized Berth Logic ---
   const getRecommendedZone = (ship: Ship) => {
@@ -371,11 +374,11 @@ const App: React.FC = () => {
           setPhase(SimulationPhase.MATCHING);
           highlightAgents([AgentType.SCHEDULER]);
           
-          // 在匹配阶段只显示候选泊位集生成，不显示具体分配（因为分配在优化阶段完成）
+          // 在匹配阶段只显示候选泊位集和候选锚位集生成，不显示具体分配（因为分配在优化阶段完成）
           addMessage(AgentType.SCHEDULER, 'ALL', 
 `调度智能体：
 物理约束(长度/吃水)校验通过。
-候选泊位集生成完毕。
+候选泊位集和候选锚位集生成完毕。
 等待优化阶段进行最终分配。`, "warning");
           
            // 使用真实算法生成候选泊位时空资源集合
@@ -421,10 +424,43 @@ const App: React.FC = () => {
                        special: s.type === ShipType.TANKER
                    };
 
+                   // 计算候选锚位（根据船舶类型和大小选择合适的锚位区域）
+                   let preferredAnchorageIds: string[] = [];
+                   if (s.type === ShipType.TANKER || s.length > 200) {
+                       // A区锚位：Y6, Y9, 13（深水区，吃水深度较大）
+                       preferredAnchorageIds = ['Y6', 'Y9', '13'];
+                   } else if (s.length < 100) {
+                       // C区锚位：Y8, M7, 14, 15（支线区，吃水深度较小）
+                       preferredAnchorageIds = ['Y8', 'M7', '14', '15'];
+                   } else {
+                       // B区锚位：Y7, Y10, 12（通用区）
+                       preferredAnchorageIds = ['Y7', 'Y10', '12'];
+                   }
+                   
+                   // 查找满足物理约束的候选锚位（锚位深度需≥船舶吃水×1.2）
+                   const candidateAnchorages = berths
+                       .filter(b => 
+                           b.type === 'anchorage' && 
+                           preferredAnchorageIds.includes(b.id) &&
+                           b.depth >= s.draft * 1.2 // 物理规则：锚位深度需≥船舶吃水×1.2
+                       )
+                       .map(b => b.id);
+                   
+                   // 如果首选锚位没有满足条件的，查找所有满足深度要求的锚位
+                   const allCandidateAnchorages = candidateAnchorages.length > 0 
+                       ? candidateAnchorages
+                       : berths
+                           .filter(b => 
+                               b.type === 'anchorage' &&
+                               b.depth >= s.draft * 1.2
+                           )
+                           .map(b => b.id);
+
                    return { 
                        ...s, 
                        constraints: c, 
-                       candidateBerths: candidateSlots.map(slot => slot.berthId)
+                       candidateBerths: candidateSlots.map(slot => slot.berthId),
+                       candidateAnchorages: allCandidateAnchorages
                    };
                }
                return s;
@@ -1397,9 +1433,8 @@ ${anchorageAssignmentsList}
           </div>
           <div>
             <h1 className="font-bold text-base tracking-wide text-slate-100 uppercase font-sans drop-shadow-sm">
-              SmartPort <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">MAS</span>
+              多智能体港口调度系统
             </h1>
-            <div className="text-xs text-slate-400 leading-none font-medium">多智能体港口调度系统 V3.2</div>
           </div>
         </div>
 
@@ -1539,7 +1574,46 @@ ${anchorageAssignmentsList}
                   {/* 直接显示静态地图 */}
                   <StaticMap berths={berths} ships={ships} simulationPhase={phase} processingShipIds={processingShipIds} />
              </div>
-             <div className={`${isBottomPanelOpen ? 'flex-[1] min-h-[220px] max-h-[250px]' : 'hidden'} shrink-0 overflow-hidden rounded-xl relative group`}>
+             <div className={`${isBottomPanelOpen ? 'flex-[1] min-h-[220px] max-h-[250px]' : 'hidden'} shrink-0 overflow-hidden rounded-xl relative group flex flex-col`}>
+                 {/* 视图切换按钮 */}
+                 <div className="flex gap-2 p-2 border-b border-slate-700/50 bg-slate-900/50 shrink-0">
+                    <button
+                        onClick={() => setActiveDetailView('perception')}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                            activeDetailView === 'perception'
+                                ? 'bg-cyan-600/90 text-white shadow-lg shadow-cyan-500/20'
+                                : 'bg-slate-800/50 text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'
+                        }`}
+                        title="智能感知 & ETA修正"
+                    >
+                        <Activity size={14} />
+                        智能感知 & ETA修正
+                    </button>
+                    <button
+                        onClick={() => setActiveDetailView('matching')}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                            activeDetailView === 'matching'
+                                ? 'bg-amber-600/90 text-white shadow-lg shadow-amber-500/20'
+                                : 'bg-slate-800/50 text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'
+                        }`}
+                        title="物理约束校验矩阵"
+                    >
+                        <ShieldCheck size={14} />
+                        物理约束校验矩阵
+                    </button>
+                    <button
+                        onClick={() => setActiveDetailView('optimization')}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                            activeDetailView === 'optimization'
+                                ? 'bg-purple-600/90 text-white shadow-lg shadow-purple-500/20'
+                                : 'bg-slate-800/50 text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'
+                        }`}
+                        title="优化博弈与决策日志"
+                    >
+                        <TrendingUp size={14} />
+                        优化博弈与决策日志
+                    </button>
+                 </div>
                  <div className="absolute right-2 top-2 z-20">
                     <button 
                         onClick={() => setIsBottomPanelOpen(false)}
@@ -1549,16 +1623,19 @@ ${anchorageAssignmentsList}
                         <ChevronDown size={14} />
                     </button>
                  </div>
-                 <PhaseDetailPanel 
-                   phase={phase} 
-                   ships={ships} 
-                   processingIds={processingShipIds}
-                   totalVspSavings={optimizationData.totalVspSavings}
-                   carbonSaved={carbonSaved}
-                   hasConflict={optimizationData.hasConflict}
-                   optimizationIterations={optimizationData.iterations}
-                   optimizationReward={optimizationData.reward}
-                 />
+                 <div className="flex-1 min-h-0 overflow-hidden">
+                    <PhaseDetailPanel 
+                      phase={phase} 
+                      ships={ships} 
+                      processingIds={processingShipIds}
+                      totalVspSavings={optimizationData.totalVspSavings}
+                      carbonSaved={carbonSaved}
+                      hasConflict={optimizationData.hasConflict}
+                      optimizationIterations={optimizationData.iterations}
+                      optimizationReward={optimizationData.reward}
+                      activeView={activeDetailView}
+                    />
+                 </div>
              </div>
         </div>
 
