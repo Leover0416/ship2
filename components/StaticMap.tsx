@@ -2446,17 +2446,25 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
         minZoom: 2
       });
 
-      // 添加 OpenStreetMap 瓦片图层（使用多个备用服务器）
-      const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors',
-        maxZoom: 19,
-        subdomains: ['a', 'b', 'c'], // 使用多个子域名提高可用性
-        errorTileUrl: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7' // 加载失败时显示空白图
-      }).addTo(map);
+      // 添加 WMS 海图瓦片图层（使用 maritime_security 提供的服务）
+      // WMS 服务地址：http://59.46.138.121:85/map/
+      const wmsServerUrl = 'http://59.46.138.121:85/map/';
       
-      // 监听瓦片加载错误，提供备用方案
-      osmLayer.on('tileerror', (error: any, tile: any) => {
-        console.warn('[StaticMap] 瓦片加载失败:', error, tile);
+      // 创建 WMS 图层（使用您提供的参数）
+      const wmsLayer = L.tileLayer.wms(wmsServerUrl, {
+        version: '1.3.0',
+        layers: 'ENC',
+        format: 'image/png',
+        CSBOOL: parseInt('1000000000000010', 2).toString(16),
+        CSVALUE: '10,5,20,10,1,2,1,500000,100000,200000,1'
+      });
+      
+      // 将 WMS 图层添加到地图
+      wmsLayer.addTo(map);
+      
+      // 监听瓦片加载错误
+      wmsLayer.on('tileerror', (error: any, tile: any) => {
+        console.warn('[StaticMap] WMS 瓦片加载失败:', error, tile);
       });
 
       // 设置地图容器的 z-index，确保弹窗可以显示在上方
