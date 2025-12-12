@@ -2446,26 +2446,64 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
         minZoom: 2
       });
 
-      // 添加 WMS 海图瓦片图层（使用 maritime_security 提供的服务）
+      // 添加 WMS 海图瓦片图层（使用 maritime_security 提供的服务），失败时回退到 OSM，避免部署环境加载不出地图
       // WMS 服务地址：http://59.46.138.121:85/map/
       const wmsServerUrl = 'http://59.46.138.121:85/map/';
-      
-      // 创建 WMS 图层（使用您提供的参数）
-      const wmsLayer = L.tileLayer.wms(wmsServerUrl, {
-        version: '1.3.0',
-        layers: 'ENC',
-        format: 'image/png',
-        CSBOOL: parseInt('1000000000000010', 2).toString(16),
-        CSVALUE: '10,5,20,10,1,2,1,500000,100000,200000,1'
-      });
-      
-      // 将 WMS 图层添加到地图
-      wmsLayer.addTo(map);
-      
-      // 监听瓦片加载错误
-      wmsLayer.on('tileerror', (error: any, tile: any) => {
-        console.warn('[StaticMap] WMS 瓦片加载失败:', error, tile);
-      });
+
+      let baseLayer: any = null;
+      let wmsLoaded = false;
+      const switchToOSM = (reason: string) => {
+        if (baseLayer) {
+          map.removeLayer(baseLayer);
+        }
+        console.warn(`[StaticMap] 切换到 OSM 瓦片，原因: ${reason}`);
+        baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors',
+          maxZoom: 19,
+          subdomains: ['a', 'b', 'c'],
+          errorTileUrl: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+        }).addTo(map);
+      };
+
+      // 如果是 https 部署，http 的 WMS 可能被浏览器拦截为混合内容，直接回退
+      if (window.location.protocol === 'https:') {
+        console.warn('[StaticMap] 当前站点为 HTTPS，http 的 WMS 服务可能被阻止，直接回退到 OSM');
+        switchToOSM('https-mixed-content');
+      } else {
+        // 创建 WMS 图层（使用您提供的参数）
+        const wmsLayer = L.tileLayer.wms(wmsServerUrl, {
+          version: '1.3.0',
+          layers: 'ENC',
+          format: 'image/png',
+          CSBOOL: parseInt('1000000000000010', 2).toString(16),
+          CSVALUE: '10,5,20,10,1,2,1,500000,100000,200000,1'
+        });
+
+        baseLayer = wmsLayer.addTo(map);
+
+        // 超时未加载则回退
+        const wmsLoadTimeout = setTimeout(() => {
+          if (!wmsLoaded) {
+            switchToOSM('wms-timeout');
+          }
+        }, 6000);
+
+        // 加载成功
+        wmsLayer.on('load', () => {
+          wmsLoaded = true;
+          clearTimeout(wmsLoadTimeout);
+        });
+
+        // 监听瓦片加载错误，若持续失败则回退
+        let errorCount = 0;
+        wmsLayer.on('tileerror', (error: any, tile: any) => {
+          console.warn('[StaticMap] WMS 瓦片加载失败:', error, tile);
+          errorCount += 1;
+          if (errorCount >= 3 && !wmsLoaded) {
+            switchToOSM('wms-tileerror');
+          }
+        });
+      }
 
       // 设置地图容器的 z-index，确保弹窗可以显示在上方
       const mapContainer = map.getContainer();
