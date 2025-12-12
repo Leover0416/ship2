@@ -2464,45 +2464,41 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
         }).addTo(map);
       };
 
-      // 如果是 https 部署，http 的 WMS 可能被浏览器拦截为混合内容，直接回退
-      if (window.location.protocol === 'https:') {
-        console.warn('[StaticMap] 当前站点为 HTTPS，http 的 WMS 服务可能被阻止，直接回退到 OSM');
-        switchToOSM('https-mixed-content');
-      } else {
-        // 创建 WMS 图层（使用您提供的参数）
-        const wmsLayer = L.tileLayer.wms(wmsServerUrl, {
-          version: '1.3.0',
-          layers: 'ENC',
-          format: 'image/png',
-          CSBOOL: parseInt('1000000000000010', 2).toString(16),
-          CSVALUE: '10,5,20,10,1,2,1,500000,100000,200000,1'
-        });
+      // 创建 WMS 图层（使用 HTTPS Worker 代理，避免混合内容问题）
+      const wmsLayer = L.tileLayer.wms(wmsServerUrl, {
+        version: '1.3.0',
+        layers: 'ENC',
+        format: 'image/png',
+        CSBOOL: parseInt('1000000000000010', 2).toString(16),
+        CSVALUE: '10,5,20,10,1,2,1,500000,100000,200000,1'
+      });
 
-        baseLayer = wmsLayer.addTo(map);
+      baseLayer = wmsLayer.addTo(map);
 
-        // 超时未加载则回退
-        const wmsLoadTimeout = setTimeout(() => {
-          if (!wmsLoaded) {
-            switchToOSM('wms-timeout');
-          }
-        }, 6000);
+      // 超时未加载则回退
+      const wmsLoadTimeout = setTimeout(() => {
+        if (!wmsLoaded) {
+          console.warn('[StaticMap] WMS 加载超时，回退到 OSM');
+          switchToOSM('wms-timeout');
+        }
+      }, 6000);
 
-        // 加载成功
-        wmsLayer.on('load', () => {
-          wmsLoaded = true;
-          clearTimeout(wmsLoadTimeout);
-        });
+      // 加载成功
+      wmsLayer.on('load', () => {
+        wmsLoaded = true;
+        clearTimeout(wmsLoadTimeout);
+        console.log('[StaticMap] WMS 海图加载成功');
+      });
 
-        // 监听瓦片加载错误，若持续失败则回退
-        let errorCount = 0;
-        wmsLayer.on('tileerror', (error: any, tile: any) => {
-          console.warn('[StaticMap] WMS 瓦片加载失败:', error, tile);
-          errorCount += 1;
-          if (errorCount >= 3 && !wmsLoaded) {
-            switchToOSM('wms-tileerror');
-          }
-        });
-      }
+      // 监听瓦片加载错误，若持续失败则回退
+      let errorCount = 0;
+      wmsLayer.on('tileerror', (error: any, tile: any) => {
+        console.warn('[StaticMap] WMS 瓦片加载失败:', error, tile);
+        errorCount += 1;
+        if (errorCount >= 3 && !wmsLoaded) {
+          switchToOSM('wms-tileerror');
+        }
+      });
 
       // 设置地图容器的 z-index，确保弹窗可以显示在上方
       const mapContainer = map.getContainer();
