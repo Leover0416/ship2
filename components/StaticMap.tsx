@@ -2446,9 +2446,8 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
         minZoom: 2
       });
 
-      // 添加 WMS 海图瓦片图层（使用 maritime_security 提供的服务），失败时回退到 OSM，避免部署环境加载不出地图
-      // WMS 服务地址：http://59.46.138.121:85/map/
-      const wmsServerUrl = 'http://59.46.138.121:85/map/';
+      // 添加 WMS 海图瓦片图层（通过 Cloudflare Worker 代理为 HTTPS，避免混合内容）
+      const wmsServerUrl = 'https://wms-proxy.1737648397.workers.dev/map/';
 
       let baseLayer: any = null;
       let wmsLoaded = false;
