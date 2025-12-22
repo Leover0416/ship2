@@ -3090,8 +3090,8 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
         </div>
       )}
 
-      {/* 顶部工具栏（锚位添加、泊位添加、管理按钮） */}
-      {!editingBerthId && (
+      {/* 顶部工具栏（锚位添加、泊位添加、管理按钮）- 已隐藏 */}
+      {false && !editingBerthId && (
         <div 
           className="absolute top-3 right-3 flex gap-2 bg-slate-800/95 border border-slate-600/80 rounded-lg shadow-2xl backdrop-blur-md p-2"
           style={{ zIndex: 10000 }}
@@ -3138,8 +3138,8 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
         </div>
       )}
 
-      {/* 管理面板 */}
-      {showManagementPanel && (
+      {/* 管理面板 - 已隐藏 */}
+      {false && showManagementPanel && (
         <div
           className="absolute bg-slate-900/98 text-slate-100 text-sm px-4 py-3 rounded-lg border border-slate-600 shadow-2xl pointer-events-auto"
           style={{
