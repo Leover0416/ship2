@@ -135,7 +135,7 @@ const BERTH_DOCKED_ROTATION: Record<string, number> = {
   'C01': 0,
   'C02': 0,
   
-  'M01': 0,   // 原 A01 朝右 -> 0? 原代码注释说是朝右但值为0，ship.svg默认朝上，0度是朝上。
+  'M01': 0,   // 原 A01 朝右 -> 0? 原代码注释说是朝右但值为0，新船型.svg默认朝上，0度是朝上。
               // 原代码：'A01': 0, // 朝右。 Wait, if 0 is Up, then 90 is Right. 
               // The comment says "0度=朝上". But "A01: 0 // 朝右". This is contradictory or the comment is wrong.
               // Let's trust the value.
@@ -734,19 +734,19 @@ const getShipPosition = (ship: Ship, index: number, waitingShips: Ship[]) => {
          // 如果未设置角度，则自动计算：从最后一个路径点指向泊位的方向
          const dx = berthPos.x - lastWaypoint.x;
          const dy = berthPos.y - lastWaypoint.y;
-         return (Math.atan2(dy, dx) * 180 / Math.PI) + 90; // +90 适配 ship.svg 默认朝上
+         return (Math.atan2(dy, dx) * 180 / Math.PI) + 90; // +90 适配 新船型.svg 默认朝上
       }
     }
     return BERTH_DOCKED_ROTATION[berthId] || 90;
   };
 
   /**
-   * 船舶图标：使用用户提供的船.svg，并根据船长和旋转角度缩放/旋转
-   * 注意：ship.svg 默认尖头朝上，这里所有 rotationDeg 都是围绕"尖头朝上"为 0 度来计算
+   * 船舶图标：使用用户提供的新船型.svg，并根据船长和旋转角度缩放/旋转
+   * 注意：新船型.svg 默认尖头朝上，这里所有 rotationDeg 都是围绕"尖头朝上"为 0 度来计算
    */
   const renderShipIcon = (ship: Ship, rotationDeg: number, isMoving: boolean = false) => {
     // 统一所有船的大小，比现在小一点
-    const width = 24; // 统一大小，所有船都是18px宽
+    const width = 36; // 统一大小，所有船都是36px宽
 
     // 移动时：船的边缘发光（使用 drop-shadow，只作用于船的形状边缘，不是矩形边缘）
     // 静止时：普通阴影
@@ -755,20 +755,34 @@ const getShipPosition = (ship: Ship, index: number, waitingShips: Ship[]) => {
       : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)) saturate(1.2) contrast(1.02)';
 
     return (
-      <img
-        src="/船.svg"
-        alt={ship.name}
-        className="select-none"
+      <div
         style={{
           width: `${width}px`,
-          height: 'auto',
-          // 先平移再旋转，让锚点接近船中心
-          transform: `translateY(1px) rotate(${rotationDeg}deg)`,
-          // 使用 drop-shadow 实现边缘发光，只作用于船的形状，不是整个矩形
-          filter: filterStyle,
+          height: `${width}px`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
-        draggable={false}
-      />
+      >
+        <img
+          src="/新船型.svg"
+          alt={ship.name}
+          className="select-none"
+          style={{
+            width: `${width}px`,
+            height: 'auto',
+            maxWidth: '100%',
+            maxHeight: '100%',
+            // 旋转中心设置为图标中心，确保船在轨迹正中间
+            // 统一逆时针旋转90度
+            transform: `rotate(${rotationDeg - 90}deg)`,
+            transformOrigin: 'center center',
+            // 使用 drop-shadow 实现边缘发光，只作用于船的形状，不是整个矩形
+            filter: filterStyle,
+          }}
+          draggable={false}
+        />
+      </div>
     );
   };
 
@@ -1616,7 +1630,7 @@ const getShipPosition = (ship: Ship, index: number, waitingShips: Ship[]) => {
                 const dx = p1.x - p0.x;
                 const dy = p1.y - p0.y;
                 const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-                rotationDeg = angle + 90; // ship.svg 默认尖头朝上，需要+90度让船头朝向移动方向
+                rotationDeg = angle + 90; // 新船型.svg 默认尖头朝上，需要+90度让船头朝向移动方向
             } else {
               rotationDeg = 0; // 默认朝上
             }
@@ -1660,7 +1674,8 @@ const getShipPosition = (ship: Ship, index: number, waitingShips: Ship[]) => {
             }}
           >
               <div 
-                className="relative flex flex-col items-center p-2"
+                className="relative flex flex-col items-center justify-center"
+                style={{ width: '36px', height: '36px' }}
                 onMouseEnter={() => setHoveredShipId(ship.id)}
                 onMouseLeave={() => setHoveredShipId(null)}
               >
@@ -1671,7 +1686,7 @@ const getShipPosition = (ship: Ship, index: number, waitingShips: Ship[]) => {
                   <div className="text-[10px] font-normal mt-0.5">{ship.name}</div>
               </div>
               )}
-              <div className="relative">
+              <div className="relative flex items-center justify-center" style={{ width: '36px', height: '36px' }}>
                 {renderShipIcon(ship, rotationDeg, isMoving)}
               </div>
             </div>

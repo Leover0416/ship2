@@ -1882,18 +1882,22 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
       const shipIcon = L.divIcon({
         className: 'ship-marker',
         html: `<div style="
-          width: 24px;
-          height: auto;
-          transform: translateY(1px) rotate(${rotationDeg}deg);
+          width: 36px;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transform: rotate(${rotationDeg - 90}deg);
+          transform-origin: center center;
           filter: ${isMoving 
             ? 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.9)) drop-shadow(0 0 4px rgba(59, 130, 246, 0.6)) saturate(1.2) contrast(1.02)' 
             : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)) saturate(1.2) contrast(1.02)'};
           cursor: pointer;
         ">
-          <img src="/船.svg" alt="${ship.name}" style="width: 24px; height: auto; display: block;" draggable="false" />
+          <img src="/新船型.svg" alt="${ship.name}" style="width: 36px; height: auto; display: block; margin: 0 auto;" draggable="false" />
         </div>`,
-        iconSize: [24, 24],
-        iconAnchor: [12, 12]
+        iconSize: [36, 36],
+        iconAnchor: [18, 18]
       });
 
       // 检查是否已存在标记，如果存在则更新位置，否则创建新标记
@@ -3086,8 +3090,8 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
         </div>
       )}
 
-      {/* 顶部工具栏（已隐藏：锚位添加、泊位添加、管理按钮） */}
-      {false && !editingBerthId && (
+      {/* 顶部工具栏（锚位添加、泊位添加、管理按钮） */}
+      {!editingBerthId && (
         <div 
           className="absolute top-3 right-3 flex gap-2 bg-slate-800/95 border border-slate-600/80 rounded-lg shadow-2xl backdrop-blur-md p-2"
           style={{ zIndex: 10000 }}
@@ -3134,8 +3138,8 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
         </div>
       )}
 
-      {/* 管理面板（已隐藏） */}
-      {false && showManagementPanel && (
+      {/* 管理面板 */}
+      {showManagementPanel && (
         <div
           className="absolute bg-slate-900/98 text-slate-100 text-sm px-4 py-3 rounded-lg border border-slate-600 shadow-2xl pointer-events-auto"
           style={{
