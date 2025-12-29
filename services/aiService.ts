@@ -119,18 +119,10 @@ export async function generateResourceAgentMessage(context: AgentContext): Promi
   // 总泊位和锚位数（按类型区分）
   const totalBerths = berths.filter(b => b.type === 'berth').length; 
   const totalAnchorages = berths.filter(b => b.type === 'anchorage').length;
-
-  const totalDeepBerths = berths.filter(b => b.type === 'berth' && b.zone === 'A').length;
-  const totalGeneralBerths = berths.filter(b => b.type === 'berth' && b.zone === 'B').length;
-  const totalFeederBerths = berths.filter(b => b.type === 'berth' && b.zone === 'C').length;
   
   // 空闲泊位数
   const freeBerths = berths.filter(b => b.type === 'berth' && !b.isOccupied && !b.currentShipId).length;
   const freeAnchorages = berths.filter(b => b.type === 'anchorage' && !b.isOccupied && !b.currentShipId).length;
-
-  const deepBerths = berths.filter(b => b.type === 'berth' && b.zone === 'A' && !b.isOccupied && !b.currentShipId).length;
-  const generalBerths = berths.filter(b => b.type === 'berth' && b.zone === 'B' && !b.isOccupied && !b.currentShipId).length;
-  const feederBerths = berths.filter(b => b.type === 'berth' && b.zone === 'C' && !b.isOccupied && !b.currentShipId).length;
 
   // 获取具体名称列表
   const anchorageNames = berths
@@ -138,19 +130,16 @@ export async function generateResourceAgentMessage(context: AgentContext): Promi
     .map(b => `${b.name}(${b.isOccupied ? '占用' : '空闲'})`)
     .join('、');
 
-  const deepBerthNames = berths
-    .filter(b => b.type === 'berth' && b.zone === 'A')
-    .map(b => `${b.name}(${b.isOccupied ? '占用' : '空闲'})`)
+  // 直接列出所有空闲泊位（不分区域）
+  const freeBerthNames = berths
+    .filter(b => b.type === 'berth' && !b.isOccupied && !b.currentShipId)
+    .map(b => `${b.name}(空闲)`)
     .join('、');
   
-  const generalBerthNames = berths
-    .filter(b => b.type === 'berth' && b.zone === 'B')
-    .map(b => `${b.name}(${b.isOccupied ? '占用' : '空闲'})`)
-    .join('、');
-
-  const feederBerthNames = berths
-    .filter(b => b.type === 'berth' && b.zone === 'C')
-    .map(b => `${b.name}(${b.isOccupied ? '占用' : '空闲'})`)
+  // 所有泊位列表（包括占用的，用于显示完整状态）
+  const allBerthNames = berths
+    .filter(b => b.type === 'berth')
+    .map(b => `${b.name}(${b.isOccupied || b.currentShipId ? '占用' : '空闲'})`)
     .join('、');
 
   const prompt = `你是一个港口调度系统中的资源智能体。需要报告当前港口资源状态。
@@ -158,16 +147,13 @@ export async function generateResourceAgentMessage(context: AgentContext): Promi
 
 当前资源状态：
 - 锚位资源: 总计${totalAnchorages}个，空闲${freeAnchorages}个。详情：${anchorageNames}
-- 泊位资源: 总计${totalBerths}个，空闲${freeBerths}个
-  - 深水泊位(A区): 总计${totalDeepBerths}个，空闲${deepBerths}个。详情：${deepBerthNames}
-  - 通用泊位(B区): 总计${totalGeneralBerths}个，空闲${generalBerths}个。详情：${generalBerthNames}
-  - 支线泊位(C区): 总计${totalFeederBerths}个，空闲${feederBerths}个。详情：${feederBerthNames}
+- 泊位资源: 总计${totalBerths}个，空闲${freeBerths}个。空闲泊位：${freeBerthNames || '无'}
 - 潮汐窗：开放 (4.8m)
 - 气象：风速3级，适航
 
 请生成一份专业的资源智能体报告，包括：
 1. 锚位资源状态（务必列出锚位名称）
-2. 各区域泊位可用情况（务必列出泊位名称）
+2. 泊位可用情况（务必列出空闲泊位名称）
 3. 环境条件（潮汐、气象）
 4. 数字孪生环境状态
 
@@ -190,9 +176,7 @@ export async function generateResourceAgentMessage(context: AgentContext): Promi
 - 锚位资源: 总计${totalAnchorages}个，空闲${freeAnchorages}个
   详情：${anchorageNames}
 - 泊位资源: 总计${totalBerths}个，空闲${freeBerths}个
-  - 深水泊位(A区): ${deepBerthNames}
-  - 通用泊位(B区): ${generalBerthNames}
-  - 支线泊位(C区): ${feederBerthNames}
+  空闲泊位：${freeBerthNames || '无'}
 - 潮汐窗：开放 (4.8m)
 - 气象：风速3级，适航。
 数字孪生环境已更新。`;
