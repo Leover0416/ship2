@@ -113,10 +113,10 @@ const loadWaypointsFromStorage = (): BerthWaypoints => {
     // 泊位在地图背景上的实际位置（根据T型区域05/07/08等位置设置）
 const BERTH_POSITIONS: Record<string, { x: number; y: number }> = {
   // 新增泊位
-  'A01': { x: 474, y: 62 },
-  'B01': { x: 410, y: 13},
-  'C01': { x: 563, y: 72 },
-  'C02': { x: 432, y: 36 },
+  'A01': { x: 474, y: 62 },  // 1号泊位
+  'B01': { x: 410, y: 13},   // 2号泊位
+  'B02': { x: 432, y: 36 },  // 3号泊位
+  'A02': { x: 563, y: 72 },  // 5号泊位（原C01区域）
   
   // 原有泊位改为锚位
   'M01': { x: 370, y: 61 },  // 原 A01
@@ -130,12 +130,12 @@ const BERTH_POSITIONS: Record<string, { x: number; y: number }> = {
 // 每个泊位停靠后船的箭头朝向（度）
 // 0度=朝上, 90度=朝右, 180度=朝下, 270度=朝左
 const BERTH_DOCKED_ROTATION: Record<string, number> = {
-  'A01': 0,
-  'B01': 0,
-  'C01': 0,
-  'C02': 0,
+  'A01': 0,  // 1号泊位
+  'B01': 0,  // 2号泊位
+  'B02': 0,  // 3号泊位
+  'A02': 0,  // 5号泊位
   
-  'M01': 0,   // 原 A01 朝右 -> 0? 原代码注释说是朝右但值为0，新船型.svg默认朝上，0度是朝上。
+  'M01': 0,   // 原 A01 朝右 -> 0? 原代码注释说是朝右但值为0，船.svg默认朝上，0度是朝上。
               // 原代码：'A01': 0, // 朝右。 Wait, if 0 is Up, then 90 is Right. 
               // The comment says "0度=朝上". But "A01: 0 // 朝右". This is contradictory or the comment is wrong.
               // Let's trust the value.
@@ -201,7 +201,7 @@ const PortMap: React.FC<PortMapProps> = ({ ships, berths, simulationPhase, onBer
       }
       
       // 如果都没有，使用默认数据并初始化缺失的泊位
-      const allBerthIds = ['A01', 'B01', 'C01', 'C02', 'M01', 'M02', 'M03', 'M04', 'M05', 'M06'];
+      const allBerthIds = ['A01', 'B01', 'B02', 'A02', 'M01', 'M02', 'M03', 'M04', 'M05', 'M06'];
       const currentData = { ...berthWaypoints };
       let needsSave = false;
       allBerthIds.forEach(id => {
@@ -734,19 +734,19 @@ const getShipPosition = (ship: Ship, index: number, waitingShips: Ship[]) => {
          // 如果未设置角度，则自动计算：从最后一个路径点指向泊位的方向
          const dx = berthPos.x - lastWaypoint.x;
          const dy = berthPos.y - lastWaypoint.y;
-         return (Math.atan2(dy, dx) * 180 / Math.PI) + 90; // +90 适配 新船型.svg 默认朝上
+         return (Math.atan2(dy, dx) * 180 / Math.PI) + 90; // +90 适配 船.svg 默认朝上
       }
     }
     return BERTH_DOCKED_ROTATION[berthId] || 90;
   };
 
   /**
-   * 船舶图标：使用用户提供的新船型.svg，并根据船长和旋转角度缩放/旋转
-   * 注意：新船型.svg 默认尖头朝上，这里所有 rotationDeg 都是围绕"尖头朝上"为 0 度来计算
+   * 船舶图标：使用船.svg，并根据船长和旋转角度缩放/旋转
+   * 注意：船.svg 默认尖头朝上，这里所有 rotationDeg 都是围绕"尖头朝上"为 0 度来计算
    */
   const renderShipIcon = (ship: Ship, rotationDeg: number, isMoving: boolean = false) => {
-    // 统一所有船的大小，比现在小一点
-    const width = 36; // 统一大小，所有船都是36px宽
+    // 统一所有船的大小
+    const width = 24; // 统一大小，所有船都是24px宽
 
     // 移动时：船的边缘发光（使用 drop-shadow，只作用于船的形状边缘，不是矩形边缘）
     // 静止时：普通阴影
@@ -765,7 +765,7 @@ const getShipPosition = (ship: Ship, index: number, waitingShips: Ship[]) => {
         }}
       >
         <img
-          src="/新船型.svg"
+          src="/船.svg"
           alt={ship.name}
           className="select-none"
           style={{
@@ -774,8 +774,8 @@ const getShipPosition = (ship: Ship, index: number, waitingShips: Ship[]) => {
             maxWidth: '100%',
             maxHeight: '100%',
             // 旋转中心设置为图标中心，确保船在轨迹正中间
-            // 统一逆时针旋转90度
-            transform: `rotate(${rotationDeg - 90}deg)`,
+            // 正常方向，不进行额外旋转
+            transform: `rotate(${rotationDeg}deg)`,
             transformOrigin: 'center center',
             // 使用 drop-shadow 实现边缘发光，只作用于船的形状，不是整个矩形
             filter: filterStyle,
@@ -945,54 +945,56 @@ const getShipPosition = (ship: Ship, index: number, waitingShips: Ship[]) => {
       </div>
       
 
-      {/* 3. Trajectory Lines - 每艘船从锚地实际位置到泊位的整条曲线路径 */}
+      {/* 3. Trajectory Lines - 只显示当前正在移动的船的轨迹 */}
       <svg className="absolute inset-0 w-full h-full pointer-events-none z-10">
          {(() => {
-          // 只为正在移动的船（navigating 或 docking 状态）画轨迹线
-          // 这样轨迹线会一艘船一艘船地出现，而不是一次性全部画出来
+          // 只显示当前正在移动的第一艘船的轨迹（navigating 或 docking 状态）
+          // 只显示一艘船的轨迹，其他船的轨迹不显示
           const movingShips = ships.filter(s => 
             (s.status === 'navigating' || s.status === 'docking') && 
             s.assignedBerthId &&
             processingShipIds && processingShipIds.includes(s.id)
           );
           
-          return movingShips.map((ship) => {
-            if (ship.assignedBerthId) {
-              // 第二阶段（锚位->泊位）不显示蓝色虚线，只在第一阶段（起步->锚位）显示
-              const isFromAnchorage = ship.assignedAnchorageId && ship.assignedBerthId !== ship.assignedAnchorageId;
-              if (isFromAnchorage) return null;
+          // 只取第一艘正在移动的船
+          if (movingShips.length === 0) return null;
+          const ship = movingShips[0];
+          
+          if (ship.assignedBerthId) {
+            // 第二阶段（锚位->泊位）不显示蓝色虚线，只在第一阶段（起步->锚位）显示
+            const isFromAnchorage = ship.assignedAnchorageId && ship.assignedBerthId !== ship.assignedAnchorageId;
+            if (isFromAnchorage) return null;
 
-              // 获取泊位位置（终点）
-              const berthPos = getBerthCenterPosition(ship.assignedBerthId);
-              if (!berthPos) return null;
+            // 获取泊位位置（终点）
+            const berthPos = getBerthCenterPosition(ship.assignedBerthId);
+            if (!berthPos) return null;
 
-              // 使用可编辑的路径点构建路径（与 getShipPosition 中的逻辑保持一致）
-              // 路径直接从第一个路径点开始，依次经过所有路径点，最后到达泊位
-              const waypoints = getBerthWaypoints(ship.assignedBerthId);
-              const waypointPositions = waypoints.map(wp => ({ x: wp.x, y: wp.y }));
-              const pathPoints = [...waypointPositions, berthPos];
+            // 使用可编辑的路径点构建路径（与 getShipPosition 中的逻辑保持一致）
+            // 路径直接从第一个路径点开始，依次经过所有路径点，最后到达泊位
+            const waypoints = getBerthWaypoints(ship.assignedBerthId);
+            const waypointPositions = waypoints.map(wp => ({ x: wp.x, y: wp.y }));
+            const pathPoints = [...waypointPositions, berthPos];
 
-              // 绘制直线路径（按照红色路径点的连线）
-              let pathData = `M ${pathPoints[0].x} ${pathPoints[0].y}`;
-              for (let i = 1; i < pathPoints.length; i++) {
-                pathData += ` L ${pathPoints[i].x} ${pathPoints[i].y}`;
-              }
-              
-              // 绘制轨迹线（直线连接，与船的移动路径完全一致）
-               return (
-                 <path 
-                   key={`path-${ship.id}`}
-                   d={pathData}
-                   fill="none"
-                   stroke="#38bdf8"
-                   strokeWidth="2"
-                   strokeDasharray="6,4"
-                   className="opacity-80"
-                 />
-               );
-             }
-             return null;
-           });
+            // 绘制直线路径（按照红色路径点的连线）
+            let pathData = `M ${pathPoints[0].x} ${pathPoints[0].y}`;
+            for (let i = 1; i < pathPoints.length; i++) {
+              pathData += ` L ${pathPoints[i].x} ${pathPoints[i].y}`;
+            }
+            
+            // 绘制轨迹线（直线连接，与船的移动路径完全一致）
+            return (
+              <path 
+                key={`path-${ship.id}`}
+                d={pathData}
+                fill="none"
+                stroke="#38bdf8"
+                strokeWidth="2"
+                strokeDasharray="6,4"
+                className="opacity-80"
+              />
+            );
+          }
+          return null;
          })()}
       </svg>
 
@@ -1153,7 +1155,7 @@ const getShipPosition = (ship: Ship, index: number, waitingShips: Ship[]) => {
                     }}
                     title="点击编辑路径"
                   >
-                    {berth.id}
+                    {berth.name || berth.id}
                   </div>
                 </>
               ) : (
@@ -1174,7 +1176,7 @@ const getShipPosition = (ship: Ship, index: number, waitingShips: Ship[]) => {
                     }}
                     title="点击编辑路径"
                   >
-                    {berth.id}
+                    {berth.name || berth.id}
                   </div>
                   {/* 定位点 - 在下方 */}
                   <div className={`w-2 h-2 rounded-full border transition-colors ${getPointColor()} shadow-md`}>
@@ -1207,7 +1209,7 @@ const getShipPosition = (ship: Ship, index: number, waitingShips: Ship[]) => {
           >
             <div className="font-bold mb-1 flex items-center justify-between">
               <span>
-                {berthToShow.type === 'anchorage' ? '锚位' : '泊位'} {berthToShow.id}{' '}
+                {berthToShow.name || (berthToShow.type === 'anchorage' ? '锚位' : '泊位')} {berthToShow.type === 'anchorage' ? berthToShow.id : ''}{' '}
                 <span className="text-[10px] text-slate-400">
                   ({berthToShow.zone === 'A' ? '深水区' : berthToShow.zone === 'B' ? '通用区' : '支线区'})
                 </span>
@@ -1630,7 +1632,7 @@ const getShipPosition = (ship: Ship, index: number, waitingShips: Ship[]) => {
                 const dx = p1.x - p0.x;
                 const dy = p1.y - p0.y;
                 const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-                rotationDeg = angle + 90; // 新船型.svg 默认尖头朝上，需要+90度让船头朝向移动方向
+                rotationDeg = angle + 90; // 船.svg 默认尖头朝上，需要+90度让船头朝向移动方向
             } else {
               rotationDeg = 0; // 默认朝上
             }
@@ -1675,7 +1677,7 @@ const getShipPosition = (ship: Ship, index: number, waitingShips: Ship[]) => {
           >
               <div 
                 className="relative flex flex-col items-center justify-center"
-                style={{ width: '36px', height: '36px' }}
+                style={{ width: '24px', height: '24px' }}
                 onMouseEnter={() => setHoveredShipId(ship.id)}
                 onMouseLeave={() => setHoveredShipId(null)}
               >

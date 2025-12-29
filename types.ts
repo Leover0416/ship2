@@ -50,6 +50,7 @@ export interface Ship {
   headingDeg?: number;           // 船首向（度）
   courseOverGroundDeg?: number;  // 航向 COG（度）
   callSign?: string;             // 呼号
+  mmsi?: string;                 // MMSI 编号
   imo?: string;                  // IMO 编号
   speedKnots?: number;           // 航速（节）
   navStatusText?: string;        // 航行状态文本（如：靠泊、在航）

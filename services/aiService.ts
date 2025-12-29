@@ -375,7 +375,7 @@ function getRecommendedZone(ship: any) {
   // 4. Large Containers (>150m) go to B or A
   if (ship.length > 150) return { zone: 'B', berths: ['B01', 'A01'] };
 
-  // 5. Small Feeder (<150m) go to C
-  return { zone: 'C', berths: ['C01', 'C02'] };
+  // 5. Small Feeder (<150m) go to A02 (5号泊位，原C01区域)
+  return { zone: 'A', berths: ['A02'] };
 }
 

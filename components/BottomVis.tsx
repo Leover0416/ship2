@@ -68,7 +68,7 @@ const BottomVis: React.FC<BottomVisProps> = ({ ships }) => {
                     
                     return (
                         <div key={s.id} className="relative h-4 bg-slate-800/50 rounded-sm flex items-center group">
-                            <span className="absolute left-1 text-xs text-slate-500 font-mono w-6">{s.id}</span>
+                            <span className="absolute left-1 text-xs text-slate-500 font-bold whitespace-nowrap pr-2">{s.name}</span>
                             <div 
                                 className="absolute h-2.5 rounded-[1px] shadow-sm flex items-center justify-center overflow-hidden transition-all duration-1000 border border-white/10 group-hover:border-white/40"
                                 style={{ 

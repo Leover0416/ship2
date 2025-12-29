@@ -7,86 +7,224 @@ export const SHIP_COLORS = {
     [ShipType.TANKER]: '#ef4444',    // Red 500
 };
 
-export const INITIAL_SHIPS: Ship[] = [
-  // 宁波镇海港区典型来船：20-100m，吃水 3.5-9m
+// 油品码头船舶数据池（13艘船）
+const TANKER_SHIP_POOL: Ship[] = [
   {
-    id: 'S001',
-    name: '浙甬集装 1',
-    type: ShipType.CONTAINER,
-    length: 95,     // m
-    width: 16,      // m
-    draft: 8.5,     // m
+    id: '412752880',
+    name: '浙甬油11',
+    type: ShipType.TANKER,
+    length: 118,
+    width: 17,
+    draft: 4.5,
     etaOriginal: '10:00',
     priority: 10,
     status: 'waiting',
-    color: SHIP_COLORS[ShipType.CONTAINER],
+    color: SHIP_COLORS[ShipType.TANKER],
     candidateBerths: [],
+    callSign: 'H',
+    mmsi: '412752880',
+    navStatusText: '靠泊',
   },
   {
-    id: 'S002',
-    name: '甬港集装 3',
-    type: ShipType.CONTAINER,
-    length: 72,
-    width: 14,
-    draft: 7.2,
+    id: '413446010',
+    name: '舟供油68',
+    type: ShipType.TANKER,
+    length: 53,
+    width: 9,
+    draft: 3.4,
     etaOriginal: '10:15',
     priority: 8,
     status: 'waiting',
-    color: SHIP_COLORS[ShipType.CONTAINER],
+    color: SHIP_COLORS[ShipType.TANKER],
     candidateBerths: [],
+    callSign: 'L',
+    mmsi: '413446010',
+    navStatusText: '锚泊',
   },
   {
-    id: 'S003',
-    name: '镇海散货 5',
-    type: ShipType.BULK,
-    length: 88,
-    width: 15,
-    draft: 8.0,
+    id: '413437350',
+    name: '祥鸿17',
+    type: ShipType.TANKER,
+    length: 55,
+    width: 9,
+    draft: 3.5,
     etaOriginal: '09:30',
     priority: 6,
     status: 'waiting',
-    color: SHIP_COLORS[ShipType.BULK],
+    color: SHIP_COLORS[ShipType.TANKER],
     candidateBerths: [],
+    callSign: '8',
+    mmsi: '413437350',
+    navStatusText: '在航(主机推动)',
   },
   {
-    id: 'S004',
-    name: '镇海化工 2',
+    id: '413615420',
+    name: 'HAI ZHI XIN',
     type: ShipType.TANKER,
-    length: 100,
-    width: 17,
-    draft: 9.0,
+    length: 93,
+    width: 16,
+    draft: 4.6,
     etaOriginal: '11:00',
     priority: 9,
     status: 'waiting',
     color: SHIP_COLORS[ShipType.TANKER],
     candidateBerths: [],
+    callSign: 'BPZA9',
+    mmsi: '413615420',
+    navStatusText: '在航(主机推动)',
   },
   {
-    id: 'S005',
-    name: '浙甬拖轮 6',
-    type: ShipType.BULK,
-    length: 23,
-    width: 9,
+    id: '414403030',
+    name: '宏达海88',
+    type: ShipType.TANKER,
+    length: 78,
+    width: 15,
     draft: 3.8,
     etaOriginal: '10:45',
-    priority: 4,
+    priority: 7,
     status: 'waiting',
-    color: '#6366f1', // 小船用单独颜色
+    color: SHIP_COLORS[ShipType.TANKER],
     candidateBerths: [],
+    callSign: 'BRXL',
+    mmsi: '414403030',
+    navStatusText: '靠泊',
   },
   {
-    id: 'S006',
-    name: '宁波杂货 8',
-    type: ShipType.CONTAINER,
-    length: 54,
-    width: 11,
-    draft: 5.5,
+    id: '412402620',
+    name: '龙宇3',
+    type: ShipType.TANKER,
+    length: 49,
+    width: 10,
+    draft: 0.3,
     etaOriginal: '11:15',
     priority: 5,
     status: 'waiting',
-    color: '#06b6d4', // Cyan
+    color: SHIP_COLORS[ShipType.TANKER],
     candidateBerths: [],
+    mmsi: '412402620',
+    navStatusText: '在航(主机推动)',
   },
+  {
+    id: '413548350',
+    name: '东方朝阳',
+    type: ShipType.TANKER,
+    length: 88,
+    width: 16,
+    draft: 5.3,
+    etaOriginal: '09:00',
+    priority: 8,
+    status: 'waiting',
+    color: SHIP_COLORS[ShipType.TANKER],
+    candidateBerths: [],
+    callSign: 'C',
+    mmsi: '413548350',
+    navStatusText: '锚泊',
+  },
+  {
+    id: '413450860',
+    name: '嘉信2号',
+    type: ShipType.TANKER,
+    length: 92,
+    width: 15,
+    draft: 4.5,
+    etaOriginal: '10:30',
+    priority: 7,
+    status: 'waiting',
+    color: SHIP_COLORS[ShipType.TANKER],
+    candidateBerths: [],
+    callSign: 'BPBW2',
+    mmsi: '413450860',
+    navStatusText: '锚泊',
+  },
+  {
+    id: '412764580',
+    name: '润宇66',
+    type: ShipType.TANKER,
+    length: 48,
+    width: 8,
+    draft: 6.8,
+    etaOriginal: '11:30',
+    priority: 6,
+    status: 'waiting',
+    color: SHIP_COLORS[ShipType.TANKER],
+    candidateBerths: [],
+    callSign: 'H0R 0',
+    mmsi: '412764580',
+    navStatusText: '靠船帆提供动力',
+  },
+  {
+    id: '413528940',
+    name: '永旺达6',
+    type: ShipType.TANKER,
+    length: 94,
+    width: 15,
+    draft: 5.0,
+    etaOriginal: '09:15',
+    priority: 9,
+    status: 'waiting',
+    color: SHIP_COLORS[ShipType.TANKER],
+    candidateBerths: [],
+    callSign: 'SSD',
+    mmsi: '413528940',
+    navStatusText: '锚泊',
+  },
+  {
+    id: '413540630',
+    name: '瑞丰7',
+    type: ShipType.TANKER,
+    length: 93,
+    width: 15,
+    draft: 4.8,
+    etaOriginal: '10:20',
+    priority: 8,
+    status: 'waiting',
+    color: SHIP_COLORS[ShipType.TANKER],
+    candidateBerths: [],
+    callSign: 'BPHU9',
+    mmsi: '413540630',
+    navStatusText: '锚泊',
+  },
+  {
+    id: '414402420',
+    name: '祥鸿59',
+    type: ShipType.TANKER,
+    length: 119,
+    width: 17,
+    draft: 6.5,
+    etaOriginal: '08:45',
+    priority: 10,
+    status: 'waiting',
+    color: SHIP_COLORS[ShipType.TANKER],
+    candidateBerths: [],
+    mmsi: '414402420',
+    navStatusText: '锚泊',
+  },
+  {
+    id: '413450140',
+    name: '傍海16',
+    type: ShipType.TANKER,
+    length: 97,
+    width: 14,
+    draft: 3.6,
+    etaOriginal: '11:45',
+    priority: 7,
+    status: 'waiting',
+    color: SHIP_COLORS[ShipType.TANKER],
+    candidateBerths: [],
+    callSign: 'BPMN3',
+    mmsi: '413450140',
+    navStatusText: '锚泊',
+  },
+];
+
+// 初始6艘船（从船舶池中选择）
+export const INITIAL_SHIPS: Ship[] = [
+  TANKER_SHIP_POOL[0],  // 浙甬油11
+  TANKER_SHIP_POOL[1],  // 舟供油68
+  TANKER_SHIP_POOL[2],  // 祥鸿17
+  TANKER_SHIP_POOL[3],  // HAI ZHI XIN
+  TANKER_SHIP_POOL[4],  // 宏达海88
+  TANKER_SHIP_POOL[5],  // 龙宇3
 ];
 
 // 静态地图上的实际锚位和泊位（使用经纬度坐标）
@@ -124,54 +262,40 @@ export const TIDE_DATA: TidePoint[] = [
 ];
 
 // Helper to generate random ships for "Continue Scheduling"
-// 每次只生成1艘新船
-export const generateNewShips = (startIndex: number): Ship[] => {
-  const types = [ShipType.CONTAINER, ShipType.BULK, ShipType.TANKER];
-  const names = ['浙甬集装', '镇海散货', '镇海化工', '宁波杂货', '浙甬拖轮'];
-    const newShips: Ship[] = [];
-    
-    // 只生成1艘船
-    const type = types[Math.floor(Math.random() * types.length)];
-    const idNum = startIndex + 1;
-    const id = `S00${idNum}`;
-    const name = `${names[Math.floor(Math.random() * names.length)]} ${idNum}`;
-    
-  let length = 60;
-  let width = 12;
-  let draft = 5.5;
+// 每次只生成1艘新船，从油品码头船舶池中随机选择
+export const generateNewShips = (startIndex: number, existingShipIds: string[] = []): Ship[] => {
+  const newShips: Ship[] = [];
   
-  // 根据类型设置更合理的尺度（20-100m，吃水 3.5-9m）
-  if (type === ShipType.TANKER) {
-    length = 80 + Math.random() * 20;          // 80-100m 小型化工/成品油船
-    width = 14 + Math.random() * 3;            // 14-17m
-    draft = 7.5 + Math.random() * 1.5;         // 7.5-9.0m
-  } else if (type === ShipType.BULK) {
-    length = 60 + Math.random() * 25;          // 60-85m 散货/多用途
-    width = 10 + Math.random() * 3;            // 10-13m
-    draft = 5.0 + Math.random() * 3.0;         // 5.0-8.0m
-  } else if (type === ShipType.CONTAINER) {
-    length = 40 + Math.random() * 40;          // 40-80m 支线集装箱
-    width = 9 + Math.random() * 3;             // 9-12m
-    draft = 3.5 + Math.random() * 3.5;         // 3.5-7.0m
-  }
+  // 从船舶池中随机选择一艘未使用的船
+  const availableShips = TANKER_SHIP_POOL.filter(ship => !existingShipIds.includes(ship.id));
+  
+  if (availableShips.length === 0) {
+    // 如果所有船都已使用，随机选择一艘（保持原有MMSI作为ID）
+    const randomShip = TANKER_SHIP_POOL[Math.floor(Math.random() * TANKER_SHIP_POOL.length)];
     
     // 计算ETA时间（基于当前时间，避免重复）
     const currentHour = new Date().getHours();
     const etaHour = (currentHour + 1) % 24; // 1小时后到达
     
     newShips.push({
-        id,
-        name,
-        type,
-        length: Math.floor(length),
-      width: parseFloat(width.toFixed(1)),
-        draft: parseFloat(draft.toFixed(1)),
-        etaOriginal: `${String(etaHour).padStart(2, '0')}:00`,
-        priority: Math.floor(Math.random() * 5) + 5,
-        status: 'waiting',
-        color: SHIP_COLORS[type],
-        candidateBerths: []
+      ...randomShip,
+      etaOriginal: `${String(etaHour).padStart(2, '0')}:00`,
+      status: 'waiting',
     });
+  } else {
+    // 从可用船舶中随机选择（保持原有MMSI作为ID）
+    const selectedShip = availableShips[Math.floor(Math.random() * availableShips.length)];
     
-    return newShips;
+    // 计算ETA时间（基于当前时间，避免重复）
+    const currentHour = new Date().getHours();
+    const etaHour = (currentHour + 1) % 24; // 1小时后到达
+    
+    newShips.push({
+      ...selectedShip,
+      etaOriginal: `${String(etaHour).padStart(2, '0')}:00`,
+      status: 'waiting',
+    });
+  }
+  
+  return newShips;
 };

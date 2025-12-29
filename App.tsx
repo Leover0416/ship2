@@ -17,28 +17,38 @@ const App: React.FC = () => {
   // 获取标准泊位规格的函数
   const getBerthSpecs = (berthId: string): { length: number; depth: number } | null => {
     const specs: Record<string, { length: number; depth: number }> = {
-      'B02': { length: 300, depth: 18.0 },
-      'A02': { length: 250, depth: 13.5 },
-      'C01': { length: 200, depth: 12.0 },
-      'B01': { length: 150, depth: 10.5 },
-      'A01': { length: 80, depth: 9.0 },
+      'A01': { length: 330, depth: 22.5 },  // 1号泊位
+      'B01': { length: 220, depth: 14.5 },  // 2号泊位
+      'B02': { length: 130, depth: 9.5 },  // 3号泊位
+      'A02': { length: 334, depth: 23.8 },  // 5号泊位
     };
     return specs[berthId] || null;
+  };
+  
+  // 泊位ID到名称的映射（统一使用#号格式）
+  const getBerthName = (berthId: string): string => {
+    const nameMap: Record<string, string> = {
+      'A01': '1#',
+      'B01': '2#',
+      'B02': '3#',
+      'A02': '5#',
+    };
+    return nameMap[berthId] || `${berthId} 泊位`;
   };
   
   // 从localStorage加载StaticMap的动态泊位，合并到berths状态中，并添加标准泊位
   const [berths, setBerths] = useState<Berth[]>(() => {
     const initialBerths = [...PORT_BERTHS];
     
-    // 添加标准泊位（A01, A02, B01, B02, C01）
-    const standardBerthIds = ['A01', 'A02', 'B01', 'B02', 'C01'];
+    // 添加标准泊位（A01→1号, B01→2号, B02→3号, A02→5号）
+    const standardBerthIds = ['A01', 'B01', 'B02', 'A02'];
     standardBerthIds.forEach(id => {
       const specs = getBerthSpecs(id);
       if (specs) {
         const zone = id.startsWith('A') ? 'A' : id.startsWith('B') ? 'B' : 'C';
         initialBerths.push({
           id,
-          name: `${id} 泊位`,
+          name: getBerthName(id),
           type: 'berth' as const,
           zone: zone as 'A' | 'B' | 'C',
           length: specs.length,
@@ -62,7 +72,14 @@ const App: React.FC = () => {
     } catch (e) {
       console.error('Failed to load dynamic berths:', e);
     }
-    return initialBerths;
+    
+    // 确保所有标准泊位都使用正确的名称（防止被localStorage覆盖）
+    return initialBerths.map(berth => {
+      if (standardBerthIds.includes(berth.id)) {
+        return { ...berth, name: getBerthName(berth.id) };
+      }
+      return berth;
+    });
   });
   
   // 监听localStorage变化，更新berths状态（当StaticMap添加/删除泊位时）
@@ -72,7 +89,7 @@ const App: React.FC = () => {
         const stored = localStorage.getItem('dynamic-berths-latlng');
         setBerths(prev => {
           // 保留PORT_BERTHS中的锚位和标准泊位
-          const standardBerthIds = ['A01', 'A02', 'B01', 'B02', 'C01'];
+          const standardBerthIds = ['A01', 'B01', 'B02', 'A02'];
           const staticBerths = prev.filter(b => 
             PORT_BERTHS.some(sb => sb.id === b.id) || 
             standardBerthIds.includes(b.id)
@@ -87,7 +104,7 @@ const App: React.FC = () => {
                 const zone = id.startsWith('A') ? 'A' : id.startsWith('B') ? 'B' : 'C';
                 allBerths.push({
                   id,
-                  name: `${id} 泊位`,
+                  name: getBerthName(id),
                   type: 'berth' as const,
                   zone: zone as 'A' | 'B' | 'C',
                   length: specs.length,
@@ -108,7 +125,13 @@ const App: React.FC = () => {
             });
           }
           
-          return allBerths;
+          // 确保所有标准泊位都使用正确的名称（不被localStorage覆盖）
+          return allBerths.map(berth => {
+            if (standardBerthIds.includes(berth.id)) {
+              return { ...berth, name: getBerthName(berth.id) };
+            }
+            return berth;
+          });
         });
       } catch (e) {
         console.error('Failed to update berths from storage:', e);
@@ -306,14 +329,27 @@ const App: React.FC = () => {
           let latestBerths = [...berths];
           
           try {
-            // 加载自定义名称并应用到berths
+            // 加载自定义名称并应用到berths（标准泊位不受影响，始终使用getBerthName）
+            const standardBerthIds = ['A01', 'B01', 'B02', 'A02'];
             const customNamesStored = localStorage.getItem('berth-custom-names-latlng');
             if (customNamesStored) {
               const customNames = JSON.parse(customNamesStored);
               latestBerths = latestBerths.map(berth => {
+                // 标准泊位始终使用getBerthName，不被localStorage覆盖
+                if (standardBerthIds.includes(berth.id)) {
+                  return { ...berth, name: getBerthName(berth.id) };
+                }
+                // 非标准泊位可以使用自定义名称
                 if (customNames[berth.id]) {
-                  // 使用自定义名称更新name字段
                   return { ...berth, name: customNames[berth.id] };
+                }
+                return berth;
+              });
+            } else {
+              // 即使没有自定义名称，也要确保标准泊位使用正确的名称
+              latestBerths = latestBerths.map(berth => {
+                if (standardBerthIds.includes(berth.id)) {
+                  return { ...berth, name: getBerthName(berth.id) };
                 }
                 return berth;
               });
@@ -754,12 +790,27 @@ ${anchorageAssignmentsList}
                   });
                 }
                 
+                // 标准泊位始终使用getBerthName，不被localStorage覆盖
+                const standardBerthIds = ['A01', 'B01', 'B02', 'A02'];
                 const customNamesStored = localStorage.getItem('berth-custom-names-latlng');
                 if (customNamesStored) {
                   const customNames = JSON.parse(customNamesStored);
                   latestBerthsForMessage = latestBerthsForMessage.map(berth => {
+                    // 标准泊位始终使用getBerthName
+                    if (standardBerthIds.includes(berth.id)) {
+                      return { ...berth, name: getBerthName(berth.id) };
+                    }
+                    // 非标准泊位可以使用自定义名称
                     if (customNames[berth.id]) {
                       return { ...berth, name: customNames[berth.id] };
+                    }
+                    return berth;
+                  });
+                } else {
+                  // 即使没有自定义名称，也要确保标准泊位使用正确的名称
+                  latestBerthsForMessage = latestBerthsForMessage.map(berth => {
+                    if (standardBerthIds.includes(berth.id)) {
+                      return { ...berth, name: getBerthName(berth.id) };
                     }
                     return berth;
                   });
@@ -798,10 +849,10 @@ ${anchorageAssignmentsList}
                   const berth = latestBerthsForMessage.find(b => b.id === s.assignedBerthId);
                   // 使用berth.name，与资源智能体输出保持一致
                   const anchorageName = anchorage ? anchorage.name : s.assignedAnchorageId;
-                  // 统一格式：确保泊位名称包含"泊位"后缀
-                  let berthName = berth ? berth.name : (s.assignedBerthId || '未知泊位');
-                  // 如果泊位名称不包含"泊位"，则添加
-                  if (berth && !berthName.includes('泊位')) {
+                  // 统一格式：使用#号格式（1#、2#、3#、5#）
+                  let berthName = berth ? berth.name : (s.assignedBerthId ? getBerthName(s.assignedBerthId) : '未知泊位');
+                  // 如果泊位名称不包含"#"，则添加"泊位"后缀（兼容其他泊位）
+                  if (berth && !berthName.includes('#') && !berthName.includes('泊位')) {
                     berthName = `${berthName} 泊位`;
                   }
                   return `${s.name} -> ${anchorageName} -> ${berthName}`;
@@ -1094,12 +1145,27 @@ ${anchorageAssignmentsList}
               });
             }
             
+            // 标准泊位始终使用getBerthName，不被localStorage覆盖
+            const standardBerthIds = ['A01', 'B01', 'B02', 'A02'];
             const customNamesStored = localStorage.getItem('berth-custom-names-latlng');
             if (customNamesStored) {
               const customNames = JSON.parse(customNamesStored);
               latestBerthsForMessage = latestBerthsForMessage.map(berth => {
+                // 标准泊位始终使用getBerthName
+                if (standardBerthIds.includes(berth.id)) {
+                  return { ...berth, name: getBerthName(berth.id) };
+                }
+                // 非标准泊位可以使用自定义名称
                 if (customNames[berth.id]) {
                   return { ...berth, name: customNames[berth.id] };
+                }
+                return berth;
+              });
+            } else {
+              // 即使没有自定义名称，也要确保标准泊位使用正确的名称
+              latestBerthsForMessage = latestBerthsForMessage.map(berth => {
+                if (standardBerthIds.includes(berth.id)) {
+                  return { ...berth, name: getBerthName(berth.id) };
                 }
                 return berth;
               });
@@ -1117,10 +1183,10 @@ ${anchorageAssignmentsList}
                   const berth = latestBerthsForMessage.find(b => b.id === berthId);
                   // 使用berth.name，与资源智能体输出保持一致
                   const anchorageName = anchorage ? anchorage.name : anchorageId;
-                  // 统一格式：确保泊位名称包含"泊位"后缀
-                  let berthName = berth ? berth.name : (berthId || '未知泊位');
-                  // 如果泊位名称不包含"泊位"，则添加
-                  if (berth && !berthName.includes('泊位')) {
+                  // 统一格式：使用#号格式（1#、2#、3#、5#）
+                  let berthName = berth ? berth.name : (berthId ? getBerthName(berthId) : '未知泊位');
+                  // 如果泊位名称不包含"#"，则添加"泊位"后缀（兼容其他泊位）
+                  if (berth && !berthName.includes('#') && !berthName.includes('泊位')) {
                     berthName = `${berthName} 泊位`;
                   }
                   return `${ship?.name || shipId} -> ${anchorageName} -> ${berthName}`;
@@ -1371,7 +1437,8 @@ ${anchorageAssignmentsList}
   const handleContinue = () => {
       if (isSimulating) return;
       const currentCount = ships.length;
-      const newShips = generateNewShips(currentCount);
+      const existingShipIds = ships.map(s => s.id);
+      const newShips = generateNewShips(currentCount, existingShipIds);
       setShips(prev => [...prev, ...newShips]);
       addMessage(AgentType.SHIP, 'ALL', `新船舶已到达锚地 (${newShips.length}艘)，等待调度。`, 'info');
   };
@@ -1380,7 +1447,38 @@ ${anchorageAssignmentsList}
     setIsSimulating(false);
     setIsThinking(false);
     setShips(INITIAL_SHIPS);
-    setBerths(PORT_BERTHS);
+    // 重置泊位时，确保标准泊位使用正确的名称
+    const standardBerthIds = ['A01', 'B01', 'B02', 'A02'];
+    const resetBerths = [...PORT_BERTHS];
+    // 添加标准泊位
+    standardBerthIds.forEach(id => {
+      const specs = getBerthSpecs(id);
+      if (specs) {
+        const zone = id.startsWith('A') ? 'A' : id.startsWith('B') ? 'B' : 'C';
+        const existingIndex = resetBerths.findIndex(b => b.id === id);
+        if (existingIndex >= 0) {
+          // 更新现有泊位的名称
+          resetBerths[existingIndex] = {
+            ...resetBerths[existingIndex],
+            name: getBerthName(id),
+            length: specs.length,
+            depth: specs.depth,
+          };
+        } else {
+          // 添加新泊位
+          resetBerths.push({
+            id,
+            name: getBerthName(id),
+            type: 'berth' as const,
+            zone: zone as 'A' | 'B' | 'C',
+            length: specs.length,
+            depth: specs.depth,
+            isOccupied: false,
+          });
+        }
+      }
+    });
+    setBerths(resetBerths);
     setMessages([]);
     setPhase(SimulationPhase.IDLE);
     setActiveAgents([]);
@@ -1510,7 +1608,7 @@ ${anchorageAssignmentsList}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="flex justify-between items-center mb-0.5">
-                                            <span className="font-bold text-sm text-slate-200">{ship.id}</span>
+                                            <span className="text-[10px] text-slate-500 font-mono">MMSI: {ship.mmsi || ship.id}</span>
                                             <span className="text-xs px-1.5 py-0.5 bg-slate-700 rounded text-slate-400">{ship.type}</span>
                                         </div>
                                         <div className="text-sm text-slate-400 truncate font-bold">{ship.name}</div>
@@ -1689,7 +1787,7 @@ ${anchorageAssignmentsList}
                         <div className="grid grid-cols-2 gap-x-4 gap-y-1 font-mono text-xs bg-slate-900/60 rounded-lg p-2 border border-slate-700/60">
                             <div className="flex justify-between">
                                 <span className="text-slate-400">MMSI:</span>
-                                <span className="text-slate-200 font-bold">{selectedShipForDetail.id}</span>
+                                <span className="text-slate-200 font-bold">{selectedShipForDetail.mmsi || selectedShipForDetail.id}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-slate-400">船首向:</span>
@@ -1729,14 +1827,7 @@ ${anchorageAssignmentsList}
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-slate-400">状态:</span>
-                                <span className="font-bold text-emerald-400">
-                                  {selectedShipForDetail.navStatusText ||
-                                    (selectedShipForDetail.status === 'waiting' ? '待港' :
-                                     selectedShipForDetail.status === 'anchored' ? '停锚中' :
-                                     selectedShipForDetail.status === 'navigating' ? '航行中' :
-                                     (selectedShipForDetail.status === 'docking' || selectedShipForDetail.status === 'docked') ? '已靠泊' :
-                                      '离港中')}
-                                </span>
+                                <span className="font-bold text-emerald-400">待港</span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-slate-400">经度:</span>
@@ -1784,7 +1875,7 @@ ${anchorageAssignmentsList}
                               <div className="flex justify-between col-span-2">
                                   <span className="text-slate-400">分配泊位:</span>
                                   <span className="text-cyan-400 font-bold">
-                                    {selectedShipForDetail.assignedBerthId}
+                                    {getBerthName(selectedShipForDetail.assignedBerthId)}
                                   </span>
                               </div>
                             )}

@@ -78,44 +78,51 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
   const [draggingManagementPanel, setDraggingManagementPanel] = useState(false);
   
   // 根据泊位ID设置不同的长度和吃水深度
-  // 顺序：B02 > A02 > C01 > B01 > A01
   const getBerthSpecs = (berthId: string): { length: number; depth: number } | null => {
     const specs: Record<string, { length: number; depth: number }> = {
-      'B02': { length: 300, depth: 18.0 }, // 最大，可容纳16米吃水船舶（16+1=17米安全余量）
-      'A02': { length: 250, depth: 13.5 },
-      'C01': { length: 200, depth: 12.0 },
-      'B01': { length: 150, depth: 10.5 },
-      'A01': { length: 80, depth: 9.0 },   // 最小
+      'A01': { length: 330, depth: 22.5 },  // 1号泊位
+      'B01': { length: 220, depth: 14.5 },  // 2号泊位
+      'B02': { length: 130, depth: 9.5 },   // 3号泊位
+      'A02': { length: 334, depth: 23.8 },  // 5号泊位
     };
     return specs[berthId] || null; // 如果不是标准泊位，返回null
   };
-
-  // 标准泊位的固定位置（经纬度坐标）
-  // 注意：A01和A02需要不同的位置，否则会重叠
-  const STANDARD_BERTH_POSITIONS: Record<string, { lat: number; lng: number }> = {
-    'A01': { lat: 29.939986003172454, lng: 122.25445591754996 }, // 从日志中获取的实际位置
-    'A02': { lat: 29.9405, lng: 122.2550 }, // A02需要不同的位置，避免与A01重叠
-    'B01': { lat: 29.945192219631437, lng: 122.23852157592775 }, // 从日志中获取的实际位置
-    'B02': { lat: 29.937085278663123, lng: 122.26444244384767 }, // 从日志中获取的实际位置
-    'C01': { lat: 29.92536995390245, lng: 122.29190826416017 },  // 从日志中获取的实际位置
+  
+  // 泊位ID到名称的映射（统一使用#号格式）
+  const getBerthName = (berthId: string): string => {
+    const nameMap: Record<string, string> = {
+      'A01': '1#',
+      'B01': '2#',
+      'B02': '3#',
+      'A02': '5#',
+    };
+    return nameMap[berthId] || `${berthId} 泊位`;
   };
 
-  // 直接创建5个标准泊位（A01, A02, B01, B02, C01），忽略localStorage中的错误数据
+  // 标准泊位的固定位置（经纬度坐标）
+  const STANDARD_BERTH_POSITIONS: Record<string, { lat: number; lng: number }> = {
+    'A01': { lat: 29.939986003172454, lng: 122.25445591754996 }, // 1号泊位
+    'B01': { lat: 29.945192219631437, lng: 122.23852157592775 }, // 2号泊位
+    'B02': { lat: 29.937085278663123, lng: 122.26444244384767 }, // 3号泊位
+    'A02': { lat: 29.9405, lng: 122.2550 }, // 5号泊位（原C01区域）
+  };
+
+  // 直接创建4个标准泊位（A01→1号, B01→2号, B02→3号, A02→5号），忽略localStorage中的错误数据
   // 从berths prop中获取锚位
   const allBerths = useMemo(() => {
-    const standardBerthIds = ['A01', 'A02', 'B01', 'B02', 'C01'];
+    const standardBerthIds = ['A01', 'B01', 'B02', 'A02'];
     const standardBerths: Berth[] = standardBerthIds.map(id => {
       const specs = getBerthSpecs(id);
       if (!specs) {
         return null;
       }
       
-      // 确定区域：A01/A02 -> A区, B01/B02 -> B区, C01 -> C区
+      // 确定区域：A01/A02 -> A区, B01/B02 -> B区
       const zone = id.startsWith('A') ? 'A' : id.startsWith('B') ? 'B' : 'C';
       
       return {
         id,
-        name: `${id} 泊位`,
+        name: getBerthName(id),
         type: 'berth' as const,
         zone: zone as 'A' | 'B' | 'C',
         length: specs.length,
@@ -1008,7 +1015,11 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
       
       if (isAnchorage) {
         // 锚位：使用圆形框，里面显示自定义名称或默认ID
-        const displayName = berthCustomNames[berth.id] || berth.id;
+        // 标准泊位始终使用getBerthName，不被自定义名称覆盖
+        const standardBerthIds = ['A01', 'B01', 'B02', 'A02'];
+        const displayName = standardBerthIds.includes(berth.id) 
+          ? getBerthName(berth.id)
+          : (berthCustomNames[berth.id] || (berth.type === 'berth' ? getBerthName(berth.id) : berth.id));
         
         // 这个icon变量已不再使用，保留以避免潜在问题，但样式已更新为灰色
 
@@ -1075,7 +1086,11 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
             // 先显示popup（如果还没有显示）
             if (!marker.isPopupOpen()) {
               const currentMaxDraft = latestBerth.depth / 1.2;
-              const displayName = berthCustomNames[berthId] || berthId;
+              // 标准泊位始终使用getBerthName
+              const standardBerthIds = ['A01', 'B01', 'B02', 'A02'];
+              const displayName = standardBerthIds.includes(berthId)
+                ? getBerthName(berthId)
+                : (berthCustomNames[berthId] || berthId);
               marker.bindPopup(`
                 <div style="font-weight: bold; margin-bottom: 4px; font-size: 13px;">
                   锚位 ${displayName}
@@ -1108,7 +1123,11 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
         // 获取可以匹配的船舶
         const matchingShips = getMatchingShipsForBerth(berth);
         const maxLength = berth.length / 1.1; // 最大可容纳船长
-        const displayName = berthCustomNames[berth.id] || berth.id;
+        // 标准泊位始终使用getBerthName，不被自定义名称覆盖
+        const standardBerthIds = ['A01', 'B01', 'B02', 'A02'];
+        const displayName = standardBerthIds.includes(berth.id) 
+          ? getBerthName(berth.id)
+          : (berthCustomNames[berth.id] || (berth.type === 'berth' ? getBerthName(berth.id) : berth.id));
         
         // 检查是否有船占用此泊位：只有当船真正靠泊（docked）时才显示为占用
         const isOccupied = berth.isOccupied || ships.some(s => 
@@ -1195,11 +1214,15 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
           }
           
           const currentMaxLength = latestBerth.length / 1.1;
-          const displayName = berthCustomNames[berthId] || berthId;
+          // 标准泊位始终使用getBerthName
+          const standardBerthIds = ['A01', 'B01', 'B02', 'A02'];
+          const displayName = standardBerthIds.includes(berthId)
+            ? getBerthName(berthId)
+            : (berthCustomNames[berthId] || getBerthName(berthId));
           
           marker.bindTooltip(`
             <div style="font-weight: bold; margin-bottom: 4px; font-size: 13px; text-align: center;">
-              泊位 ${displayName}
+              ${displayName}
             </div>
             <div style="font-size: 11px; line-height: 1.5;">
               <div style="margin-bottom: 2px;"><strong>区域：</strong>${latestBerth.zone === 'A' ? '深水区' : latestBerth.zone === 'B' ? '通用区' : '支线区'}</div>
@@ -1500,7 +1523,11 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
         const berthId = key.replace('berth-', '');
         const berth = allBerths.find(b => b.id === berthId);
         if (berth) {
-          const displayName = berthCustomNames[berthId] || berthId;
+          // 标准泊位始终使用getBerthName
+          const standardBerthIds = ['A01', 'B01', 'B02', 'A02'];
+          const displayName = standardBerthIds.includes(berthId)
+            ? getBerthName(berthId)
+            : (berthCustomNames[berthId] || berthId);
           if (berth.type === 'anchorage') {
             // 锚位标记：统一使用小圆点
             const newIcon = L.divIcon({
@@ -1882,22 +1909,22 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
       const shipIcon = L.divIcon({
         className: 'ship-marker',
         html: `<div style="
-          width: 36px;
-          height: 36px;
+          width: 24px;
+          height: 24px;
           display: flex;
           align-items: center;
           justify-content: center;
-          transform: rotate(${rotationDeg - 90}deg);
+          transform: rotate(${rotationDeg}deg);
           transform-origin: center center;
           filter: ${isMoving 
             ? 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.9)) drop-shadow(0 0 4px rgba(59, 130, 246, 0.6)) saturate(1.2) contrast(1.02)' 
             : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)) saturate(1.2) contrast(1.02)'};
           cursor: pointer;
         ">
-          <img src="/新船型.svg" alt="${ship.name}" style="width: 36px; height: auto; display: block; margin: 0 auto;" draggable="false" />
+          <img src="/船.svg" alt="${ship.name}" style="width: 24px; height: auto; display: block; margin: 0 auto;" draggable="false" />
         </div>`,
-        iconSize: [36, 36],
-        iconAnchor: [18, 18]
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
       });
 
       // 检查是否已存在标记，如果存在则更新位置，否则创建新标记
@@ -1942,8 +1969,15 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
       }
 
       // 绘制轨迹线（仅对navigating或docking状态的船舶）
-      // 轨迹线只在航行时显示，航行完成后不显示
-      if ((ship.status === 'navigating' || ship.status === 'docking') && ship.assignedBerthId) {
+      // 只显示第一艘正在移动的船的轨迹，其他船的轨迹不显示
+      const movingShips = visibleShips.filter(s => 
+        (s.status === 'navigating' || s.status === 'docking') && 
+        s.assignedBerthId &&
+        processingShipIds && processingShipIds.includes(s.id)
+      );
+      const isFirstMovingShip = movingShips.length > 0 && ship.id === movingShips[0].id;
+      
+      if (isFirstMovingShip && (ship.status === 'navigating' || ship.status === 'docking') && ship.assignedBerthId) {
         const berthPos = berthPositions[ship.assignedBerthId] || 
                         (maziAnchoragePositions[ship.assignedBerthId] ? 
                           { lat: maziAnchoragePositions[ship.assignedBerthId].lat, 
@@ -2019,14 +2053,14 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
     }
   };
 
-  // 清空localStorage中的错误泊位数据（A02-A06等），只保留标准泊位（A01, A02, B01, B02, C01）和锚位
+  // 清空localStorage中的错误泊位数据，只保留标准泊位（A01→1号, B01→2号, B02→3号, A02→5号）和锚位
   useEffect(() => {
     try {
       const stored = localStorage.getItem('dynamic-berths-latlng');
       if (stored) {
         const parsed: Berth[] = JSON.parse(stored);
-        // 过滤掉所有错误的泊位（A03-A06等），只保留标准泊位和锚位
-        const standardBerthIds = ['A01', 'A02', 'B01', 'B02', 'C01'];
+        // 过滤掉所有错误的泊位，只保留标准泊位和锚位
+        const standardBerthIds = ['A01', 'B01', 'B02', 'A02'];
         const filtered = parsed.filter(b => {
           // 保留锚位
           if (b.type === 'anchorage') return true;
@@ -2108,7 +2142,7 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
             counter++;
           } while (existingIds.includes(newId));
         } else {
-          // 泊位：根据区域生成，先尝试 A01, B01, C01
+          // 泊位：根据区域生成，先尝试 A01, B01
           const zones = ['A', 'B', 'C'];
           let found = false;
           for (const zone of zones) {
@@ -3213,7 +3247,11 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
                 .filter(b => b.type === 'anchorage')
                 .map(berth => {
                   const position = berthPositions[berth.id];
-                  const customName = berthCustomNames[berth.id] || berth.id;
+                  // 标准泊位始终使用getBerthName，不被自定义名称覆盖
+                  const standardBerthIds = ['A01', 'B01', 'B02', 'A02'];
+                  const customName = standardBerthIds.includes(berth.id)
+                    ? getBerthName(berth.id)
+                    : (berthCustomNames[berth.id] || (berth.type === 'berth' ? getBerthName(berth.id) : berth.id));
                   return (
                     <div
                       key={berth.id}
@@ -3264,7 +3302,11 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
                 .filter(b => b.type === 'berth')
                 .map(berth => {
                   const position = berthPositions[berth.id] || STANDARD_BERTH_POSITIONS[berth.id];
-                  const customName = berthCustomNames[berth.id] || berth.id;
+                  // 标准泊位始终使用getBerthName，不被自定义名称覆盖
+                  const standardBerthIds = ['A01', 'B01', 'B02', 'A02'];
+                  const customName = standardBerthIds.includes(berth.id)
+                    ? getBerthName(berth.id)
+                    : (berthCustomNames[berth.id] || (berth.type === 'berth' ? getBerthName(berth.id) : berth.id));
                   return (
                     <div
                       key={berth.id}
@@ -3337,7 +3379,13 @@ const StaticMap: React.FC<StaticMapProps> = ({ className = '', berths = [], ship
             style={{ userSelect: 'none' }}
           >
             <h3 className="font-bold text-sm text-black">
-              编辑 - {berthCustomNames[editingBerthId || ''] || currentBerth.id} ({currentBerth.type === 'anchorage' ? '锚位' : '泊位'})
+              编辑 - {(() => {
+                const standardBerthIds = ['A01', 'B01', 'B02', 'A02'];
+                const displayName = standardBerthIds.includes(currentBerth.id)
+                  ? getBerthName(currentBerth.id)
+                  : (berthCustomNames[editingBerthId || ''] || (currentBerth.type === 'berth' ? getBerthName(currentBerth.id) : currentBerth.id));
+                return `${displayName} (${currentBerth.type === 'anchorage' ? '锚位' : '泊位'})`;
+              })()}
             </h3>
             <button
               onClick={() => {
